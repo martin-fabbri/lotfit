@@ -1,2 +1,2 @@
-# loffit
+# LotFit
 LotFit
