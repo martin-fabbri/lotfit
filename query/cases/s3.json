@@ -1,0 +1,575 @@
+{
+  "schema": "lotfit.case/1",
+  "case_id": "019a4000-0000-7000-8000-000000000003",
+  "as_of": {
+    "date": "2026-11-15",
+    "meaning": "planned_submittal"
+  },
+  "jurisdiction": {
+    "state_layer": "OR",
+    "city_layer": "PDX"
+  },
+  "mode": "check_spot",
+  "capture": {
+    "capture_id": "walk-3 (illustration)",
+    "manifest_sha256": "3e6c867900000000000000000000000000000000000000000000000000000003",
+    "grade": "A",
+    "provisional": false,
+    "tolerances_95pct": {
+      "formula": "0.08 + 0.015 * r_m",
+      "coefficients": { "a": 0.08, "b": 0.015 },
+      "reference_range_m": 10
+    }
+  },
+  "site": {
+    "zone": {
+      "value": "R5",
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "zoning",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "overlays": {
+      "value": [],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "overlay zones",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "lot_outline": {
+      "value": [[0, 0], [50, 0], [50, 100], [0, 100]],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "lot dimensions in lot frame",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.5, "unit": "ft", "at_range_m": 15 }
+        }
+      ]
+    },
+    "front_lot_line": {
+      "value": [[0, 0], [50, 0]],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "front lot line",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft", "at_range_m": 5 }
+        }
+      ]
+    },
+    "rear_lot_line": {
+      "value": [[0, 100], [50, 100]],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "rear lot line",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.5, "unit": "ft", "at_range_m": 20 }
+        }
+      ]
+    },
+    "side_lot_lines": {
+      "value": [[[0, 0], [0, 100]], [[50, 0], [50, 100]]],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "side lot lines",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.5, "unit": "ft", "at_range_m": 15 }
+        }
+      ]
+    },
+    "house_outline": {
+      "value": [[12, 20], [38, 20], [38, 55], [12, 55]],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "house walls",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft", "at_range_m": 8 }
+        }
+      ]
+    },
+    "structures": {
+      "value": [
+        {
+          "id": "shed",
+          "outline": [[40, 85], [48, 85], [48, 95], [40, 95]]
+        }
+      ],
+      "prov": [
+        {
+          "kind": "entered",
+          "rests_on": "capture walk-3 (illustration)",
+          "document": "capture walk-3 (illustration)",
+          "where": "shed walls",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft", "at_range_m": 6 }
+        }
+      ]
+    },
+    "primary_living_area_sqft": {
+      "value": 1400,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "building: living area",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "corner_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "street frontage",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "flag_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "parcel shape",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "through_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "street frontage",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "alley": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "right-of-way",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "trees": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "capture walk-3 (illustration)",
+          "where": "tree survey",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft" }
+        }
+      ]
+    },
+    "slope_pct": {
+      "value": 2,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "capture walk-3 (illustration)",
+          "where": "ground mesh grade",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.5, "unit": "deg" }
+        }
+      ]
+    },
+    "historic_resource": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "historic resource inventory",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "primary_is_duplex": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "building use",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "primary_is_attached_house": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "building use",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "primary_is_manufactured": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "building use",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "screening": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "capture walk-3 (illustration)",
+          "where": "perimeter fence scan",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft" }
+        }
+      ]
+    },
+    "other_structures_in_setback": {
+      "value": 0,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "capture walk-3 (illustration)",
+          "where": "west and rear setback scan",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "tolerance": { "value": 0.25, "unit": "ft" }
+        }
+      ]
+    }
+  },
+  "plan": {
+    "kind": {
+      "value": "adu",
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session (illustration)",
+          "where": "what",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "client's wish"
+        }
+      ]
+    },
+    "detached": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "footprint": {
+      "value": [[0, 0], [24, 0], [24, 24], [0, 24]],
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "placement": {
+      "value": { "x": 13, "y": 65, "rotation": 0 },
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session (illustration)",
+          "where": "client's spot",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "client's wish"
+        }
+      ]
+    },
+    "height_ft": {
+      "value": 18,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A3, measured per 33.930.050",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "wall_height_ft": {
+      "value": 10,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2 exterior wall",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "living_area_sqft": {
+      "value": 864,
+      "by_reading": {
+        "amb.living-area.sloped-ceiling": [864, 576]
+      },
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1 area table (576 sq ft main floor + 576 sq ft full 24 x 24 upper-floor loft sloping 7 ft to 3 ft, half of it [288 sq ft] below 5 ft; Reading 1 excludes only the 288 sq ft below 5 ft -> 576 + 288 = 864 sq ft; Reading 2 excludes the whole loft -> 576 sq ft)",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "eave_ft": {
+      "value": 1,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2 eave detail",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "parking": {
+      "value": 0,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "is_garage": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "is_cistern": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "gable_walls": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "dormers": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "rooftop_deck": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "openings_facing_lot_line": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A2 west elevation",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "basement_conversion": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "vacation_occupancy": {
+      "value": false,
+      "status": "unconfirmed",
+      "prov": [
+        {
+          "kind": "owner_statement",
+          "document": "LotFit session (illustration)",
+          "where": "use declaration",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "unconfirmed"
+        }
+      ]
+    },
+    "owner_occupancy_required": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session (illustration)",
+          "where": "covenant check",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "sloped_ceiling": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland 24 x 24 loft studio plan set (illustration)",
+          "where": "sheet A3 section (loft 7 ft at ridge sloping to 3 ft at eaves)",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    }
+  },
+  "unknowns": []
+}

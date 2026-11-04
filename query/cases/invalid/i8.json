@@ -1,0 +1,28 @@
+{
+  "schema": "lotfit.case/1",
+  "case_id": "019a4000-0000-7000-8000-000000000108",
+  "as_of": { "date": "2026-11-15", "meaning": "planned_submittal" },
+  "jurisdiction": { "state_layer": "OR", "city_layer": "PDX" },
+  "mode": "check_spot",
+  "capture": null,
+  "site": {
+    "zone": { "value": "R5", "prov": [{ "kind": "official_record", "document": "PortlandMaps (illustration)", "where": "zoning", "when": "2026-10-20", "by": "Martin Fabbri", "issuer": "City of Portland", "status": "current" }] },
+    "overlays": { "value": [], "prov": [{ "kind": "official_record", "document": "PortlandMaps (illustration)", "where": "overlays", "when": "2026-10-20", "by": "Martin Fabbri", "issuer": "City of Portland", "status": "current" }] },
+    "lot_outline": { "value": [[0, 0], [50, 0], [50, 100], [0, 100]], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "lot", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.5, "unit": "ft" } }] },
+    "front_lot_line": { "value": [[0, 0], [50, 0]], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "front", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.25, "unit": "ft" } }] },
+    "rear_lot_line": { "value": [[0, 100], [50, 100]], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "rear", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.5, "unit": "ft" } }] },
+    "side_lot_lines": { "value": [[[0, 0], [0, 100]], [[50, 0], [50, 100]]], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "sides", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.5, "unit": "ft" } }] },
+    "house_outline": { "value": [[12, 20], [38, 20], [38, 55], [12, 55]], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "house", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.25, "unit": "ft" } }] },
+    "structures": { "value": [{ "id": "shed", "outline": [[40, 85], [48, 85], [48, 95], [40, 95]] }], "prov": [{ "kind": "entered", "rests_on": "capture walk-3 (illustration)", "document": "capture walk-3 (illustration)", "where": "shed", "when": "2026-11-01", "by": "Martin Fabbri", "tolerance": { "value": 0.25, "unit": "ft" } }] },
+    "primary_living_area_sqft": { "value": 1400, "prov": [{ "kind": "official_record", "document": "PortlandMaps (illustration)", "where": "living area", "when": "2026-10-20", "by": "Martin Fabbri", "issuer": "City of Portland", "status": "current" }] }
+  },
+  "plan": {
+    "kind": { "value": "adu", "prov": [{ "kind": "entered", "document": "session (illustration)", "where": "what", "when": "2026-11-01", "by": "Martin Fabbri", "status": "client's wish" }] },
+    "detached": { "value": true, "prov": [{ "kind": "plan_document", "document": "plan set (illustration)", "where": "A1", "when": "2026-10-30", "by": "Martin Fabbri", "status": "as drawn" }] },
+    "footprint": { "value": [[0, 0], [24, 0], [24, 24], [0, 24]], "prov": [{ "kind": "plan_document", "document": "plan set (illustration)", "where": "A1", "when": "2026-10-30", "by": "Martin Fabbri", "status": "as drawn" }] },
+    "height_ft": { "value": 15, "prov": [{ "kind": "plan_document", "document": "plan set (illustration)", "where": "A3", "when": "2026-10-30", "by": "Martin Fabbri", "status": "as drawn" }] },
+    "living_area_sqft": { "value": 576, "prov": [{ "kind": "plan_document", "document": "plan set (illustration)", "where": "A1", "when": "2026-10-30", "by": "Martin Fabbri", "status": "as drawn" }] },
+    "sloped_ceiling": { "value": false, "prov": [{ "kind": "plan_document", "document": "plan set (illustration)", "where": "A3", "when": "2026-10-30", "by": "Martin Fabbri", "status": "as drawn" }] }
+  },
+  "unknowns": []
+}
