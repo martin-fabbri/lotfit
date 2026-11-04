@@ -1,6 +1,8 @@
-// Narration lines: the model writes one spoken line per trace beat; code checks every number,
-// provision and the verdict sentence against the trace and report. A failing beat gets one retry,
-// then a template line built in code. Pure except the model calls.
+// Narration lines: code writes every number and every outcome; the model writes only
+// words (a verb-led gloss per rule, a chapter title per beat, one sentence each for the
+// establish, envelope and place beats). Model words are checked: no digit outside the
+// rule's own quote, no outcome words, length-capped. A failing item gets the code
+// fallback; there is no retry call. The summary beat is code only.
 import type { ModelClient, ModelRequest } from "./model-client.mts";
 import { makeUuid7 } from "./events.mts";
 
@@ -16,190 +18,226 @@ export interface Narration {
   beats: NarrationBeat[];
 }
 
-const round2 = (n: number): number => Math.round(n * 100) / 100;
-const fmt2 = (n: number): string => String(round2(n));
 const isProvisionId = (s: string): boolean => /^[A-Z]{2,}\./.test(s);
-const numericSegments = (pid: string): string[] => pid.split(".").slice(1).filter((s) => /^\d+$/.test(s));
-
-function collectNumbers(node: unknown, into: Set<number>): void {
-  if (typeof node === "number" && isFinite(node)) { into.add(round2(node)); return; }
-  if (Array.isArray(node)) { for (const v of node) collectNumbers(v, into); return; }
-  if (node && typeof node === "object") { for (const v of Object.values(node)) collectNumbers(v, into); }
-}
-
-/** Section numbers a beat may speak: individual segments and dotted prefixes of its ref provisions. */
-export function sectionNumbers(refs: string[]): Set<string> {
-  const out = new Set<string>();
-  for (const r of refs.filter(isProvisionId)) {
-    const segs = numericSegments(r);
-    for (const s of segs) out.add(s);
-    for (let i = 2; i <= segs.length; i++) out.add(segs.slice(0, i).join("."));
-  }
-  return out;
-}
-
 const textNumbers = (text: string): string[] => text.match(/\d[\d,]*(?:\.\d+)?/g) ?? [];
-const literalIds = (text: string): string[] =>
-  (text.match(/[A-Z]{2,}\.[A-Za-z0-9._-]+/g) ?? []).map((s) => s.replace(/\.+$/, ""));
-
-function spokenMatches(code: string | undefined, section: string | undefined, refs: string[]): string[] {
-  const codeParts = code ? code.split(".").filter((p) => /^\d+$/.test(p)) : [];
-  return refs.filter(isProvisionId).filter((r) => {
-    const segs = numericSegments(r);
-    if (section && !segs.includes(section)) return false;
-    let at = 0;
-    for (const p of codeParts) { const i = segs.indexOf(p, at); if (i < 0) return false; at = i + 1; }
-    return codeParts.length > 0 || !!section;
-  });
-}
-
-export interface BeatCheck {
-  ok: boolean;
-  reasons: string[];
-  numbers: string[];
-  provisions: string[];
-}
-
-/** Check one line: numbers, provisions, and (summary) the verdict sentence. */
-export function checkBeat(
-  text: string, refs: string[], kind: string, numberPool: Set<number>, sections: Set<string>, verdict: string,
-): BeatCheck {
-  const reasons: string[] = [];
-  const numbers = textNumbers(text);
-  for (const raw of numbers) {
-    const bare = raw.replace(/,/g, "");
-    if (sections.has(bare)) continue;
-    if (numberPool.has(round2(Number(bare)))) continue;
-    reasons.push(`number ${raw} is not in the trace or report`);
-  }
-  const provisions: string[] = [];
-  for (const id of literalIds(text)) {
-    if (!refs.includes(id)) reasons.push(`provision ${id} is not in this beat's refs`);
-    else provisions.push(id);
-  }
-  const spoken = new Set<string>();
-  for (const m of text.matchAll(/code\s+([\d.]+)(?:,?\s*section\s+(\d+))?/gi)) {
-    const hit = spokenMatches(m[1], m[2], refs);
-    if (!hit.length) reasons.push(`spoken ref code ${m[1]}${m[2] ? `, section ${m[2]}` : ""} matches no ref provision`);
-    else for (const h of hit) if (!spoken.has(h)) { spoken.add(h); provisions.push(h); }
-  }
-  const codeSpans: Array<[number, number]> = [...text.matchAll(/code\s+[\d.]+(?:,?\s*section\s+\d+)?/gi)]
-    .map((m) => [m.index ?? 0, (m.index ?? 0) + m[0].length]);
-  for (const m of text.matchAll(/section\s+(\d+)/gi)) {
-    if (codeSpans.some(([a, b]) => (m.index ?? 0) >= a && (m.index ?? 0) < b)) continue;
-    const hit = spokenMatches(undefined, m[1], refs);
-    if (!hit.length) reasons.push(`spoken section ${m[1]} matches no ref provision`);
-    else for (const h of hit) if (!spoken.has(h)) { spoken.add(h); provisions.push(h); }
-  }
-  if (kind === "summary") {
-    const t = ` ${text.toLowerCase()} `;
-    const need =
-      verdict === "FITS" ? /\bfits\b/.test(t) && !/does\s+not\s+fit|doesn'?t\s+fit/.test(t) :
-      verdict === "NEEDS_CHECK" ? /needs?\s+a\s+check/.test(t) :
-      verdict === "DOESNT_FIT" ? /does\s+not\s+fit|doesn'?t\s+fit/.test(t) :
-      verdict === "NO_LEGS" ? /no\s+spot\s+found/.test(t) : true;
-    if (!need) reasons.push(`verdict sentence does not match ${verdict}`);
-  }
-  return { ok: reasons.length === 0, reasons, numbers, provisions };
-}
+const words = (text: string): string[] => text.trim().split(/\s+/).filter(Boolean);
 
 const JURISDICTION: Record<string, string> = { EUG: "Eugene", PDX: "Portland", OR: "Oregon", ORS: "Oregon", GRE: "Gresham" };
 
-function spoken(pid: string): string {
-  const place = JURISDICTION[pid.split(".")[0]!] ?? "The code";
-  const segs = numericSegments(pid);
-  if (segs.length >= 3) return `${place} code ${segs[0]}.${segs[1]}, section ${segs[2]}`;
-  if (segs.length === 2) return `${place} code ${segs[0]}.${segs[1]}`;
-  if (segs.length === 1) return `${place} code ${segs[0]}`;
-  return place;
+/** EUG.9.2751.17.a.1 -> "Eugene code 9.2751, 17 a 1"; EUG.T9.2750 -> "Eugene table 9.2750". */
+export function spokenRef(pid: string): string {
+  const [head, ...segs] = pid.split(".");
+  const place = JURISDICTION[head!] ?? head;
+  if (!segs.length) return place!;
+  if (/^T\d/i.test(segs[0]!)) return `${place} table ${segs.join(".").slice(1)}`;
+  const speak = (s: string): string =>
+    s.replace(/([A-Za-z]+)/g, " $1").replace(/(\d+)/g, " $1").replace(/\s+/g, " ").trim();
+  const code = segs.slice(0, 2).join(".");
+  const rest = segs.slice(2).map(speak).join(" ");
+  return rest ? `${place} code ${code}, ${rest}` : `${place} code ${code}`;
 }
 
-const OUTCOME_WORDS: Record<string, string> = {
-  pass: "passes", fail: "fails", too_close_to_call: "is too close to call", unknown: "is not measured yet",
-};
+/** 682.72484 sq ft -> "about 683 square feet"; 6.36 ft -> "about 6.4 feet"; 1 count -> "1 unit". */
+export function speakMeasure(value: number, unit: string | null): string {
+  if (!isFinite(value)) return String(value);
+  const u = unit ?? "";
+  const words: Record<string, string> = { sqft: "square feet", ft: "feet", in: "inches", "%": "percent", pct: "percent", degrees: "degrees" };
+  if (u === "count") {
+    const r = Math.round(value);
+    return `${r !== value ? "about " : ""}${r} unit${r === 1 ? "" : "s"}`;
+  }
+  const uw = words[u] ?? u;
+  const r = u === "sqft" ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${r !== value ? "about " : ""}${String(r)}${uw ? ` ${uw}` : ""}`;
+}
 
-export interface TemplateData {
-  lotW: number; lotD: number; houseId: string;
-  constraints: Map<string, { value: number | null; limit: number | null; unit: string | null; outcome: string | null }>;
-  spot: { x: number; y: number } | null;
+export interface SpokenProvision {
+  ref: string;
+  values: string[];
+  limits: string[];
+  outcome: string | null;
+}
+export interface SpokenData {
+  provisions: Map<string, SpokenProvision>;
+  lot: string[];
+  spot: string[];
+  houseId: string;
   verdict: string;
 }
 
-export function templateData(trace: any, report: any): TemplateData {
+function limitOf(limit: any): { value: number; unit: string | null } | null {
+  if (typeof limit?.value === "number") return { value: limit.value, unit: limit.unit ?? null };
+  if (typeof limit === "number") return { value: limit, unit: null };
+  return null;
+}
+
+/** Spoken forms for every provision in the trace, plus the lot and spot geometry. */
+export function buildSpoken(trace: any, report: any): SpokenData {
+  const provisions = new Map<string, SpokenProvision>();
+  const pids = new Set<string>();
+  for (const c of trace?.constraints ?? []) if (c.provision_id) pids.add(c.provision_id);
+  for (const b of trace?.beats ?? []) for (const r of b.refs ?? []) if (isProvisionId(r)) pids.add(r);
+  for (const f of report?.findings ?? []) if (f.provision_id) pids.add(f.provision_id);
+  for (const pid of pids) {
+    const finding = (report?.findings ?? []).find((f: any) => f.provision_id === pid);
+    const constraint = (trace?.constraints ?? []).find((c: any) => c.provision_id === pid);
+    const values: string[] = [];
+    const limits: string[] = [];
+    const measures = finding?.measures?.length ? finding.measures : constraint?.value != null ? [constraint] : [];
+    for (const m of measures) {
+      if (typeof m.value === "number") values.push(speakMeasure(m.value, m.unit ?? null));
+      const lim = m.limit !== undefined ? limitOf(m.limit) : null;
+      if (lim) limits.push(speakMeasure(lim.value, lim.unit));
+    }
+    provisions.set(pid, { ref: spokenRef(pid), values, limits, outcome: finding?.outcome ?? constraint?.outcome ?? null });
+  }
   const lot: number[][] = trace?.site?.lot ?? [];
   const xs = lot.map((p) => p[0] ?? 0), ys = lot.map((p) => p[1] ?? 0);
-  const constraints = new Map();
-  for (const c of trace?.constraints ?? []) {
-    constraints.set(c.provision_id, { value: c.value ?? null, limit: c.limit?.value ?? c.limit ?? null,
-      unit: c.unit ?? c.limit?.unit ?? null, outcome: c.outcome ?? null });
-  }
   const opt = (trace?.options ?? [])[0];
   return {
-    lotW: xs.length ? Math.max(...xs) - Math.min(...xs) : 0,
-    lotD: ys.length ? Math.max(...ys) - Math.min(...ys) : 0,
+    provisions,
+    lot: xs.length ? [speakMeasure(Math.max(...xs) - Math.min(...xs), "ft"), speakMeasure(Math.max(...ys) - Math.min(...ys), "ft")] : [],
+    spot: opt?.placement && typeof opt.placement.x === "number" && typeof opt.placement.y === "number"
+      ? [speakMeasure(opt.placement.x, "ft"), speakMeasure(opt.placement.y, "ft")] : [],
     houseId: (trace?.site?.existing ?? [])[0]?.id ?? "house",
-    constraints, verdict: report?.verdict ?? "",
-    spot: opt?.placement ? { x: opt.placement.x, y: opt.placement.y } : null,
+    verdict: report?.verdict ?? "",
   };
 }
 
-/** Template line built in code from the same data the model sees. Always checkable. */
-export function templateLine(beat: { id: string; kind: string; refs: string[] }, data: TemplateData): { chapter: string; text: string } {
-  if (beat.kind === "establish") {
-    return { chapter: "The lot", text: `The lot measures ${fmt2(data.lotW)} by ${fmt2(data.lotD)} feet, with the ${data.houseId} on it.` };
-  }
-  if (beat.kind === "place") {
-    return { chapter: "The spot",
-      text: data.spot ? `The unit goes at the client spot, ${fmt2(data.spot.x)} feet from the left and ${fmt2(data.spot.y)} feet back.`
-        : "The unit goes at the client spot." };
-  }
-  if (beat.kind === "summary") {
-    const v = data.verdict;
-    const text =
-      v === "FITS" ? "It fits." : v === "NEEDS_CHECK" ? "It needs a check." : v === "DOESNT_FIT" ? "It does not fit." :
-      v === "NO_LEGS" ? "No spot found." : v === "FITS_IF" ? "It fits, if the conditions hold." :
-      v === "BLOCKED_BY_GATE" ? "It is not allowed here." : "It is not measured yet.";
-    return { chapter: "The answer", text };
-  }
-  const pid = beat.refs.find(isProvisionId);
-  if (!pid) return { chapter: "A rule", text: "This rule is not measured yet." };
-  const c = data.constraints.get(pid);
-  const words = OUTCOME_WORDS[c?.outcome ?? ""] ?? "is not measured yet";
-  const chapter = `Rule ${pid.split(".").slice(1, 3).join(".")}`;
-  const u = !c?.unit || c.unit === "count" ? "" : ` ${c.unit}`;
-  if (typeof c?.value === "number" && typeof c?.limit === "number" && c.outcome !== "unknown") {
-    return { chapter, text: `${spoken(pid)}: the measured ${fmt2(c.value)}${u} against a limit of ${fmt2(c.limit)}${u} ${words}.` };
-  }
-  if (typeof c?.value === "number" && c.outcome !== "unknown") {
-    return { chapter, text: `${spoken(pid)}: the measured ${fmt2(c.value)}${u} ${words}.` };
-  }
-  return { chapter, text: `${spoken(pid)} ${words}.` };
+export const OUTCOME_PHRASE: Record<string, string> = {
+  pass: "passes",
+  fail: "fails",
+  too_close_to_call: "is too close to call with the scan, so it gets taped",
+  unknown: "isn't measured yet",
+};
+
+/** One rule sentence, assembled in code: "<ref> <gloss>. We measured <values> against <limits>: it <phrase>." */
+export function ruleSentence(pid: string, gloss: string, spoken: SpokenData): string {
+  const p = spoken.provisions.get(pid);
+  const ref = p?.ref ?? spokenRef(pid);
+  const clean = gloss.trim().replace(/\.+$/, "");
+  const head = `${ref} ${clean}.`;
+  const phrase = OUTCOME_PHRASE[p?.outcome ?? ""] ?? OUTCOME_PHRASE.unknown!;
+  if ((p?.outcome ?? "unknown") === "unknown") return `${ref} ${clean}, which isn't measured yet.`;
+  const v = (p?.values ?? []).join(" and ");
+  const l = (p?.limits ?? []).join(" and ");
+  if (v && l) return `${head} We measured ${v} against ${l}: it ${phrase}.`;
+  if (v) return `${head} We measured ${v}: it ${phrase}.`;
+  if (l) return `${head} Against ${l}, it ${phrase}.`;
+  return `${head} It ${phrase}.`;
 }
 
-function findingLines(report: any): string {
-  return (report?.findings ?? []).map((f: any) => {
-    const m = (f.measures ?? [])[0] ?? {};
-    return `- ${f.provision_id} (${f.outcome}): value ${m.value ?? "?"} ${m.unit ?? ""}, limit ${m.limit?.value ?? "?"} ${m.limit?.unit ?? ""}, margin ${m.margin ?? "?"}. Quote: "${(f.citations ?? [])[0]?.quote ?? ""}"`;
-  }).join("\n");
+export function findingQuote(report: any, pid: string): string {
+  const f = (report?.findings ?? []).find((x: any) => x.provision_id === pid);
+  return (f?.citations ?? [])[0]?.quote ?? "";
 }
 
-function buildPrompt(trace: any, report: any): string {
-  const beats = (trace.beats ?? []).map((b: any) => `- ${b.id} (${b.kind}): refs ${JSON.stringify(b.refs ?? [])}`).join("\n");
-  return `Write one spoken line per beat of this walkthrough, as JSON {"beats": [{"id", "chapter", "text"}]}.
-Chapter: 2-4 words. Text: one or two plain sentences for a homeowner, present tense, no jargon, at most 40 words.
-establish: the lot and the house. Constraint beats: each rule — what it requires, the measured value, pass or fail,
-saying the code section as "Eugene code 9.2751, section 17". place: where the unit goes. summary: the verdict in one sentence.
-Use only numbers from the data below. Reply with JSON only.
+const BANNED = /\b(pass\w*|fail\w*|fits?|compl\w*|allow\w*|too\s+close)\b/i;
 
-Beats:
-${beats}
-Verdict: ${report?.verdict}
-Findings:
-${findingLines(report)}`;
+export interface WordCheck { ok: boolean; reasons: string[]; }
+
+/** A model gloss: no digit outside its quote, no outcome word, at most 14 words. */
+export function checkGloss(gloss: string, quote: string): WordCheck {
+  return checkWords(gloss, [quote], 14);
 }
 
-function parseBeats(content: string): Map<string, { chapter: string; text: string }> {
-  const out = new Map();
+/** A model beat sentence: no digit outside the beat refs' quotes, no outcome word, at most 30 words. */
+export function checkSentence(sentence: string, quotes: string[]): WordCheck {
+  return checkWords(sentence, quotes, 30);
+}
+
+function checkWords(text: string, quotes: string[], maxWords: number): WordCheck {
+  const reasons: string[] = [];
+  for (const raw of textNumbers(text)) {
+    const digits = raw.replace(/,/g, "");
+    if (!quotes.some((q) => q.includes(digits))) reasons.push(`number ${raw} is not in the rule's own quote`);
+  }
+  const bad = text.match(BANNED);
+  if (bad) reasons.push(`outcome word "${bad[0]}" must come from code, not the model`);
+  if (words(text).length > maxWords) reasons.push(`over ${maxWords} words`);
+  if (!words(text).length) reasons.push("empty");
+  return { ok: reasons.length === 0, reasons };
+}
+
+/** A model chapter title: 2-4 words. */
+export function checkChapter(title: string): WordCheck {
+  const n = words(title).length;
+  return n >= 2 && n <= 4 ? { ok: true, reasons: [] } : { ok: false, reasons: ["chapter is not 2-4 words"] };
+}
+
+export const FALLBACK_GLOSS = "sets a limit";
+const FALLBACK_CHAPTER: Record<string, string> = {
+  establish: "The lot", constrain: "The rules", height: "The rules",
+  envelope: "The space", place: "The spot", summary: "The answer",
+};
+export const fallbackChapter = (kind: string): string => FALLBACK_CHAPTER[kind] ?? "The rules";
+
+/** Template sentence built in code for the establish, envelope and place beats. */
+export function templateLine(kind: string, refs: string[], spoken: SpokenData): string {
+  if (kind === "establish") {
+    return spoken.lot.length === 2
+      ? `The lot measures ${spoken.lot[0]} by ${spoken.lot[1]}, with the ${spoken.houseId} on it.`
+      : "The lot is on screen, with the house on it.";
+  }
+  if (kind === "place") {
+    return spoken.spot.length === 2
+      ? `The unit goes at the client spot, ${spoken.spot[0]} from the left and ${spoken.spot[1]} back.`
+      : "The unit goes at the client spot.";
+  }
+  if (spoken.verdict === "NO_LEGS") return "No space is left to build in inside the setbacks.";
+  const setback = refs.map((r) => spoken.provisions.get(r)).find((p) => p && /setback/i.test(p.ref) && p.limits.length);
+  const any = refs.map((r) => spoken.provisions.get(r)).find((p) => p && p.limits.length);
+  const limit = setback?.limits[0] ?? any?.limits[0];
+  return limit ? `Inside setbacks of ${limit}, space is left to build in.` : "Space is left to build in inside the setbacks.";
+}
+
+/** Summary sentence, code only: the verdict and what remains open. */
+export function templateSummary(openRefs: string[], spoken: SpokenData): string {
+  const v = spoken.verdict;
+  const sentence =
+    v === "FITS" ? "It fits." : v === "NEEDS_CHECK" ? "It needs a check." : v === "DOESNT_FIT" ? "It does not fit." :
+    v === "NO_LEGS" ? "No spot found." : v === "FITS_IF" ? "It fits, if the conditions hold." :
+    v === "BLOCKED_BY_GATE" ? "It is not allowed here." : "It is not measured yet.";
+  if (!openRefs.length) return `${sentence} Nothing remains open.`;
+  const shown = openRefs.slice(0, 3).map((r) => spoken.provisions.get(r)?.ref ?? r).join("; ");
+  return `${sentence} Still open: ${shown}${openRefs.length > 3 ? "; and others" : ""}.`;
+}
+
+function beatSentenceAsk(kind: string): string | null {
+  if (kind === "establish") return "the lot and the house on screen";
+  if (kind === "envelope") return "the space left to build in";
+  if (kind === "place") return "the unit at the client spot";
+  return null;
+}
+
+/** Short prompt: per provision only its id and quote; no measures, limits or outcomes. */
+export function buildPrompt(trace: any, report: any): string {
+  const pids = new Set<string>();
+  for (const b of trace?.beats ?? []) for (const r of b.refs ?? []) if (isProvisionId(r)) pids.add(r);
+  for (const f of report?.findings ?? []) if (f.provision_id) pids.add(f.provision_id);
+  const rules = [...pids].map((pid) => `- ${pid}: "${findingQuote(report, pid)}"`).join("\n");
+  const asks = (trace?.beats ?? [])
+    .map((b: any) => beatSentenceAsk(b.kind) ? `- ${b.id} (${b.kind}): one sentence about ${beatSentenceAsk(b.kind)}` : null)
+    .filter(Boolean).join("\n");
+  const chapters = (trace?.beats ?? []).map((b: any) => b.id).join(", ");
+  return `Write walkthrough words as JSON {"glosses": {"<provision_id>": "..."}, "chapters": {"<beat_id>": "..."}, "sentences": {"<beat_id>": "..."}}.
+Per provision: a gloss of what the rule asks, plain words, at most 14 words, starting with a verb.
+Per beat (${chapters}): a chapter title of 2-4 words.
+One sentence each, at most 30 words:
+${asks}
+Glosses and sentences: no numbers except numbers in the rule's own quote; never write pass, fail, fits, complies, allowed or too close. Reply JSON only.
+
+${rules}`;
+}
+
+export interface ModelWords {
+  glosses: Map<string, string>;
+  chapters: Map<string, string>;
+  sentences: Map<string, string>;
+}
+
+export function parseWords(content: string): ModelWords {
+  const out: ModelWords = { glosses: new Map(), chapters: new Map(), sentences: new Map() };
   const fence = content.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const candidate = (fence ? fence[1]! : content).trim();
   let parsed: any = null;
@@ -207,9 +245,10 @@ function parseBeats(content: string): Map<string, { chapter: string; text: strin
     const a = candidate.indexOf("{"), b = candidate.lastIndexOf("}");
     if (a >= 0 && b > a) { try { parsed = JSON.parse(candidate.slice(a, b + 1)); } catch { parsed = null; } }
   }
-  for (const b of parsed?.beats ?? []) {
-    if (b && typeof b.id === "string" && typeof b.text === "string") {
-      out.set(b.id, { chapter: typeof b.chapter === "string" ? b.chapter : "", text: b.text });
+  for (const [key, map] of [["glosses", out.glosses], ["chapters", out.chapters], ["sentences", out.sentences]] as const) {
+    const obj = parsed?.[key];
+    if (obj && typeof obj === "object") {
+      for (const [k, v] of Object.entries(obj)) if (typeof v === "string") map.set(k, v);
     }
   }
   return out;
@@ -224,56 +263,66 @@ function requestWith(messages: Array<{ role: "system" | "user"; content: string 
   };
 }
 
-export async function writeNarration(trace: any, report: any, client: ModelClient): Promise<Narration> {
-  const pool = new Set<number>();
-  collectNumbers(trace, pool);
-  collectNumbers(report, pool);
-  const data = templateData(trace, report);
-  const beats: Array<{ id: string; kind: string; refs: string[] }> = trace.beats ?? [];
+function beatProvisions(text: string, refs: string[], spoken: SpokenData): string[] {
+  const out: string[] = [];
+  for (const id of ((text.match(/[A-Z]{2,}\.[A-Za-z0-9._-]+/g) ?? []).map((s) => s.replace(/\.+$/, "")))) {
+    if (refs.includes(id) && !out.includes(id)) out.push(id);
+  }
+  for (const r of refs.filter(isProvisionId)) {
+    const ref = spoken.provisions.get(r)?.ref;
+    if (ref && text.includes(ref) && !out.includes(r)) out.push(r);
+  }
+  if (/\bhouse\b/i.test(text) && refs.includes("house") && !out.includes("house")) out.push("house");
+  if (/client spot/i.test(text) && refs.includes("client_spot") && !out.includes("client_spot")) out.push("client_spot");
+  return out;
+}
 
-  const accept = new Map<string, NarrationBeat>();
-  const failed: Array<{ id: string; reasons: string[] }> = [];
-  const first = parseBeats((await client.complete(requestWith([
-    { role: "system", content: "You write spoken walkthrough lines as JSON." },
+/** One model call; every failing word falls back to code. Numbers and outcomes are all code. */
+export async function writeNarration(trace: any, report: any, client: ModelClient): Promise<Narration> {
+  const spoken = buildSpoken(trace, report);
+  const beats: Array<{ id: string; kind: string; refs: string[] }> = trace.beats ?? [];
+  const words = parseWords((await client.complete(requestWith([
+    { role: "system", content: "You write walkthrough words as JSON: rule glosses, chapter titles, bridge sentences." },
     { role: "user", content: buildPrompt(trace, report) },
   ]))).content);
-  for (const b of beats) {
-    const line = first.get(b.id);
-    if (!line) { failed.push({ id: b.id, reasons: ["missing line"] }); continue; }
-    const refs = (b.refs ?? []).filter(isProvisionId);
-    const chk = checkBeat(line.text, refs, b.kind, pool, sectionNumbers(refs), report?.verdict ?? "");
-    if (chk.ok) accept.set(b.id, { id: b.id, chapter: line.chapter, text: line.text, numbers: chk.numbers, provisions: chk.provisions, source: "model" });
-    else failed.push({ id: b.id, reasons: chk.reasons });
-  }
 
-  if (failed.length) {
-    const notes = failed.map((f) => `- ${f.id}: ${f.reasons.join("; ")}`).join("\n");
-    const second = parseBeats((await client.complete(requestWith([
-      { role: "system", content: "You write spoken walkthrough lines as JSON." },
-      { role: "user", content: `${buildPrompt(trace, report)}\n\nThese lines failed the check, rewrite only them:\n${notes}` },
-    ]))).content);
-    const still: Array<{ id: string; reasons: string[] }> = [];
-    for (const f of failed) {
-      const b = beats.find((x) => x.id === f.id)!;
-      const line = second.get(f.id);
-      const refs = (b.refs ?? []).filter(isProvisionId);
-      const chk = line ? checkBeat(line.text, refs, b.kind, pool, sectionNumbers(refs), report?.verdict ?? "") : null;
-      if (line && chk!.ok) {
-        accept.set(b.id, { id: b.id, chapter: line.chapter, text: line.text, numbers: chk!.numbers, provisions: chk!.provisions, source: "model" });
-      } else still.push(f);
-    }
-    failed.length = 0;
-    failed.push(...still);
-  }
+  const glossFor = (pid: string): { gloss: string; model: boolean } => {
+    const g = words.glosses.get(pid);
+    if (g !== undefined && checkGloss(g, findingQuote(report, pid)).ok) return { gloss: g, model: true };
+    return { gloss: FALLBACK_GLOSS, model: false };
+  };
+  const chapterFor = (id: string, kind: string): { chapter: string; model: boolean } => {
+    const c = words.chapters.get(id);
+    if (c !== undefined && checkChapter(c).ok) return { chapter: c, model: true };
+    return { chapter: fallbackChapter(kind), model: false };
+  };
+  const quotesFor = (refs: string[]): string[] =>
+    refs.filter(isProvisionId).map((r) => findingQuote(report, r)).filter(Boolean);
 
+  const openRefs = (report?.findings ?? []).filter((f: any) => f.outcome !== "pass").map((f: any) => f.provision_id).filter(Boolean);
   const out: NarrationBeat[] = [];
   for (const b of beats) {
-    const a = accept.get(b.id);
-    if (a) { out.push(a); continue; }
-    const refs = (b.refs ?? []).filter(isProvisionId);
-    const tpl = templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, data);
-    const chk = checkBeat(tpl.text, refs, b.kind, pool, sectionNumbers(refs), report?.verdict ?? "");
-    out.push({ id: b.id, chapter: tpl.chapter, text: tpl.text, numbers: chk.numbers, provisions: chk.provisions, source: "template" });
+    const refs = b.refs ?? [];
+    const ch = b.kind === "summary" ? { chapter: "The answer", model: false } : chapterFor(b.id, b.kind);
+    let text = "";
+    let model = ch.model;
+    if (b.kind === "constrain" || b.kind === "height") {
+      const parts: string[] = [];
+      for (const pid of refs.filter(isProvisionId)) {
+        const g = glossFor(pid);
+        model = model && g.model;
+        parts.push(ruleSentence(pid, g.gloss, spoken));
+      }
+      text = parts.length ? parts.join(" ") : "This rule isn't measured yet.";
+    } else if (b.kind === "summary") {
+      text = templateSummary(openRefs.filter((r: string) => refs.includes(r)), spoken);
+      model = false;
+    } else {
+      const s = words.sentences.get(b.id);
+      if (s !== undefined && checkSentence(s, quotesFor(refs)).ok) text = s;
+      else { text = templateLine(b.kind, refs, spoken); model = false; }
+    }
+    out.push({ id: b.id, chapter: ch.chapter, text, numbers: textNumbers(text), provisions: beatProvisions(text, refs, spoken), source: model ? "model" : "template" });
   }
   return { beats: out };
 }

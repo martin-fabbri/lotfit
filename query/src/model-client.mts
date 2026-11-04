@@ -30,6 +30,8 @@ export interface ModelToolCallDraft {
   args: Record<string, unknown>;
 }
 
+export type ReasoningEffort = "low" | "medium" | "high";
+
 export interface ModelRequest {
   phase: "plan" | "execute";
   turn_id: string;
@@ -40,6 +42,8 @@ export interface ModelRequest {
   window_turns: TurnWindowEntry[];
   current_turn_calls: TurnWindowEntry["calls"];
   pending_repairs: RepairErrorType[];
+  /** Per-request reasoning effort; overrides the client default. Unset by default. */
+  reasoningEffort?: ReasoningEffort;
 }
 
 export interface ModelResponse {
@@ -66,6 +70,8 @@ export interface BasetenModelClientOptions {
   costPerMillionCompletionUsd?: number;
   costPerMillionCachedUsd?: number;
   provider?: "baseten" | "fireworks";
+  /** Default reasoning effort, sent as reasoning_effort. Unset by default. */
+  reasoningEffort?: ReasoningEffort;
 }
 
 // Each tool goes to the model with its real description and the JSON Schema of its frozen args contract (C3, and C4
@@ -111,6 +117,34 @@ function buildOpenAiTools(allowedTools: string[]): OpenAI.Chat.Completions.ChatC
   }));
 }
 
+/** Request body for one completion. reasoning_effort goes out only when set (per-request wins). */
+export function buildCompletionParams(
+  req: ModelRequest,
+  modelId: string,
+  maxTokens: number,
+  clientEffort?: ReasoningEffort,
+): OpenAI.Chat.Completions.ChatCompletionCreateParamsStreaming {
+  // Ensure prior reasoning is never re-sent: only plain `{role, content}` strings are transmitted.
+  const cleanMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = req.messages.map((m) => ({
+    role: m.role,
+    content: m.content,
+  }));
+
+  const tools = req.allowed_tools.length > 0 ? buildOpenAiTools(req.allowed_tools) : undefined;
+  const effort = req.reasoningEffort ?? clientEffort;
+  return {
+    model: modelId,
+    messages: cleanMessages,
+    temperature: 0,
+    max_tokens: maxTokens,
+    ...(tools ? { tools, tool_choice: "auto" } : {}),
+    ...(effort ? { reasoning_effort: effort } : {}),
+    stream: true,
+    stream_options: { include_usage: true },
+    // The installed SDK's chat types predate reasoning_effort; Fireworks reads it from the body.
+  } as OpenAI.Chat.Completions.ChatCompletionCreateParamsStreaming;
+}
+
 function extractJsonObjectFromText(text: string): Record<string, unknown> | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
@@ -151,6 +185,7 @@ export class BasetenModelClient implements ModelClient {
   public readonly providerRoute: string;
   private readonly client: OpenAI;
   private readonly maxTokens: number;
+  private readonly reasoningEffort?: ReasoningEffort;
   private readonly costPromptPerM: number;
   private readonly costCompletionPerM: number;
   private readonly costCachedPerM: number;
@@ -169,6 +204,7 @@ export class BasetenModelClient implements ModelClient {
     this.modelId = opts.model ?? (fireworks ? "accounts/fireworks/models/muse-spark-open" : DEFAULT_BASETEN_MODEL);
     this.providerRoute = baseURL;
     this.maxTokens = Math.max(opts.maxTokens ?? DEFAULT_MAX_TOKENS, MIN_MAX_TOKENS);
+    this.reasoningEffort = opts.reasoningEffort;
     this.costPromptPerM = opts.costPerMillionPromptUsd ?? 1.25;
     this.costCompletionPerM = opts.costPerMillionCompletionUsd ?? 4.25;
     this.costCachedPerM = opts.costPerMillionCachedUsd ?? 0.15;
@@ -187,23 +223,9 @@ export class BasetenModelClient implements ModelClient {
   async complete(req: ModelRequest): Promise<ModelResponse> {
     const t0 = Date.now();
 
-    // Ensure prior reasoning is never re-sent: only plain `{role, content}` strings are transmitted.
-    const cleanMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = req.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
-
-    const tools = req.allowed_tools.length > 0 ? buildOpenAiTools(req.allowed_tools) : undefined;
-
-    const stream = await this.client.chat.completions.create({
-      model: this.modelId,
-      messages: cleanMessages,
-      temperature: 0,
-      max_tokens: this.maxTokens,
-      ...(tools ? { tools, tool_choice: "auto" } : {}),
-      stream: true,
-      stream_options: { include_usage: true },
-    });
+    const stream = await this.client.chat.completions.create(
+      buildCompletionParams(req, this.modelId, this.maxTokens, this.reasoningEffort),
+    );
     const completion = await foldChatCompletionStream(stream);
 
     const durationMs = Math.max(0, Date.now() - t0);
