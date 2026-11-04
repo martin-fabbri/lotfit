@@ -553,3 +553,115 @@ export async function review(o: ReviewOptions): Promise<ReviewResult> {
     : null;
   return { calls, outcome: C.ReviewOutcome.parse({ status, answered, warnings, model: client.modelId, rubric: rub, items: o.items.length, flags, sound, unclear, rejected, hold, error, usage }) };
 }
+
+export type FlagResolvedData = Extract<LotFitEvent, { type: "lotfit.flag_resolved" }>["data"];
+
+export function resolutionValid(
+  ev: Extract<LotFitEvent, { type: "lotfit.flag_resolved" }>,
+  people: People,
+): { ok: boolean; why: string } {
+  const named = (n: unknown): n is string =>
+    typeof n === "string" && n.length > 0 && people.people.some((p) => p.name === n.trim());
+  if (ev.data.action !== "dismissed") {
+    return { ok: false, why: `${ev.data.action} forks a new run (B6); this report stays held until the flag is dismissed` };
+  }
+  if (named(ev.data.by)) {
+    return { ok: true, why: "named person" };
+  }
+  const obo = ev.data.on_behalf_of;
+  if (named(obo)) {
+    return { ok: true, why: `agent on ${obo}'s delegation` };
+  }
+  return { ok: false, why: `${ev.data.by} is not a named person on reviewer/people.json and names no one on it in on_behalf_of` };
+}
+
+export function deliveryAllowed(
+  report: Report,
+  events: Iterable<LotFitEvent>,
+  people: People,
+  threadId: string,                      // required: the thread of the run that made this report
+): { allowed: boolean; open: string[]; reviewed: "yes" | "partly" | "no" } {
+  const r = report.reviewer;
+  const reviewed: "yes" | "partly" | "no" = !r || r.status === "not_run" ? "no" : r.status === "partial" ? "partly" : "yes";
+  const held: string[] = !r || (report.verdict !== "FITS" && report.verdict !== "FITS_IF")
+    ? []
+    : r.flags.filter((f) => f.severity === "high" && f.confirmed && f.route === "hold_if_fits").map((f) => f.flag_id);
+  if (held.length === 0) {
+    return { allowed: true, open: [], reviewed };
+  }
+  const closed = new Set<string>();
+  for (const ev of events) {
+    if (ev.type === "lotfit.flag_resolved" && ev.thread_id === threadId && resolutionValid(ev, people).ok) {
+      closed.add(ev.data.flag_id);
+    }
+  }
+  const open = held.filter((id) => !closed.has(id));
+  return { allowed: open.length === 0, open, reviewed };
+}
+
+export function deliveryAllowedForRun(runDir: string, people: People = loadPeople()):
+  { allowed: boolean; open: string[]; reviewed: "yes" | "partly" | "no"; why: string } {
+  const raw = readFileSync(join(runDir, "events.jsonl"), "utf8");
+  const events = raw.split("\n").filter((line) => line.trim() !== "").map((line) => C.LotFitEvent.parse(JSON.parse(line)));
+  if (events.length === 0) {
+    throw new Error(`no events in ${runDir}`);
+  }
+  const thread = events[0]!.thread_id;
+  const text = readFileSync(join(runDir, "report.json"), "utf8");
+  let written: Extract<LotFitEvent, { type: "artifact_written" }> | undefined;
+  for (const ev of events) {
+    if (ev.type === "artifact_written" && ev.data.artifact.path === "report.json") {
+      written = ev;
+    }
+  }
+  if (!written || written.data.artifact.sha256 !== sha256Hex(text)) {
+    return { allowed: false, open: [], reviewed: "no", why: "report.json is not the file this run wrote" };
+  }
+  const report = C.Report.parse(JSON.parse(text));
+  const d = deliveryAllowed(report, events, people, thread);
+  return { ...d, why: d.allowed ? "no open hold" : `${d.open.length} held flag(s) open` };
+}
+
+export function recordResolution(runDir: string,
+  data: Omit<FlagResolvedData, "when" | "fork_thread_id"> & { fork_thread_id?: string | null },
+  people: People = loadPeople(), when: string = new Date().toISOString()): LotFitEvent {
+  const raw = readFileSync(join(runDir, "events.jsonl"), "utf8");
+  const events = raw.split("\n").filter((line) => line.trim() !== "").map((line) => C.LotFitEvent.parse(JSON.parse(line)));
+  if (events.length === 0) {
+    throw new Error(`no events in ${runDir}`);
+  }
+  const thread = events[0]!.thread_id;
+  const last = events[events.length - 1]!;
+  const text = readFileSync(join(runDir, "report.json"), "utf8");
+  let written: Extract<LotFitEvent, { type: "artifact_written" }> | undefined;
+  for (const ev of events) {
+    if (ev.type === "artifact_written" && ev.data.artifact.path === "report.json") {
+      written = ev;
+    }
+  }
+  if (!written || written.data.artifact.sha256 !== sha256Hex(text)) {
+    throw new Error("report.json is not the file this run wrote");
+  }
+  const report = C.Report.parse(JSON.parse(text));
+  const flags = report.reviewer?.flags ?? [];
+  if (!flags.some((f) => f.flag_id === data.flag_id)) {
+    throw new Error(`flag ${data.flag_id} is not in this run's review`);
+  }
+  const ev = C.LotFitEvent.parse({
+    id: makeUuid7(), thread_id: thread, session_id: null, turn_id: null, seq: last.seq + 1,
+    created_at: when, config_hash: last.config_hash, graph_load_id: last.graph_load_id,
+    type: "lotfit.flag_resolved",
+    data: { ...data, when, fork_thread_id: data.fork_thread_id ?? null, on_behalf_of: data.on_behalf_of ?? null },
+  }) as Extract<LotFitEvent, { type: "lotfit.flag_resolved" }>;
+  const named = (n: unknown): n is string =>
+    typeof n === "string" && n.length > 0 && people.people.some((p) => p.name === n.trim());
+  if (!named(ev.data.by) && !named(ev.data.on_behalf_of)) {
+    throw new Error(`${data.by} is not a named person on reviewer/people.json and names no one on it in on_behalf_of`);
+  }
+  appendFileSync(join(runDir, "events.jsonl"), JSON.stringify(ev) + "\n");
+  return ev;
+}
+
+export function mergeReview(report: Report, outcome: ReviewOutcome, configured: boolean): Report {
+  return C.Report.parse({ ...report, reviewer: outcome, telemetry: { ...report.telemetry, models: { ...report.telemetry.models, ...(configured ? { reviewer: outcome.model } : {}) } } });
+}
