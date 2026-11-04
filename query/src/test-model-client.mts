@@ -1,5 +1,6 @@
 // Model client streaming: a fake streamed response (no network) folds into the right ModelResponse.
-import { foldChatCompletionStream, modelResponseFromCompletion } from "./model-client.mts";
+import { buildCompletionParams, foldChatCompletionStream, modelResponseFromCompletion } from "./model-client.mts";
+import type { ModelRequest } from "./model-client.mts";
 
 let n = 0, t = 0;
 const ok = (name: string, cond: boolean, detail = "") => { t++; if (cond) n++; console.log(`${cond ? "PASS" : "FAIL"}  ${name}${cond || !detail ? "" : " — " + detail}`); };
@@ -43,6 +44,15 @@ ok("tokens fold from the last chunk",
   res.usage.prompt_tokens === 100 && res.usage.completion_tokens === 50 && res.usage.prompt_cached_tokens === 0,
   JSON.stringify(res.usage));
 ok("cost folds from tokens", res.usage.cost_usd === 0.000338, String(res.usage.cost_usd));
+
+const reqBase = { messages: [{ role: "user", content: "hi" }], allowed_tools: [] } as unknown as ModelRequest;
+const effortOf = (p: object): unknown => (p as Record<string, unknown>)["reasoning_effort"];
+ok("reasoning_effort absent when unset",
+  !("reasoning_effort" in buildCompletionParams(reqBase, "m", 6000, undefined)));
+ok("reasoning_effort sent from the client option",
+  effortOf(buildCompletionParams(reqBase, "m", 6000, "low")) === "low");
+ok("per-request reasoning effort wins",
+  effortOf(buildCompletionParams({ ...reqBase, reasoningEffort: "high" } as ModelRequest, "m", 6000, "low")) === "high");
 
 console.log(`${n}/${t} model-client checks passed`);
 process.exit(n === t ? 0 : 1);
