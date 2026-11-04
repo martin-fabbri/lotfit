@@ -112,6 +112,15 @@ different trace, and the default is `demo/eug-demo-24x24.trace.json`. Stills and
 render with `python3 render.py stills <t…>` and `python3 render.py video <name>`
 (playwright, Chromium, and ffmpeg).
 
+## Narrated walkthrough
+
+Muse Spark writes one spoken line per beat of a run's trace (`query/src/narration.mts`),
+and code checks every line before it is spoken: each number must appear in the trace or
+report, each provision named must belong to that beat, and the verdict sentence must match
+the report's verdict. A failing line gets one retry, then a template line built from the
+same data. One voice reads the lines, the player shows them word by word, and `render.py`
+cuts the walkthrough video. See `query/player/narrate/README.md` for the four commands.
+
 ## Repository layout
 
 ```
