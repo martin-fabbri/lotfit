@@ -158,3 +158,238 @@ export function buildSite(kase: CaseInput, conflicts: ReadonlySet<string> = new 
   }
   return { lot, north_deg, north_uncertainty_deg, existing };
 }
+
+export function buildConstraints(report: ReportInput, lot: PolygonType): TraceOutput["constraints"] {
+  const lotBox = polygonBbox(lot);
+  const constraints: TraceOutput["constraints"] = [];
+  for (const f of report.findings) {
+    if (f.target !== "case") continue;
+    const m0 = f.measures[0];
+    const p0 = f.params[0];
+    constraints.push({
+      provision_id: f.provision_id,
+      kind: f.evaluation_stage,
+      zone: null,
+      value: m0 ? cleanNum(m0.value) : p0 ? cleanNum(p0.value) : null,
+      unit: m0 ? m0.unit : p0 ? p0.unit : null,
+      outcome: f.outcome,
+      measures: f.measures.map((m) => structuredClone(m)),
+    });
+  }
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const f of report.findings) {
+    if (f.target === "case") continue;
+    if (!seen.has(f.provision_id)) {
+      seen.add(f.provision_id);
+      order.push(f.provision_id);
+    }
+  }
+  for (const provision_id of order) {
+    const group = report.findings.filter((f) => f.target !== "case" && f.provision_id === provision_id);
+    const preferred = group.find((f) => f.target === "selected_placement") ?? group[0]!;
+    const sideParam = preferred.params.find((p) => p.param.includes("side_building_setback"));
+    const rearParam = preferred.params.find((p) => p.param.includes("rear_building_setback"));
+    const frontParam = preferred.params.find((p) => p.param.includes("front_lot_line_setback"));
+    const cloneMeasures = () => preferred.measures.map((m) => structuredClone(m));
+    if (sideParam || rearParam) {
+      const { x0, x1, y0, y1 } = lotBox;
+      if (sideParam && sideParam.value > 0 && x1 - x0 > sideParam.value * 2) {
+        const s = cleanNum(sideParam.value);
+        constraints.push({
+          provision_id,
+          kind: "setback",
+          zone: [
+            [x0, y0],
+            [cleanNum(x0 + s), y0],
+            [cleanNum(x0 + s), y1],
+            [x0, y1],
+          ],
+          value: s,
+          unit: sideParam.unit,
+          outcome: preferred.outcome,
+          measures: cloneMeasures(),
+        });
+        constraints.push({
+          provision_id,
+          kind: "setback",
+          zone: [
+            [cleanNum(x1 - s), y0],
+            [x1, y0],
+            [x1, y1],
+            [cleanNum(x1 - s), y1],
+          ],
+          value: s,
+          unit: sideParam.unit,
+          outcome: preferred.outcome,
+          measures: [],
+        });
+      }
+      if (rearParam && rearParam.value > 0 && y1 - y0 > rearParam.value) {
+        const r = cleanNum(rearParam.value);
+        constraints.push({
+          provision_id,
+          kind: "setback",
+          zone: [
+            [x0, cleanNum(y1 - r)],
+            [x1, cleanNum(y1 - r)],
+            [x1, y1],
+            [x0, y1],
+          ],
+          value: r,
+          unit: rearParam.unit,
+          outcome: preferred.outcome,
+          measures: sideParam ? [] : cloneMeasures(),
+        });
+      }
+    } else if (frontParam && frontParam.value > 0 && lotBox.y1 - lotBox.y0 > frontParam.value) {
+      const fr = cleanNum(frontParam.value);
+      constraints.push({
+        provision_id,
+        kind: "setback",
+        zone: [
+          [lotBox.x0, lotBox.y0],
+          [lotBox.x1, lotBox.y0],
+          [lotBox.x1, cleanNum(lotBox.y0 + fr)],
+          [lotBox.x0, cleanNum(lotBox.y0 + fr)],
+        ],
+        value: fr,
+        unit: frontParam.unit,
+        outcome: preferred.outcome,
+        measures: cloneMeasures(),
+      });
+    } else {
+      const m0 = preferred.measures[0];
+      const p0 = preferred.params[0];
+      constraints.push({
+        provision_id,
+        kind: preferred.evaluation_stage,
+        zone: null,
+        value: m0 ? cleanNum(m0.value) : p0 ? cleanNum(p0.value) : null,
+        unit: m0 ? m0.unit : p0 ? p0.unit : null,
+        outcome: preferred.outcome,
+        measures: cloneMeasures(),
+      });
+    }
+  }
+  return constraints;
+}
+
+function samePlacement(a: PlacementType | undefined | null, b: PlacementType | undefined | null): boolean {
+  if (!a || !b) return false;
+  return (
+    cleanNum(a.x) === cleanNum(b.x) &&
+    cleanNum(a.y) === cleanNum(b.y) &&
+    cleanNum(normRot(a.rotation)) === cleanNum(normRot(b.rotation))
+  );
+}
+
+function resolvePlacedOutlineInLotFrame(
+  kase: CaseInput,
+  placement: PlacementType,
+  conflicts: ReadonlySet<string>,
+): PolygonType {
+  const outline = C.Polygon.safeParse(unwrapFactValue(kase.plan["outline"], "plan.outline", conflicts));
+  if (outline.success) {
+    const that = C.Placement.safeParse(unwrapFactValue(kase.plan["placement"], "plan.placement", conflicts));
+    if (that.success && samePlacement(that.data, placement)) {
+      return outline.data.map(([x, y]) => [cleanNum(x), cleanNum(y)]) as PolygonType;
+    }
+  }
+  const footprint = C.Polygon.safeParse(unwrapFactValue(kase.plan["footprint"], "plan.footprint", conflicts));
+  if (!footprint.success) {
+    throw new Error("Case is missing a valid plan.footprint polygon");
+  }
+  return placedOutline(footprint.data, placement);
+}
+
+function summarizeFindingWhy(f: ReportFindingType): string {
+  const parts = f.measures.map((m) => {
+    const limit = m.limit;
+    let limStr = "";
+    if (limit) {
+      const v = limit.value;
+      const lim = typeof v === "number" ? cleanNum(v) : v;
+      limStr = ` vs limit ${lim} ${limit.unit} (${limit.param})`;
+    }
+    const sign = m.margin >= 0 ? `+${cleanNum(m.margin)}` : `${cleanNum(m.margin)}`;
+    return `${cleanNum(m.value)} ${m.unit}${limStr}, margin ${sign} ${m.unit}`;
+  });
+  const detail = parts.length > 0 ? parts.join("; ") : (f.citations[0]?.clause_id ?? f.evaluation_stage);
+  return `${f.provision_id} [${f.outcome}]: ${detail}`;
+}
+
+export function buildOptions(report: ReportInput, kase: CaseInput): TraceOutput["options"] {
+  const conflicts = conflictSet(report);
+  const clientSpot = report.placement.client_spot;
+  const recommended = report.placement.recommended;
+  const clientFindings = report.findings.filter((f) => f.target === "client_spot");
+  const selectedFindings = report.findings.filter((f) => f.target === "selected_placement");
+  const options: TraceOutput["options"] = [];
+  if (clientSpot) {
+    const outline = resolvePlacedOutlineInLotFrame(kase, clientSpot.placement, conflicts);
+    const why = clientFindings.map(summarizeFindingWhy);
+    for (const id of clientSpot.failing) {
+      if (!why.some((line) => line.startsWith(`${id} [`))) {
+        why.push(`${id} [fail]: failed at client_spot`);
+      }
+    }
+    for (const id of clientSpot.rejected_exceptions) {
+      if (!why.some((line) => line.startsWith(`${id} [`))) {
+        why.push(`${id} [fail]: exception conditions not met at client_spot`);
+      }
+    }
+    const margins = clientFindings.flatMap((f) => f.measures.map((m) => structuredClone(m)));
+    const status =
+      clientSpot.passes === false || clientSpot.failing.length > 0 || clientSpot.rejected_exceptions.length > 0
+        ? "rejected"
+        : "conditional";
+    options.push({
+      id: "client_spot",
+      status,
+      placement: {
+        x: cleanNum(clientSpot.placement.x),
+        y: cleanNum(clientSpot.placement.y),
+        rotation: cleanNum(clientSpot.placement.rotation ?? 0),
+      },
+      outline,
+      why,
+      margins,
+    });
+  }
+  if (recommended) {
+    const outline = resolvePlacedOutlineInLotFrame(kase, recommended.placement, conflicts);
+    const why = selectedFindings.map(summarizeFindingWhy);
+    if (why.length === 0) {
+      why.push(`verdict ${report.verdict}: recommended placement clears required setbacks`);
+    }
+    const margins = recommended.margins.map((m) => structuredClone(m));
+    for (const f of selectedFindings) {
+      for (const m of f.measures) {
+        const js = canonicalJson(m);
+        if (!margins.some((e) => canonicalJson(e) === js)) {
+          margins.push(structuredClone(m));
+        }
+      }
+    }
+    const status =
+      report.verdict === "FITS"
+        ? "selected"
+        : report.verdict === "FITS_IF" || report.verdict === "NEEDS_CHECK" || report.verdict === "NOT_MODELED"
+          ? "conditional"
+          : "rejected";
+    options.push({
+      id: "selected_placement",
+      status,
+      placement: {
+        x: cleanNum(recommended.placement.x),
+        y: cleanNum(recommended.placement.y),
+        rotation: cleanNum(recommended.placement.rotation ?? 0),
+      },
+      outline,
+      why,
+      margins,
+    });
+  }
+  return options;
+}
