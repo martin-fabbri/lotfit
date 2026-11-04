@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createScriptedModelClient } from "./model-client.mts";
-import { writeNarration, templateSummary, ruleSentence, buildSpoken, buildPrompt, spokenRef, speakMeasure,
+import { writeNarration, templateSummary, ruleSentence, buildSpoken, buildPrompt, beatFacts, spokenRef, speakMeasure,
   checkGloss, checkSentence, checkChapter, FALLBACK_GLOSS } from "./narration.mts";
 
 let n = 0, t = 0;
@@ -71,11 +71,28 @@ ok("sentence and chapter checks",
   !checkSentence("It fits the envelope.", []).ok &&
   checkChapter("The lot").ok && !checkChapter("Lot").ok);
 
-const prompt = buildPrompt(trace, report);
-ok("prompt carries ids and quotes only, no measures, limits or outcomes",
+const prompt = buildPrompt(trace, report, spoken);
+ok("gloss joins the ref mid-sentence, lowercased",
+  ruleSentence("EUG.T9.2740", "Identifies the zone's permitted uses", spoken)
+    .startsWith("Eugene table 9.2740 identifies the zone's permitted uses,"));
+ok("prompt asks third-person glosses and gives each sentence beat its facts",
+  prompt.includes("third person present") &&
+  prompt.includes("the lot measures about 64.2 feet by about 106.4 feet; the house") &&
+  prompt.includes("setbacks of 5 feet") &&
+  prompt.includes("20 feet from the left; 76 feet from the front"));
+ok("prompt carries no outcomes",
   prompt.includes("EUG.9.2751.17.a.1") && prompt.includes(Q800) &&
   !prompt.includes("6.36") && !prompt.includes("576 square feet") &&
   !prompt.includes("too_close_to_call") && !prompt.includes("NEEDS_CHECK"));
+const estFacts = beatFacts("establish", ["house"], spoken);
+ok("a sentence may use its beat's facts, nothing else",
+  checkSentence("The lot measures about 64.2 feet by about 106.4 feet.", [], estFacts).ok &&
+  !checkSentence("The lot measures about 64.2 feet by about 106.4 feet.", [], []).ok &&
+  !checkSentence("The lot measures 20 feet by 76 feet.", [], estFacts).ok);
+ok("a sentence naming a feature outside the trace is refused",
+  !checkSentence("The unit sits beside the existing landscaping.", [], beatFacts("place", ["client_spot"], spoken)).ok &&
+  !checkSentence("The fence marks the rear line.", [], beatFacts("envelope", [], spoken)).ok &&
+  checkSentence("The unit goes at the client spot.", [], beatFacts("place", ["client_spot"], spoken)).ok);
 
 const W = (w: { glosses?: Record<string, string>; chapters?: Record<string, string>; sentences?: Record<string, string> }) =>
   JSON.stringify({ glosses: w.glosses ?? {}, chapters: w.chapters ?? {}, sentences: w.sentences ?? {} });
@@ -86,7 +103,7 @@ const cleanW = {
     "EUG.9.2751.17.a.1": "limits the unit to 800 square feet",
     [SETBACK]: "keeps the unit 5 feet from the lot lines",
     "EUG.T9.2750": "covers the lot's dimensional standards",
-    [SLOPE]: "caps height on sloped lots",
+    [SLOPE]: "Caps height on sloped lots",
   },
   chapters: { b1: "The lot", b2: "The rules", b3: "Height cap", b4: "The space", b5: "The spot", b6: "The answer" },
   sentences: {
@@ -112,6 +129,9 @@ ok("constrain beat carries one rule sentence per ref, in order",
   }), b2.text);
 ok("setback sentence ends so it gets taped",
   sentences(b2.text).some((s) => s.endsWith("so it gets taped.")), b2.text);
+ok("capitalized gloss reads lowercase after the ref",
+  r0.beats.find((b) => b.id === "b3")!.text.includes("slope caps height on sloped lots"),
+  r0.beats.find((b) => b.id === "b3")!.text);
 ok("clean words stay model, summary stays code",
   r0.beats.find((b) => b.id === "b1")!.source === "model" && b2.source === "model" &&
   r0.beats.find((b) => b.id === "b6")!.source === "template" &&
@@ -130,6 +150,14 @@ badNum.glosses["EUG.9.2751.17.a.1"] = "limits the unit to 900 square feet";
 const r2 = await writeNarration(trace, report, scripted([W(badNum)]));
 ok("a gloss with a number outside its quote is refused",
   r2.beats.find((b) => b.id === "b2")!.text.includes(`Eugene code 9.2751, 17 a 1 ${FALLBACK_GLOSS}.`));
+
+const invented = structuredClone(cleanW);
+invented.sentences.b5 = "The unit sits beside the existing landscaping.";
+const rLand = await writeNarration(trace, report, scripted([W(invented)]));
+const tLand = rLand.beats.find((b) => b.id === "b5")!;
+ok("invented landscaping falls back to the code sentence",
+  tLand.source === "template" && tLand.text === "The unit goes at the client spot, 20 feet from the left and 76 feet back.",
+  `${tLand.source}: ${tLand.text}`);
 
 const r3 = await writeNarration(trace, report, scripted(["not json at all"]));
 const b2f = r3.beats.find((b) => b.id === "b2")!;
