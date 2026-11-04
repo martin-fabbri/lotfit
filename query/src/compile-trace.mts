@@ -393,3 +393,148 @@ export function buildOptions(report: ReportInput, kase: CaseInput): TraceOutput[
   }
   return options;
 }
+
+export function buildBeats(
+  report: ReportInput,
+  existing: TraceOutput["site"]["existing"],
+  constraints: TraceOutput["constraints"],
+  options: TraceOutput["options"],
+): TraceOutput["beats"] {
+  const beats: TraceOutput["beats"] = [];
+  const push = (kind: TraceOutput["beats"][number]["kind"], refs: string[]): void => {
+    beats.push({ id: `b${beats.length + 1}`, kind, refs });
+  };
+  const clientSpot = report.placement.client_spot;
+  const recommended = report.placement.recommended;
+  push("establish", existing.map((e) => e.id));
+  const heightSet = new Set<string>();
+  for (const c of constraints) {
+    if (c.provision_id === "PDX.33.110.245.C.1" || c.measures.some((m) => m.limit?.param.includes("height"))) {
+      heightSet.add(c.provision_id);
+    }
+  }
+  const constrainRefs = [
+    ...new Set(constraints.filter((c) => !heightSet.has(c.provision_id)).map((c) => c.provision_id)),
+  ];
+  if (constrainRefs.length > 0) {
+    push("constrain", constrainRefs);
+  }
+  if (heightSet.size > 0) {
+    push("height", [...heightSet]);
+  }
+  const setbacks = constraints.filter((c) => c.kind === "setback");
+  const envelopeSrc = setbacks.length > 0 ? setbacks : constraints;
+  push("envelope", [...new Set(envelopeSrc.map((c) => c.provision_id))]);
+  for (const o of options) {
+    if (o.status !== "rejected") continue;
+    const refs =
+      o.id === "client_spot"
+        ? [...new Set([o.id, ...(clientSpot?.failing ?? []), ...(clientSpot?.rejected_exceptions ?? [])])]
+        : [o.id];
+    push("reject", refs);
+  }
+  for (const o of options) {
+    if (o.status === "selected" || o.status === "conditional") {
+      push("place", [o.id]);
+    }
+  }
+  if (recommended?.solar) {
+    push("shadow", ["selected_placement"]);
+  }
+  const caveatRefs = [
+    ...report.conditions.map((c) => c.ambiguity_id),
+    ...report.assumptions.map((a) => a.fact),
+    ...report.conflicts.map((c) => c.fact),
+    ...report.questions.map((q) => q.fact),
+    ...report.dispositions_relied_on.map((d) => d.clause_id),
+  ];
+  if (caveatRefs.length > 0) {
+    push("caveats", [...new Set(caveatRefs)]);
+  }
+  push("summary", [...new Set([...report.findings.map((f) => f.provision_id), ...options.map((o) => o.id)])]);
+  return beats;
+}
+
+export function compileTrace(reportInput: ReportInput, kaseInput: CaseInput): TraceOutput {
+  const report = C.Report.parse(reportInput);
+  const kase = C.Case.parse(kaseInput);
+  const report_sha256 = createHash("sha256").update(canonicalJson(report)).digest("hex");
+  if (report.verdict === "FITS") {
+    for (const f of report.findings) {
+      if (f.target === "selected_placement" && f.outcome === "fail") {
+        throw new Error(`report says FITS but ${f.provision_id} fails at the selected placement`);
+      }
+    }
+    for (const m of report.placement.recommended?.margins ?? []) {
+      if (m.pass !== true) {
+        throw new Error("report says FITS but a margin of the recommended placement does not pass");
+      }
+    }
+  }
+  const site = buildSite(kase, conflictSet(report));
+  const constraints = buildConstraints(report, site.lot);
+  const options = buildOptions(report, kase);
+  const beats = buildBeats(report, site.existing, constraints, options);
+  const trace = sortKeysDeep(
+    C.Trace.parse({
+      schema: "buildnexus.decision-trace/1",
+      report_sha256,
+      frame: traceFrame(),
+      site,
+      constraints,
+      options,
+      beats,
+    }),
+  );
+  checkCoverage(report, trace);
+  return trace;
+}
+
+export function checkCoverage(report: ReportInput, trace: TraceOutput): void {
+  const canon = canonicalJson;
+  for (const f of report.findings) {
+    if (f.target !== "case") continue;
+    const ok = trace.constraints.some(
+      (c) =>
+        c.provision_id === f.provision_id &&
+        c.outcome === f.outcome &&
+        f.measures.every((m) => c.measures.some((cm) => canon(cm) === canon(m))),
+    );
+    if (!ok) {
+      throw new Error(`trace does not cover the case finding ${f.provision_id}`);
+    }
+  }
+  const marginCanons = new Set(trace.options.flatMap((o) => o.margins).map((m) => canon(m)));
+  for (const f of report.findings) {
+    if (f.target === "case") continue;
+    for (const m of f.measures) {
+      if (!marginCanons.has(canon(m))) {
+        throw new Error(`trace does not cover a measure of ${f.provision_id} (${f.target})`);
+      }
+    }
+  }
+  for (const m of report.placement.recommended?.margins ?? []) {
+    if (!marginCanons.has(canon(m))) {
+      throw new Error("trace does not cover a margin of the recommended placement");
+    }
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  const reportArg = process.argv[2];
+  const caseArg = process.argv[3];
+  const outArg = process.argv[4];
+  if (!reportArg || !caseArg) {
+    console.error("Usage: tsx src/compile-trace.mts <report-or-fixture.json> <case.json> [out-trace.json]");
+    process.exit(2);
+  }
+  const reportJson = JSON.parse(readFileSync(reportArg, "utf8"));
+  const reportData = reportJson?.report ? reportJson.report : reportJson;
+  const caseData = JSON.parse(readFileSync(caseArg, "utf8"));
+  const text = formatTraceJson(compileTrace(reportData, caseData));
+  if (outArg) {
+    writeFileSync(outArg, text, "utf8");
+  } else {
+    process.stdout.write(text);
+  }
+}
