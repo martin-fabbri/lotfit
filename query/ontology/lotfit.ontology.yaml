@@ -1,0 +1,563 @@
+schema: "https://neo4j.com/docs/ontology-graph-spec/1.0.0/schema.json"
+id: lotfit-codegraph
+version: "0.1"
+name: LotFit code graph (Oregon ADU zoning)
+description: >-
+  The zoning and land-use law that decides whether an accessory dwelling unit (ADU) can be built on a lot, as
+  verbatim text broken into queryable pieces. Three layers: Oregon state law (layer OR, order 0), which can
+  pre-empt the cities; the City of Portland (PDX, order 1); and the City of Gresham (GRE, order 1). The backbone is
+  Provision -> Version -> (Clause | Parameter | TableCell | Reading). Read these rules before writing a query.
+  (1) Time: law changes, so a question is about one date. A Version is in force on date D when
+  `v.when_from <= D AND (v.when_to IS NULL OR v.when_to > D)`. Dates are ISO strings ('2026-11-01'), so compare
+  them as strings. `when_from IS NULL` means the text states no effective date: return those versions too, and say
+  the date is not stated. Never guess a date. With no date in the question, use today's date.
+  (2) Evidence: every value traces to a verbatim `quote` (or a table cell), a `page` and a Document. Return the quote,
+  the page and the provision id with every answer.
+  (3) Absence is an answer: an empty result means the graph does not contain it, which is not the same as "the law
+  says no".
+  (4) Every node carries `layer` (OR, PDX or GRE). Filter on it to stay in one jurisdiction, and include OR whenever
+  a city is asked about, because state law applies there too.
+  (5) Ids are readable and structured: a provision id ('PDX.33.205.040.C.1'), then '#v1' for the version
+  ('PDX.33.205.040.C.1#v1'), then '::kind:label' for the parts inside it.
+nodes:
+  jurisdiction:
+    label: Jurisdiction
+    aliases: [city, state, layer, government]
+    description: >-
+      A government whose code is in the graph: the State of Oregon (id 'OR-STATE', layer OR), Portland
+      ('OR-PORTLAND', PDX), Gresham ('OR-GRESHAM', GRE) and Eugene ('OR-EUGENE', EUG). A city is UNDER_STATE Oregon. Usually you filter by the
+      `layer` property on other nodes instead of matching this node.
+    properties:
+      id: { type: STRING, key: true, description: "'OR-STATE', 'OR-PORTLAND', 'OR-GRESHAM' or 'OR-EUGENE'.", one_of: [OR-STATE, OR-PORTLAND, OR-GRESHAM, OR-EUGENE] }
+      name: { type: STRING, description: "Short name: 'Oregon', 'Portland', 'City of Gresham'." }
+      type: { type: STRING, description: "'state' or 'city'.", one_of: [state, city] }
+      layer: { type: STRING, description: "Layer code used on every other node: OR, PDX, GRE, EUG.", one_of: [OR, PDX, GRE, EUG] }
+      layer_name: { type: STRING, description: "What the layer contains, in words (e.g. 'City of Portland (Title 33 Zoning; Title 11 Trees)')." }
+      order: { type: INTEGER, description: "Precedence order: 0 for state law, 1 for city code. Lower order is the higher authority." }
+      code_name: { type: STRING, description: "Name of the code, e.g. 'Portland Zoning Code, Title 33'." }
+      state: { type: STRING, description: "Always 'OR'." }
+      extraction: { type: STRING, description: "Source extraction file. Provenance only; not useful for answers." }
+  document:
+    label: Document
+    aliases: [source, statute, code chapter, ordinance, publication, PDF]
+    description: >-
+      A published source document the text was extracted from: a statute chapter, an administrative rule, a session
+      law, a city code chapter, an ordinance, a guide or a draft. Cite it by `title` (and `version` for its edition),
+      with the page from the Clause, Parameter or Version. `kind` 'guide' and 'draft' are not law: use them as
+      context only, never as the rule.
+    properties:
+      id: { type: STRING, key: true, description: "Document id, e.g. 'DOC-ORS-197A', 'DOC-PDX-33110', 'DOC-GRE-4.0100'." }
+      title: { type: STRING, description: "Full title, e.g. 'Oregon Revised Statutes, Chapter 197A - Land Use Planning: ...'. Use it to name the source in an answer." }
+      kind: { type: STRING, description: "code_text (codified law), rule (administrative rule, OAR), session_law (an act as passed, may amend statutes), ordinance, guide (explanatory, not law), draft (proposed, not law).", one_of: [code_text, rule, session_law, ordinance, guide, draft] }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      version: { type: STRING, description: "The edition as printed, e.g. '2025 Edition', '11/1/26', 'Oregon Laws 2026, chapter 79; approved by the Governor March ...'." }
+      publisher: { type: STRING, description: "Who publishes it, e.g. 'City of Portland'." }
+      url: { type: STRING, description: "Where it was downloaded from; sometimes a note that the URL was not recorded." }
+      pages: { type: INTEGER, description: "Page count, when the source has pages." }
+      retrieved: { type: STRING, description: "When it was downloaded (ISO timestamp). Not an effective date." }
+      file: { type: STRING, description: "Provenance: path of the downloaded file." }
+      text_file: { type: STRING, description: "Provenance: path of the extracted text." }
+      text_method: { type: STRING, description: "Provenance: how the text was extracted." }
+      sha256: { type: STRING, description: "Provenance: hash of the downloaded file." }
+      text_sha256: { type: STRING, description: "Provenance: hash of the extracted text." }
+  provision:
+    label: Provision
+    aliases: [rule, section, subsection, code section, standard, regulation, requirement, law]
+    description: >-
+      One citable unit of law, such as a section, subsection or table: 'ORS.197A.425' (state statute),
+      'PDX.33.205.040.C.1' (Portland zoning code 33.205.040.C.1), 'PDX.T110-4' (Portland Table 110-4),
+      'GRE.10.0120.A'. Its words and values live on its Versions, never on the Provision itself. `type` says what role
+      it plays in deciding whether an ADU fits (see the property). `topics` says what it is about. To find the rules
+      about a subject, filter by topic code or match the title, then go to the version in force.
+    properties:
+      id: { type: STRING, key: true, description: "Provision id: layer prefix + section ('ORS.', 'OAR.', 'ORLAW.' session law, 'PDX.', 'GRE.'). Tables are 'PDX.T110-4'. Long sections split into '.part2', '.cont'." }
+      title: { type: STRING, description: "Heading as printed, e.g. 'Accessory Dwelling Units - Development Standards'. Many provisions share a title, so search it with toLower(...) CONTAINS." }
+      section: { type: STRING, description: "Section number as printed, e.g. '33.205.040', '197A.425'." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      type:
+        type: STRING
+        one_of: [gate, constraint, exception, definition, procedural, preemption]
+        description: >-
+          Role: gate = can stop the project outright (where ADUs are allowed at all, eligibility); constraint = limits
+          where or how big (setbacks, height, size, coverage); exception = relaxes a constraint under conditions;
+          definition = defines a term; procedural = review process, timelines, permits; preemption = state law that
+          overrides or limits city rules (for example cities must allow ADUs, and may not require owner occupancy or
+          parking).
+      topics:
+        type: LIST<STRING>
+        description: >-
+          Topic codes (a provision can have several). City topics: T01 single-dwelling zones; T02 where ADUs are
+          allowed, how many; T03 size cap / floor area; T04 height and how it is measured; T05 setbacks (front, side,
+          rear, street); T06 setback exceptions for small structures; T07 placement (behind the house, distance from
+          the front line, conversions); T08 lot coverage; T09 separation between buildings and projections (eaves,
+          porches) into setbacks; T10 design standards; T11 parking; T12 owner occupancy and short-term rental; T13
+          trees; T14 overlay zones (environmental, flood, slope, historic, airport, scenic); T15 easements and
+          utilities; T16 solar setbacks; T17 definitions; T18 corner and flag lots; T19 permit procedure; T20 dates
+          and amendments; T21 fees; T22 middle housing (duplexes and ADUs); T23 solar access permits; T24 daylight
+          planes and step-backs; T25 solar design and shadow standards. State topics: S01 the ADU mandate; S02 clear
+          and objective standards; S03 vesting and the 120-day rule; S04 middle housing rules; S05 newer session laws;
+          S06 solar access. Test with `'T05' IN p.topics`.
+      terms: { type: LIST<STRING>, description: "Terms this provision defines (the defined words), when it is a definition." }
+      defined_terms_used: { type: LIST<STRING>, description: "Defined terms its text uses, as written. The USES_TERM relationship links the same to Term nodes." }
+      refers_to: { type: LIST<STRING>, description: "Cross-references as printed ('197A.400(2)', '33.110.265.F'). REFERS_TO links the ones resolved to a Provision; some are not resolved." }
+  version:
+    label: Version
+    aliases: [text, wording, edition, amendment, in-force text]
+    description: >-
+      The text of a Provision during one period. Most provisions have one version (`version` 1); an amended one has
+      a newer version that SUPERSEDES the older. ALWAYS pick versions by date: in force on D when
+      `v.when_from <= D AND (v.when_to IS NULL OR v.when_to > D)`. `when_from` is the later of `effective_from` and
+      `operative_from`, so use `when_from`, not `effective_from`. If `when_from` is null, the date is not stated
+      (`effective_not_stated` says so): include the version and flag it. The full verbatim text is `text`.
+      Portland's code edition of 11/1/26 has when_from '2026-11-01', so before that date those versions are not yet
+      in force and the graph holds no earlier Portland text.
+    properties:
+      id: { type: STRING, key: true, description: "Provision id + '#v' + version number, e.g. 'ORLAW.2025.330.8#v2'." }
+      provision_id: { type: STRING, description: "Id of the owning Provision (the same link as HAS_VERSION)." }
+      version: { type: INTEGER, description: "1 or 2." }
+      status: { type: STRING, description: "Always 'adopted' today.", one_of: [adopted] }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      section: { type: STRING, description: "Section number as printed." }
+      text: { type: STRING, description: "The full verbatim text of this version. The same as `quote`." }
+      quote: { type: STRING, description: "Same as `text` (kept for uniform evidence fields)." }
+      page: { type: INTEGER, description: "Page where the text starts in its Document (absent for HTML sources)." }
+      document_id: { type: STRING, description: "Id of the source Document (the same link as FROM_DOCUMENT)." }
+      when_from: { type: STRING, description: "In force from this ISO date (the later of effective and operative). Null = not stated." }
+      when_to: { type: STRING, description: "In force until this ISO date, exclusive. Null = no end known." }
+      effective_from: { type: STRING, description: "Effective date as printed (ISO). Prefer when_from for in-force questions." }
+      operative_from: { type: STRING, description: "A later operative date set by another section (e.g. '2028-01-01')." }
+      effective_to: { type: STRING, description: "End date (exclusive), when a later version replaces this one." }
+      effective_quote: { type: STRING, description: "The words that state the effective date." }
+      effective_source: { type: STRING, description: "Where the effective date came from (e.g. the edition date in a page header)." }
+      effective_not_stated: { type: STRING, description: "Present when the text gives no effective date." }
+      supersedes: { type: INTEGER, description: "Version number this one replaces." }
+      amends_quote: { type: STRING, description: "For a session-law amendment: the words saying what it amends." }
+      applies_to_quote: { type: STRING, description: "Words stating what the provision applies to (e.g. 'zoned for detached single-unit dwellings')." }
+      zones_quote: { type: STRING, description: "Words naming the zones it applies to (e.g. 'In the R7, R5 and R2.5 zones')." }
+      history: { type: STRING, description: "Legislative history line as printed. Data note: a few rows hold a list of strings instead." }
+      notes: { type: STRING, description: "The extractor's note about this text. Not law: never cite it as the rule." }
+      extraction_id: { type: STRING, description: "Provenance id in the extraction." }
+      sha256: { type: STRING, description: "Provenance: hash of the source document." }
+  clause:
+    label: Clause
+    aliases: [subsection, item, sentence, condition, footnote, paragraph, part of a rule]
+    description: >-
+      One piece of a version's text: an enumerated item ('(1)(b)'), a sentence, a condition ('if', 'unless',
+      'except', 'when', 'where' inside a parent piece), a table footnote, or structural text (heading, caption,
+      reference, stem, lead-in). Together the clauses cover the whole text. `status` is the key to NEEDS_CHECK:
+      'modeled' = a Parameter carries its value (MODELED_BY); 'not_modeled' = a rule or condition the engine does not
+      evaluate, so if it could apply a person must check it; 'structural' = no rule of its own. `needs` lists the facts
+      about the site or the plan that decide whether it applies.
+    properties:
+      id: { type: STRING, key: true, description: "Version id + '::' + clause_id, e.g. 'PDX.33.110.245.C.2#v1::item:(a)'." }
+      clause_id: { type: STRING, description: "Kind and label within the version, e.g. 'item:(1)(b)', 'sentence:1', 'condition:(3)/when#1'." }
+      kind: { type: STRING, description: "item, sentence, condition, footnote, or structural kinds heading, caption, reference, stem, lead_in.", one_of: [item, sentence, condition, footnote, heading, caption, reference, stem, lead_in] }
+      label: { type: STRING, description: "Printed label, e.g. '(1)(a)', 's1'." }
+      status: { type: STRING, description: "modeled, not_modeled or structural (see the node description).", one_of: [modeled, not_modeled, structural] }
+      quote: { type: STRING, description: "The clause's verbatim words." }
+      page: { type: INTEGER, description: "Page in its Document." }
+      needs: { type: LIST<STRING>, description: "Facts that decide whether it applies, e.g. 'site.corner_lot', 'site.trees', 'plan.height_ft', 'site.overlays'. An entry starting 'unrecognised:' means no fact matched: read the clause." }
+      guards_json: { type: STRING, description: "JSON list of conditions the clause can only apply under, e.g. [{\"fact\": \"site.flag_lot\", \"op\": \"true\"}]. '[]' = no guard. Parse it in code, not in Cypher." }
+      by: { type: LIST<STRING>, description: "For a modeled clause, the parameters that carry it ('param:<name>')." }
+      stem: { type: BOOLEAN, description: "True when the item only introduces sub-items." }
+      parent_clause_id: { type: STRING, description: "clause_id of the containing clause (the same link as PARENT_CLAUSE)." }
+      opened_by_clause_id: { type: STRING, description: "clause_id of the condition that opens it (the same link as OPENED_BY)." }
+      footnote_text: { type: STRING, description: "For a table footnote, its words, e.g. '[3] Additional FAR and height may be allowed. See 33.110.265.F.'" }
+      span_start: { type: INTEGER, description: "Character offset in the version text. Provenance." }
+      span_end: { type: INTEGER, description: "Character offset end. Provenance." }
+      provision_id: { type: STRING, description: "Owning provision id." }
+      version_id: { type: STRING, description: "Owning version id." }
+      document_id: { type: STRING, description: "Source document id." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      sha256: { type: STRING, description: "Provenance hash." }
+  parameter:
+    label: Parameter
+    aliases: [value, standard, limit, number, maximum, minimum, threshold, setback distance, height limit]
+    description: >-
+      A number or value the law sets, cited to its words or to a table cell: a setback in feet, a maximum height, a
+      floor-area cap, a percentage, a day count, a yes/no. Read the value from `value_num` (numbers), `value_bool`
+      (yes/no) or `value_str` (other text, e.g. '6/12' or 'midpoint of the flag portion'), with `unit`. `name` says
+      what it is ('side_building_setback.R5', 'maximum_height.R5', 'min_adus_per_detached_dwelling'). Table-derived
+      parameters are named '<row>.<zone column>' and link to their Zone (APPLIES_TO_ZONE) and TableCell (FROM_CELL).
+      Always also return the cell's footnotes: a footnote can change the value.
+    properties:
+      id: { type: STRING, key: true, description: "Version id + '::param:' + name." }
+      name: { type: STRING, description: "snake_case name; table parameters end in '.<zone code>', e.g. 'rear_building_setback.R5'. Search with CONTAINS on words like 'setback', 'height', 'floor_area', 'coverage'." }
+      value_num: { type: FLOAT, description: "Numeric value. The unit is in `unit`." }
+      value_bool: { type: BOOLEAN, description: "Yes/no value (a 'Yes'/'No' cell or a stated allowance)." }
+      value_str: { type: STRING, description: "Non-numeric value as text (dates, ratios like '1:8', descriptions)." }
+      value_words: { type: STRING, description: "The number as written in words, when the text spells it ('three')." }
+      value_json: { type: STRING, description: "Raw value as JSON. Prefer the typed value fields." }
+      unit: { type: STRING, description: "ft, in, sqft, %, ratio, count, days, hours, years, degrees; null when unitless.", one_of: [ft, in, sqft, "%", ratio, count, days, hours, years, degrees] }
+      source_kind: { type: STRING, description: "'quote' = cited to words of the text; 'cell' = cited to a table cell.", one_of: [quote, cell] }
+      quote: { type: STRING, description: "The verbatim words (or cell text) that state the value. Return it as evidence." }
+      cell_ref_json: { type: STRING, description: "For a cell parameter: JSON {table, row, column}." }
+      footnotes: { type: LIST<STRING>, description: "Footnote markers on its cell, e.g. ['3']. The footnote text is a Clause of kind 'footnote' ON_CELL the same cell." }
+      page: { type: INTEGER, description: "Page in its Document." }
+      provision_id: { type: STRING, description: "Owning provision id." }
+      version_id: { type: STRING, description: "Owning version id." }
+      document_id: { type: STRING, description: "Source document id." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      sha256: { type: STRING, description: "Provenance hash." }
+  table_cell:
+    label: TableCell
+    aliases: [table, cell, table entry, development standards table]
+    description: >-
+      One cell of a code table, verbatim: `table` 'Table 110-4', `row` 'Rear building setback', `column` 'R5', `cell`
+      '5 ft. [3]'. Columns are usually zone codes; such cells link to the Zone (APPLIES_TO_ZONE). Footnote markers stay
+      in the text and in `footnotes`. A cell holding one plain quantity also has a Parameter (FROM_CELL points from
+      the parameter to the cell); other cells must be read from `cell`.
+    properties:
+      id: { type: STRING, key: true, description: "Version id + '::cell:' + table|row_group|...|row||column." }
+      table: { type: STRING, description: "Table name, e.g. 'Table 110-4' (Portland single-dwelling development standards), 'Table 205-1', 'Table 4.0120' (Gresham)." }
+      row: { type: STRING, description: "Row label as printed, e.g. 'Maximum Height', 'Front building setback'." }
+      column: { type: STRING, description: "Column label, usually a zone code ('R5', 'LDR-7')." }
+      row_group: { type: STRING, description: "Row group heading when the table has one (e.g. 'RESIDENTIAL')." }
+      column_group: { type: STRING, description: "Column group heading when present." }
+      row_index: { type: INTEGER, description: "Row position when recorded." }
+      cell: { type: STRING, description: "Cell text verbatim, with footnote markers, e.g. '30 ft. [3]'." }
+      quote: { type: STRING, description: "Same as `cell`." }
+      footnotes: { type: LIST<STRING>, description: "Footnote markers in the cell, e.g. ['3']." }
+      position: { type: STRING, description: "How well the extraction proved the cell's row and column: row_sequence or column_sequence = proved by order; present = only the text was found, so its row/column is the extractor's claim.", one_of: [row_sequence, column_sequence, present] }
+      page: { type: INTEGER, description: "Page in its Document." }
+      provision_id: { type: STRING, description: "Owning provision (the table), e.g. 'PDX.T110-4'." }
+      version_id: { type: STRING, description: "Owning version id." }
+      document_id: { type: STRING, description: "Source document id." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham.", one_of: [PDX, GRE] }
+      sha256: { type: STRING, description: "Provenance hash." }
+  zone:
+    label: Zone
+    aliases: [zoning district, zone code, base zone, R5, residential zone]
+    description: >-
+      A residential base zone where an ADU might go: Portland RF, R20, R10, R7, R5, R2.5 (ids 'PDX:R5'); Gresham
+      LDR-5, LDR-7, TLDR, TR, MDR-12, OFR (ids 'GRE:LDR-7'). Match a user's 'R5' on `zone_code` together with
+      `layer`, because codes can repeat across cities.
+    properties:
+      id: { type: STRING, key: true, description: "Layer + ':' + code, e.g. 'PDX:R5'." }
+      zone_code: { type: STRING, description: "Code as printed: 'R5', 'LDR-7'." }
+      name: { type: STRING, description: "Full name, e.g. 'Residential 5,000'." }
+      single_dwelling: { type: BOOLEAN, description: "True for single-dwelling zones." }
+      allows_detached_house: { type: BOOLEAN, description: "True when a detached house is allowed (all zones here)." }
+      quote: { type: STRING, description: "Words that name the zone in its document." }
+      document_id: { type: STRING, description: "Document that defines the zone." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham.", one_of: [PDX, GRE] }
+      sha256: { type: STRING, description: "Provenance hash." }
+  term:
+    label: Term
+    aliases: [defined term, definition, word, glossary entry]
+    description: >-
+      A defined word in a jurisdiction (e.g. 'Accessory Dwelling', 'Building Coverage'). The definition text is the
+      Provision that DEFINES it (type 'definition'); read the Version in force. Match `normalized_term` (lower case)
+      with CONTAINS. Words can be defined differently by the state and each city, so keep the layer.
+    properties:
+      id: { type: STRING, key: true, description: "Layer + ':' + normalized term, e.g. 'GRE:accessory dwelling'." }
+      term: { type: STRING, description: "Term as printed." }
+      normalized_term: { type: STRING, description: "Lower-case term for matching." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+  reading:
+    label: Reading
+    aliases: [gray area, ambiguity, interpretation, open question, unclear wording]
+    description: >-
+      An ambiguous phrase in a version and its possible readings, recorded but deliberately NOT settled. A Reading
+      means a person must decide: report the phrase, each reading and `why`; never pick one as the answer.
+    properties:
+      id: { type: STRING, key: true, description: "Version id + '::reading:' + index." }
+      phrase: { type: STRING, description: "The ambiguous words." }
+      quote: { type: STRING, description: "Same words, verbatim from the text." }
+      readings: { type: LIST<STRING>, description: "The possible readings, each a sentence." }
+      why: { type: STRING, description: "Why it is ambiguous." }
+      index: { type: INTEGER, description: "Order within the version." }
+      page: { type: INTEGER, description: "Page in its Document." }
+      provision_id: { type: STRING, description: "Owning provision id." }
+      version_id: { type: STRING, description: "Owning version id." }
+      document_id: { type: STRING, description: "Source document id." }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+      sha256: { type: STRING, description: "Provenance hash." }
+  gray_area_effect:
+    label: GrayAreaEffect
+    aliases: [gray area impact, ambiguity effect, who decides]
+    description: >-
+      What a gray-area Reading changes in an evaluation (EFFECT_OF points to the Reading): when it matters
+      (`matters_when_json`), what each reading does to a fact or a number (`effects_json`) and who can settle it
+      (`settled_by`, e.g. 'Portland BDS'). Report it as an open question with its settler, never as resolved.
+    properties:
+      id: { type: STRING, key: true, description: "Slug, e.g. 'amb.reduced-front-setback.the-dwelling'." }
+      phrase: { type: STRING, description: "The ambiguous words." }
+      provision_id: { type: STRING, description: "Provision the phrase is in." }
+      matters_when_json: { type: STRING, description: "JSON list of conditions on facts under which the ambiguity changes the result, e.g. [{\"fact\": \"site.corner_lot\", \"op\": \"unknown\"}]. Parse in code." }
+      effects_json: { type: STRING, description: "JSON list: per reading, what it changes (a fact's value or a number). '[]' = no modeled effect." }
+      settled_by: { type: STRING, description: "Who can resolve it: 'Portland BDS', 'Portland BDS (a written determination), or a Code Interpretation', 'Urban Forestry'." }
+      status: { type: STRING, description: "'active' = still open.", one_of: [active] }
+      layer: { type: STRING, description: "Jurisdiction layer: OR = Oregon state law, PDX = Portland, GRE = Gresham, EUG = Eugene.", one_of: [OR, PDX, GRE, EUG] }
+  fact:
+    label: Fact
+    aliases: [input, site fact, plan fact, variable, what we need to know]
+    description: >-
+      A fact about the site or the proposed plan that rules read, registered once: 'site.zone', 'site.corner_lot',
+      'site.trees', 'plan.height_ft', 'plan.living_area_sqft'. The same ids appear in Clause.needs and guards. Use it
+      to answer "what must we know about the lot to evaluate this?" (follow Operator -[:READS_FACT]-> Fact).
+    properties:
+      id: { type: STRING, key: true, description: "'site.<name>' (the lot and what is on it) or 'plan.<name>' (the proposed ADU)." }
+      scope: { type: STRING, description: "site or plan.", one_of: [site, plan] }
+      description: { type: STRING, description: "What the fact is, in words." }
+      type: { type: STRING, description: "Value type: bool, quantity, count, enum, list, polygon, line, lines, point, structures, placement.", one_of: [bool, quantity, count, enum, list, polygon, line, lines, point, structures, placement] }
+      unit: { type: STRING, description: "Unit for quantities: ft, sqft, %, count.", one_of: [ft, sqft, "%", count] }
+      values: { type: LIST<STRING>, description: "Allowed values for an enum fact (e.g. the zone codes)." }
+      accepted_sources: { type: LIST<STRING>, description: "Where the value may come from: official_record, capture (the yard scan), owner_statement, plan_document, computed." }
+      computed_json: { type: STRING, description: "For a computed fact: JSON {from: [fact ids], how: ...}. COMPUTED_FROM links the same inputs." }
+      required_for: { type: LIST<STRING>, description: "'adu_evaluation' when the evaluation cannot run without it." }
+  operator:
+    label: Operator
+    aliases: [check, rule evaluator, how a rule is checked]
+    description: >-
+      How the engine evaluates a kind of rule: a provisional modeling (by CC) that a Provision (MODELS) is checked by
+      running a Tool (RUNS_TOOL) on Facts (READS_FACT) with the provision's Parameters (TAKES_PARAMETER). A provision
+      with no Operator is not evaluated by the engine: its clauses can only give NEEDS_CHECK.
+    properties:
+      id: { type: STRING, key: true, description: "'op.<name>', e.g. 'op.base_setbacks', 'op.adu_size'." }
+      kind: { type: STRING, description: "placement, setback, exception_conditions, max, formula.", one_of: [placement, setback, exception_conditions, max, formula] }
+      tool: { type: STRING, description: "Id of the Tool it runs (the same as RUNS_TOOL)." }
+      places: { type: BOOLEAN, description: "True when it constrains where the ADU can be placed (it enters the placement search)." }
+      note: { type: STRING, description: "How the rule is read, in words." }
+      status: { type: STRING, description: "'provisional': a modeling choice not yet confirmed.", one_of: [provisional] }
+      by: { type: STRING, description: "Who modeled it." }
+      date: { type: STRING, description: "When (ISO)." }
+  tool:
+    label: Tool
+    aliases: [function, calculator, geometry check]
+    description: "A tested function the engine runs (distances to lot lines, setbacks, maxima, coverage, placements). `doc` says what it computes."
+    properties:
+      id: { type: STRING, key: true, description: "Function name, e.g. 'check_setback', 'find_placements'." }
+      doc: { type: STRING, description: "What it computes and returns." }
+      module: { type: STRING, description: "Code module ('graph/tools')." }
+  convention:
+    label: Convention
+    description: "The geometric conventions every tool follows (lot frame, plan frame, anchors, faces), as one JSON document. Rarely needed in a query."
+    properties:
+      id: { type: STRING, key: true, description: "'conventions'." }
+      about: { type: STRING, description: "What the conventions cover." }
+      json: { type: STRING, description: "The conventions as JSON. Parse in code." }
+  reading_guide:
+    label: ReadingGuide
+    description: "The written procedure for reading this graph during an evaluation (order of reading, verdicts). One node; its text is guidance, not law."
+    properties:
+      id: { type: STRING, key: true, description: "'reading-guide'." }
+      text: { type: STRING, description: "The guide, as markdown." }
+      verdicts: { type: LIST<STRING>, description: "Allowed verdicts: FITS, FITS_IF, NO_LEGS, BLOCKED_BY_GATE, NEEDS_CHECK, NOT_MODELED." }
+  confirmation:
+    label: Confirmation
+    description: "A named person's confirmation of one modeled item (append-only). No confirmations exist yet: everything modeled is provisional."
+  graph_load:
+    label: GraphLoad
+    description: "Bookkeeping: one node recording when and from what the graph was loaded. Never part of an answer."
+    properties:
+      id: { type: STRING, key: true }
+      graph_sha256: { type: STRING }
+      loaded_at: { type: STRING }
+      loaded_by: { type: STRING }
+      node_counts_json: { type: STRING }
+      schema: { type: STRING }
+      source_hashes: { type: LIST<STRING> }
+      store: { type: STRING }
+relationships:
+  has_version:
+    type: HAS_VERSION
+    from: { node: provision }
+    to: { node: version }
+    description: "Provision -> each of its Versions. Then filter the versions to the one in force on the date."
+  supersedes:
+    type: SUPERSEDES
+    from: { node: version }
+    to: { node: version }
+    description: "Newer Version -> the older version of the same provision that it replaces."
+  operative_by:
+    type: OPERATIVE_BY
+    from: { node: version }
+    to: { node: version }
+    description: "Version -> the session-law version that sets its operative date (properties carry the quote and date)."
+    properties:
+      operative_from: { type: STRING, description: "The operative date it sets (ISO)." }
+      quote: { type: STRING, description: "The words that set it." }
+      reading: { type: STRING, description: "How the link was read." }
+      status: { type: STRING, description: "'provisional'." }
+  from_document:
+    type: FROM_DOCUMENT
+    from: { node: version }
+    to: { node: document }
+    description: "Version -> the Document its text comes from. Use it to cite the source title and edition."
+  has_clause:
+    type: HAS_CLAUSE
+    from: { node: version }
+    to: { node: clause }
+    description: "Version -> every Clause of its text."
+  parent_clause:
+    type: PARENT_CLAUSE
+    from: { node: clause }
+    to: { node: clause }
+    description: "Child Clause -> the Clause that contains it (e.g. a condition -> its item; '(1)(a)' -> '(1)'). Points UP to the parent."
+  opened_by:
+    type: OPENED_BY
+    from: { node: clause }
+    to: { node: clause }
+    description: "Clause -> the condition clause ('if', 'when', 'where') that opens it: it can only apply when that condition can hold."
+  modeled_by:
+    type: MODELED_BY
+    from: { node: clause }
+    to: { node: parameter }
+    description: "Modeled Clause -> the Parameter that carries its value."
+  has_parameter:
+    type: HAS_PARAMETER
+    from: { node: version }
+    to: { node: parameter }
+    description: "Version -> each Parameter (value) it sets."
+  from_cell:
+    type: FROM_CELL
+    from: { node: parameter }
+    to: { node: table_cell }
+    description: "Parameter -> the TableCell it was read from."
+  has_table_cell:
+    type: HAS_TABLE_CELL
+    from: { node: version }
+    to: { node: table_cell }
+    description: "Version (of a table provision) -> each of its TableCells."
+  on_cell:
+    type: ON_CELL
+    from: { node: clause }
+    to: { node: table_cell }
+    description: "Footnote Clause -> each TableCell carrying its marker. Use it to get the words of a cell's footnote."
+  parameter_applies_to_zone:
+    type: APPLIES_TO_ZONE
+    from: { node: parameter }
+    to: { node: zone }
+    description: "Parameter -> the Zone it applies to (table column)."
+  cell_applies_to_zone:
+    type: APPLIES_TO_ZONE
+    from: { node: table_cell }
+    to: { node: zone }
+    description: "TableCell -> the Zone of its column."
+  clause_applies_to_zone:
+    type: APPLIES_TO_ZONE
+    from: { node: clause }
+    to: { node: zone }
+    description: "Clause -> a Zone its words name."
+  provision_in_jurisdiction:
+    type: IN_JURISDICTION
+    from: { node: provision }
+    to: { node: jurisdiction }
+    description: "Provision -> its Jurisdiction."
+  document_in_jurisdiction:
+    type: IN_JURISDICTION
+    from: { node: document }
+    to: { node: jurisdiction }
+    description: "Document -> its Jurisdiction."
+  zone_in_jurisdiction:
+    type: IN_JURISDICTION
+    from: { node: zone }
+    to: { node: jurisdiction }
+    description: "Zone -> its Jurisdiction."
+  term_in_jurisdiction:
+    type: IN_JURISDICTION
+    from: { node: term }
+    to: { node: jurisdiction }
+    description: "Term -> the Jurisdiction that defines it."
+  under_state:
+    type: UNDER_STATE
+    from: { node: jurisdiction }
+    to: { node: jurisdiction }
+    description: "City -> the State whose law also applies to it (Portland and Gresham -> Oregon)."
+  zone_defined_in:
+    type: DEFINED_IN_DOCUMENT
+    from: { node: zone }
+    to: { node: document }
+    description: "Zone -> the Document that establishes it."
+  defines:
+    type: DEFINES
+    from: { node: provision }
+    to: { node: term }
+    description: "Definition Provision -> the Term it defines."
+  uses_term:
+    type: USES_TERM
+    from: { node: provision }
+    to: { node: term }
+    description: "Provision -> a defined Term its text uses. To read what the term means, follow Term <-[:DEFINES]- Provision."
+  uses_definition:
+    type: USES_DEFINITION
+    from: { node: provision }
+    to: { node: provision }
+    description: "Provision -> the definition Provision whose meaning it relies on (a direct shortcut to the definition text). Some links were added by hand and carry the quote and the term."
+    properties:
+      term: { type: STRING, description: "The term relied on." }
+      quote: { type: STRING, description: "Words in the source provision that rely on it." }
+      note: { type: STRING, description: "Why the link matters." }
+      status: { type: STRING, description: "'provisional' for hand-added links." }
+      by: { type: STRING, description: "Who added the link." }
+      date: { type: STRING, description: "When (ISO)." }
+  modifies:
+    type: MODIFIES
+    from: { node: provision }
+    to: { node: provision }
+    description: >-
+      Exception Provision -> the rule it relaxes (a constraint, or another exception: exceptions can chain). To know
+      what can change a setback, follow incoming MODIFIES to the rule. Provisional, with the quote that does it.
+    properties:
+      quote: { type: STRING, description: "The words that relax the rule." }
+      note: { type: STRING, description: "What it does, in words." }
+      status: { type: STRING, description: "'provisional'." }
+      by: { type: STRING, description: "Who linked it." }
+      date: { type: STRING, description: "When (ISO)." }
+  preempts:
+    type: PREEMPTS
+    from: { node: provision }
+    to: { node: provision }
+    description: "State-law Provision -> a city Provision it overrides or limits. The quote and note say how far. Provisional."
+    properties:
+      quote: { type: STRING, description: "The state-law words that pre-empt." }
+      note: { type: STRING, description: "How far the pre-emption reaches." }
+      status: { type: STRING, description: "'provisional'." }
+      by: { type: STRING, description: "Who linked it." }
+      date: { type: STRING, description: "When (ISO)." }
+  models:
+    type: MODELS
+    from: { node: operator }
+    to: { node: provision }
+    description: "Operator -> the Provision it evaluates."
+  takes_parameter:
+    type: TAKES_PARAMETER
+    from: { node: operator }
+    to: { node: parameter }
+    description: "Operator -> a Parameter (the law's number) it uses."
+  runs_tool:
+    type: RUNS_TOOL
+    from: { node: operator }
+    to: { node: tool }
+    description: "Operator -> the Tool that computes it."
+  operator_reads_fact:
+    type: READS_FACT
+    from: { node: operator }
+    to: { node: fact }
+    description: "Operator -> a Fact about the site or plan it needs."
+  tool_reads_fact:
+    type: READS_FACT
+    from: { node: tool }
+    to: { node: fact }
+    description: "Tool -> a Fact it reads."
+  computed_from:
+    type: COMPUTED_FROM
+    from: { node: fact }
+    to: { node: fact }
+    description: "Computed Fact -> each Fact it is computed from."
+  effect_of:
+    type: EFFECT_OF
+    from: { node: gray_area_effect }
+    to: { node: reading }
+    description: "GrayAreaEffect -> the Reading (gray area) whose consequences it records."
+  refers_to:
+    type: REFERS_TO
+    from: { node: provision }
+    to: { node: provision }
+    description: "Provision -> another Provision its text cross-references ('See 33.110.265.F'). Follow it when a rule says 'except as provided in ...'."
+  has_reading:
+    type: HAS_READING
+    from: { node: version }
+    to: { node: reading }
+    description: "Version -> each gray-area Reading recorded in its text."
