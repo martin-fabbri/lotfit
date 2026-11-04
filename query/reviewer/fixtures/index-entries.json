@@ -1,0 +1,79 @@
+[
+ {
+  "provision_id": "EUG.9.0500.building-height",
+  "layer": "EUG",
+  "type": "definition",
+  "evaluation_stage": "definition",
+  "title": "Building Height",
+  "section": "9.0500",
+  "param_names": [],
+  "gray_areas": 0,
+  "scope": {
+   "applies_to_zones": [],
+   "project_kinds": [],
+   "scope_clause_id": "EUG.9.0500.building-height#v1::sentence:2",
+   "scope_quote": "The vertical distance above a reference datum measured to the highest point of the coping of a flat roof, to the deck line of a mansard roof, or to the average height of the gables of a pitched or hipped roof.",
+   "source": "graph",
+   "basis": "guessed"
+  },
+  "in_force": {
+   "from": "2026-07-11",
+   "to": null,
+   "date_not_stated": false
+  },
+  "has_operator": false,
+  "modifies_operator_backed": false
+ },
+ {
+  "provision_id": "EUG.9.2751.17.a.4",
+  "layer": "EUG",
+  "type": "constraint",
+  "evaluation_stage": "placement_constraint",
+  "title": "Accessory dwellings on flag lots",
+  "section": "9.2751(17)(a)4.",
+  "param_names": [],
+  "gray_areas": 0,
+  "scope": {
+   "applies_to_zones": [],
+   "project_kinds": [],
+   "scope_clause_id": "EUG.9.2751.17.a.4#v1::sentence:2",
+   "scope_quote": "Accessory dwellings on flag lots",
+   "source": "graph",
+   "basis": "stated"
+  },
+  "in_force": {
+   "from": "2025-01-02",
+   "to": null,
+   "date_not_stated": false
+  },
+  "has_operator": false,
+  "modifies_operator_backed": false
+ },
+ {
+  "provision_id": "EUG.9.2751.17.c",
+  "layer": "EUG",
+  "type": "constraint",
+  "evaluation_stage": "placement_constraint",
+  "title": "Area-specific accessory dwelling standards (Amazon, Fairmount, South University)",
+  "section": "9.2751(17)(c)",
+  "param_names": [],
+  "gray_areas": 0,
+  "scope": {
+   "applies_to_zones": [
+    "R-1"
+   ],
+   "project_kinds": [],
+   "scope_clause_id": "EUG.9.2751.17.c#v1::sentence:2",
+   "scope_quote": "within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association",
+   "source": "graph",
+   "basis": "stated"
+  },
+  "in_force": {
+   "from": "2025-01-02",
+   "to": null,
+   "date_not_stated": false
+  },
+  "has_operator": false,
+  "modifies_operator_backed": false
+ }
+]

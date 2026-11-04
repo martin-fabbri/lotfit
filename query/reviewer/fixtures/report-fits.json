@@ -1,0 +1,111 @@
+{
+  "schema": "lotfit.evaluation-report/1",
+  "case_id": "01a1a2c6-88a5-731b-af50-cca2edf5478e",
+  "case_hash": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+  "graph_load_id": "3e6c8679",
+  "config_hash": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+  "as_of": {
+    "date": "2026-11-15",
+    "meaning": "planned_submittal"
+  },
+  "verdict": "FITS",
+  "model_verdict": "FITS",
+  "verdict_note": null,
+  "banner": "Pre-feasibility only; not a permit decision.",
+  "plan_limit": null,
+  "placement": {
+    "client_spot": {
+      "placement": {
+        "x": 2,
+        "y": 74,
+        "rotation": 0
+      },
+      "passes": false,
+      "failing": [
+        "PDX.33.110.220.B"
+      ],
+      "rejected_exceptions": [
+        "PDX.33.110.245.C.2"
+      ]
+    },
+    "recommended": {
+      "placement": {
+        "x": 13,
+        "y": 65,
+        "rotation": 0
+      },
+      "margins": [
+        {
+          "value": 13,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "PDX.T110-4",
+            "param": "side_setback.R5",
+            "value": 5,
+            "unit": "ft"
+          },
+          "margin": 8,
+          "tolerance": 0.5,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        },
+        {
+          "value": 13,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "PDX.T110-4",
+            "param": "side_setback.R5",
+            "value": 5,
+            "unit": "ft"
+          },
+          "margin": 8,
+          "tolerance": 0.5,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        },
+        {
+          "value": 11,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "PDX.T110-4",
+            "param": "side_setback.R5",
+            "value": 5,
+            "unit": "ft"
+          },
+          "margin": 6,
+          "tolerance": 0.5,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        }
+      ],
+      "solar": null
+    },
+    "search": null
+  },
+  "findings": [],
+  "dispositions_relied_on": [],
+  "conflicts": [],
+  "assumptions": [],
+  "questions": [],
+  "not_found": [],
+  "unchecked": [],
+  "verifier": {
+    "passed": true,
+    "issues": []
+  },
+  "critic": null,
+  "telemetry": {
+    "tokens": 30000,
+    "calls": 30,
+    "turns": 12,
+    "wall_s_plan_execute": 40,
+    "wall_s_total": 55,
+    "cost_usd": 0.05,
+    "models": {
+      "agent": "meta-models/muse-spark-open-1026"
+    }
+  }
+}
