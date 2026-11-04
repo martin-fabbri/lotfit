@@ -1,0 +1,219 @@
+[
+ {
+  "provision_id": "EUG.9.2751.17.c",
+  "version_id": "EUG.9.2751.17.c#v1",
+  "sha256": "d04a2571ba046297ff3fb135a4ed5c722c7f39d5e411c45f61ee77981231ade0",
+  "evaluation_stage": "placement_constraint",
+  "params": [],
+  "cells": [],
+  "clauses": [
+   {
+    "clause_id": "EUG.9.2751.17.c#v1::sentence:1",
+    "kind": "heading",
+    "quote": "Area-Specific Accessory Dwelling Standards.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.2751.17.c#v1::sentence:2",
+    "kind": "sentence",
+    "quote": "Except as provided in this subsection (c), the standards at (a) and (b) do not apply to accessory dwellings within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.2751.17.c#v1::condition:s2/except#1",
+    "kind": "condition",
+    "quote": "Except as provided in this subsection (c)",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.2751.17.c#v1::sentence:3",
+    "kind": "sentence",
+    "quote": "The following standards apply to all new attached or detached accessory dwellings in the R-1 zone within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association:",
+    "modeled": false,
+    "guards": [
+     {
+      "fact": "site.zone",
+      "op": "in",
+      "value": [
+       "R-1"
+      ]
+     }
+    ],
+    "disposition": null,
+    "needs": [
+     "site.zone"
+    ]
+   }
+  ],
+  "readings": [],
+  "gray_area_effects": [],
+  "operators": [],
+  "modified_by": [],
+  "preempted_by": [],
+  "uses_definitions": []
+ },
+ {
+  "provision_id": "EUG.9.0500.building-height",
+  "version_id": "EUG.9.0500.building-height#v1",
+  "sha256": "59d050d6e4cfa2daba0054549253f6f495ee0adcf339e057f3bfb9defafe445e",
+  "evaluation_stage": "definition",
+  "params": [],
+  "cells": [],
+  "clauses": [
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::sentence:1",
+    "kind": "heading",
+    "quote": "Building Height.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::sentence:2",
+    "kind": "sentence",
+    "quote": "The vertical distance above a reference datum measured to the highest point of the coping of a flat roof, to the deck line of a mansard roof, or to the average height of the gables of a pitched or hipped roof.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": [
+     "plan.gable_walls",
+     "plan.height_ft"
+    ]
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::sentence:3",
+    "kind": "sentence",
+    "quote": "For the purposes of residential zones, building height shall be the vertical distance above a reference datum measured to the highest point of the roof.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": [
+     "plan.height_ft",
+     "site.zone_family"
+    ]
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::sentence:4",
+    "kind": "sentence",
+    "quote": "The maximum height of a stepped or terraced building is the maximum height of all segments of that building.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": [
+     "plan.height_ft"
+    ]
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::sentence:5",
+    "kind": "stem",
+    "quote": "The reference datum shall be whichever of the following two measurements results in the greater building height:",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::item:(A)",
+    "kind": "item",
+    "quote": "(A) The reference datum is the lowest grade when the highest ground surface within a five-foot horizontal distance of the exterior wall of the building is not more than 10 feet above the lowest grade.",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::condition:(A)/when#1",
+    "kind": "condition",
+    "quote": "when the highest ground surface within a five-foot horizontal distance of the exterior wall of the building is not more than 10 feet above the lowest grade",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::item:(B)",
+    "kind": "item",
+    "quote": "(B) The reference datum is 10 feet higher than the lowest grade when the highest ground surface described in item (A) above is 10 feet or more above the lowest grade. (See Figure 9.0500 Building Height Calculation.)",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": [
+     "plan.height_ft"
+    ]
+   },
+   {
+    "clause_id": "EUG.9.0500.building-height#v1::condition:(B)/when#1",
+    "kind": "condition",
+    "quote": "when the highest ground surface described in item (A) above is 10 feet or more above the lowest grade",
+    "modeled": false,
+    "guards": [],
+    "disposition": null,
+    "needs": []
+   }
+  ],
+  "readings": [],
+  "gray_area_effects": [],
+  "operators": [],
+  "modified_by": [],
+  "preempted_by": [],
+  "uses_definitions": []
+ },
+ {
+  "provision_id": "EUG.9.2751.17.a.4",
+  "version_id": "EUG.9.2751.17.a.4#v1",
+  "sha256": "d04a2571ba046297ff3fb135a4ed5c722c7f39d5e411c45f61ee77981231ade0",
+  "evaluation_stage": "placement_constraint",
+  "params": [],
+  "cells": [],
+  "clauses": [
+   {
+    "clause_id": "EUG.9.2751.17.a.4#v1::sentence:1",
+    "kind": "sentence",
+    "quote": "Additional Standards for Accessory Dwellings on Flag Lots.",
+    "modeled": false,
+    "guards": [
+     {
+      "fact": "site.flag_lot",
+      "op": "true"
+     }
+    ],
+    "disposition": null,
+    "needs": [
+     "site.flag_lot"
+    ]
+   },
+   {
+    "clause_id": "EUG.9.2751.17.a.4#v1::sentence:2",
+    "kind": "sentence",
+    "quote": "Accessory dwellings on flag lots are also subject to the standards at EC 9.2775(5)(e).",
+    "modeled": false,
+    "guards": [
+     {
+      "fact": "site.flag_lot",
+      "op": "true"
+     }
+    ],
+    "disposition": null,
+    "needs": [
+     "site.flag_lot"
+    ]
+   }
+  ],
+  "readings": [],
+  "gray_area_effects": [],
+  "operators": [],
+  "modified_by": [],
+  "preempted_by": [],
+  "uses_definitions": []
+ }
+]

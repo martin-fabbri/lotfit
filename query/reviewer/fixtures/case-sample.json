@@ -1,0 +1,215 @@
+{
+ "schema": "lotfit.case/1",
+ "case_id": "019a4a00-0000-7000-8000-0000000000c1",
+ "as_of": {
+  "date": "2026-11-15",
+  "meaning": "planned_submittal"
+ },
+ "jurisdiction": {
+  "state_layer": "OR",
+  "city_layer": "EUG"
+ },
+ "mode": "find_spots",
+ "capture": null,
+ "site": {
+  "zone": {
+   "value": "R-1",
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "sample city zoning map",
+     "where": "base zone",
+     "when": "2026-11-01",
+     "by": "sample",
+     "issuer": "Sample City",
+     "status": "current"
+    }
+   ]
+  },
+  "flag_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "sample city zoning map",
+     "where": "base zone",
+     "when": "2026-11-01",
+     "by": "sample",
+     "issuer": "Sample City",
+     "status": "current"
+    }
+   ]
+  },
+  "corner_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "sample city zoning map",
+     "where": "base zone",
+     "when": "2026-11-01",
+     "by": "sample",
+     "issuer": "Sample City",
+     "status": "current"
+    }
+   ]
+  },
+  "lot_outline": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     60,
+     0
+    ],
+    [
+     60,
+     100
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "sample scan",
+     "where": "yard",
+     "when": "2026-11-03",
+     "by": "sample",
+     "status": "unconfirmed"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "house_outline": {
+   "value": [
+    [
+     10,
+     10
+    ],
+    [
+     50,
+     10
+    ],
+    [
+     50,
+     45
+    ],
+    [
+     10,
+     45
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "sample scan",
+     "where": "yard",
+     "when": "2026-11-03",
+     "by": "sample",
+     "status": "unconfirmed"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "primary_living_area_sqft": {
+   "value": 1400,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "sample city zoning map",
+     "where": "base zone",
+     "when": "2026-11-01",
+     "by": "sample",
+     "issuer": "Sample City",
+     "status": "current"
+    }
+   ]
+  }
+ },
+ "plan": {
+  "kind": {
+   "value": "adu",
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "sample 16 x 36 ft studio",
+     "where": "sheet A1",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "illustration"
+    }
+   ]
+  },
+  "detached": {
+   "value": true,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "sample 16 x 36 ft studio",
+     "where": "sheet A1",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "illustration"
+    }
+   ]
+  },
+  "footprint": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     16,
+     0
+    ],
+    [
+     16,
+     36
+    ],
+    [
+     0,
+     36
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "sample 16 x 36 ft studio",
+     "where": "sheet A1",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "illustration"
+    }
+   ]
+  },
+  "height_ft": {
+   "value": 14,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "sample 16 x 36 ft studio",
+     "where": "sheet A1",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "illustration"
+    }
+   ]
+  }
+ },
+ "unknowns": [
+  {
+   "fact": "site.trees",
+   "reason": "not surveyed yet"
+  },
+  {
+   "fact": "site.slope_pct",
+   "reason": "no capture yet"
+  }
+ ]
+}

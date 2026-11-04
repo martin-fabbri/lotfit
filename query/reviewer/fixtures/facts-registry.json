@@ -1,0 +1,158 @@
+{
+ "about": "names only, from the LotFit facts registry (graph/curated/facts.json)",
+ "facts": [
+  {
+   "name": "site.zone"
+  },
+  {
+   "name": "site.zone_family"
+  },
+  {
+   "name": "site.overlays"
+  },
+  {
+   "name": "site.lot_outline"
+  },
+  {
+   "name": "site.lot_area_sqft"
+  },
+  {
+   "name": "site.front_lot_line"
+  },
+  {
+   "name": "site.side_street_lot_line"
+  },
+  {
+   "name": "site.rear_lot_line"
+  },
+  {
+   "name": "site.side_lot_lines"
+  },
+  {
+   "name": "site.house_outline"
+  },
+  {
+   "name": "site.structures"
+  },
+  {
+   "name": "site.primary_living_area_sqft"
+  },
+  {
+   "name": "site.corner_lot"
+  },
+  {
+   "name": "site.flag_lot"
+  },
+  {
+   "name": "site.through_lot"
+  },
+  {
+   "name": "site.alley"
+  },
+  {
+   "name": "site.trees"
+  },
+  {
+   "name": "site.slope_pct"
+  },
+  {
+   "name": "site.historic_resource"
+  },
+  {
+   "name": "site.primary_is_duplex"
+  },
+  {
+   "name": "site.primary_is_attached_house"
+  },
+  {
+   "name": "site.primary_is_manufactured"
+  },
+  {
+   "name": "site.screening"
+  },
+  {
+   "name": "site.other_structures_in_setback"
+  },
+  {
+   "name": "site.house_main_entrance"
+  },
+  {
+   "name": "site.house_rear_wall"
+  },
+  {
+   "name": "plan.kind"
+  },
+  {
+   "name": "plan.detached"
+  },
+  {
+   "name": "plan.footprint"
+  },
+  {
+   "name": "plan.placement"
+  },
+  {
+   "name": "plan.outline"
+  },
+  {
+   "name": "plan.height_ft"
+  },
+  {
+   "name": "plan.wall_height_ft"
+  },
+  {
+   "name": "plan.living_area_sqft"
+  },
+  {
+   "name": "plan.eave_ft"
+  },
+  {
+   "name": "plan.setbacks_used"
+  },
+  {
+   "name": "plan.parking"
+  },
+  {
+   "name": "plan.is_garage"
+  },
+  {
+   "name": "plan.is_cistern"
+  },
+  {
+   "name": "plan.gable_walls"
+  },
+  {
+   "name": "plan.dormers"
+  },
+  {
+   "name": "plan.rooftop_deck"
+  },
+  {
+   "name": "plan.openings_facing_lot_line"
+  },
+  {
+   "name": "plan.basement_conversion"
+  },
+  {
+   "name": "plan.vacation_occupancy"
+  },
+  {
+   "name": "plan.owner_occupancy_required"
+  },
+  {
+   "name": "plan.sloped_ceiling"
+  },
+  {
+   "name": "plan.openings_by_face"
+  },
+  {
+   "name": "plan.dormer_faces"
+  },
+  {
+   "name": "plan.total_building_sqft"
+  },
+  {
+   "name": "plan.accessory_dwellings_on_lot"
+  }
+ ]
+}
