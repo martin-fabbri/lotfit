@@ -2989,11 +2989,24 @@ export async function evaluateDetailed(
       finalized.report = mergeReview(finalized.report, o, !!opts.reviewerClient);
     }
 
+    // A refused trace must not lose the run: keep the report (flagged abnormal), skip trace.json.
+    let trace: TraceType;
+    try {
+      trace = compileTrace(finalized.report, kase);
+      eventLog.writeArtifact("trace.json", trace);
+    } catch (e) {
+      eventLog.append("error", {
+        category: "harness",
+        code: "TRACE_REFUSED",
+        message: (e as Error)?.message ?? String(e),
+        metadata: { recoverable: false },
+      });
+      (finalized.report as unknown as Record<string, unknown>).abnormal_end = true;
+      trace = null as unknown as TraceType;
+    }
+
     const reportArtifact = eventLog.writeArtifact("report.json", finalized.report);
     void reportArtifact;
-
-    const trace = compileTrace(finalized.report, kase);
-    eventLog.writeArtifact("trace.json", trace);
 
     return {
       report: finalized.report,

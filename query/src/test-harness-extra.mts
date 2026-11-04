@@ -226,6 +226,34 @@ ok("run folder holds events.jsonl, report.json and trace.json",
 const trace2 = compileTrace(rScan.report, traceKase);
 ok("trace is byte-identical when compiled twice", JSON.stringify(trace1) === JSON.stringify(trace2));
 
+// Refused trace (live: eug-demo-24x24.scanline): a selected_placement finding with no recommended
+// placement makes compileTrace throw; the run must survive with report.json and abnormal_end.
+const selCheckId = makeUuid7();
+const selTurn: ModelToolCallDraft[] = [
+  { call_id: selCheckId, tool: "check_setback", provision_id: SEARCH_PID, target: "selected_placement",
+    args: { provision_id: SEARCH_PID, target: "selected_placement",
+      outline: { placed: { x: 14, y: 79, rotation: 0 }, footprint: { fact: "plan.footprint" } },
+      lines: { fact: "site.side_lot_lines" },
+      min: { provision_id: "EUG.9.2751.17.b.4.a.setback", param: "min_interior_setback" } } },
+  { call_id: makeUuid7(), tool: "record_finding", provision_id: SEARCH_PID, target: "selected_placement",
+    args: { provision_id: SEARCH_PID, target: "selected_placement", clause_ids: [`${SEARCH_PID}#v1::sentence:1`],
+      outcome: "pass", evidence_call_ids: [selCheckId], numbers: [],
+      quotes: [{ clause_id: `${SEARCH_PID}#v1::sentence:1`, quote: "scope" }] } },
+];
+const rNoTrace = await evaluateDetailed(structuredClone(EUG_BASE), { graphReader: reader,
+  modelClient: new ScriptedModelClient(eugClosureScript(eugPlan, SEARCH_PID, [selTurn])),
+  runsDir: path.join(scratch, "runs-notrace"), budgets: { max_verify_repairs: 1 } });
+ok("refused trace: run returns a report with abnormal_end true",
+  (rNoTrace.report as unknown as Record<string, unknown>).abnormal_end === true,
+  `abnormal_end=${String((rNoTrace.report as unknown as Record<string, unknown>).abnormal_end)}`);
+const traceRefused = rNoTrace.events.find((e) => e.type === "error" && (e.data as any).code === "TRACE_REFUSED");
+ok("refused trace: event log has TRACE_REFUSED",
+  traceRefused !== undefined && String((traceRefused?.data as any).message ?? "").includes("trace does not cover"),
+  traceRefused ? String((traceRefused.data as any).message).slice(0, 160) : "no TRACE_REFUSED event");
+ok("refused trace: report.json written, trace.json skipped",
+  existsSync(path.join(rNoTrace.run_dir, "report.json")) && !existsSync(path.join(rNoTrace.run_dir, "trace.json")),
+  rNoTrace.run_dir);
+
 await reader.close();
 console.log(`${n}/${t} checks passed`);
 process.exit(n === t ? 0 : 1);
