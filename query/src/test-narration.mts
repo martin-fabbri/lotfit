@@ -1,12 +1,13 @@
-// Narration lines and timing (no network): scripted model answers checked, retried, templated;
-// spoken values built in code; timeline.mjs estimates; voice.mjs refuses without a key.
+// Narration lines and timing (no network): code assembles every number and outcome; the
+// scripted model supplies only glosses, chapters and bridge sentences, checked and fallen back.
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createScriptedModelClient } from "./model-client.mts";
-import { writeNarration, templateLine, templateSummary, checkBeat, buildSpoken, spokenRef, speakMeasure } from "./narration.mts";
+import { writeNarration, templateSummary, ruleSentence, buildSpoken, buildPrompt, spokenRef, speakMeasure,
+  checkGloss, checkSentence, checkChapter, FALLBACK_GLOSS } from "./narration.mts";
 
 let n = 0, t = 0;
 const ok = (name: string, cond: boolean, detail = "") => { t++; if (cond) n++; console.log(`${cond ? "PASS" : "FAIL"}  ${name}${cond || !detail ? "" : " — " + detail}`); };
@@ -27,8 +28,6 @@ const report = {
   ],
 };
 const spoken = buildSpoken(trace, report);
-const refsOf = (id: string): string[] => trace.beats.find((b: any) => b.id === id).refs ?? [];
-const kindOf = (id: string): string => trace.beats.find((b: any) => b.id === id).kind;
 const sentences = (text: string): string[] => text.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
 
 ok("spoken_ref for EUG, PDX, ORS and table ids",
@@ -43,98 +42,113 @@ ok("rounded measures say about, exact ones do not",
   speakMeasure(576, "sqft") === "576 square feet" &&
   speakMeasure(1, "count") === "1 unit",
   [speakMeasure(682.72484, "sqft"), speakMeasure(6.36, "ft")].join(" | "));
-ok("a line with 682.72484 is refused",
-  !checkBeat("Eugene code 9.2751, 17 a 1 measures 682.72484 square feet and passes.", refsOf("b2"), kindOf("b2"), spoken).ok);
 
-const J = (beats: Array<{ id: string; chapter: string; text: string }>) => JSON.stringify({ beats });
-const clean: Array<{ id: string; chapter: string; text: string }> = [
-  { id: "b1", chapter: "The lot", text: "The lot measures about 64.2 feet by about 106.4 feet, with the house on it." },
-  { id: "b2", chapter: "The rules", text: [
-    "Eugene table 9.2740 isn't measured yet.",
-    "Eugene code 9.2741, 3 (1 unit) passes.",
-    "Eugene code 9.2751, 17 a 1 (576 square feet vs 800 square feet) passes.",
-    "Eugene code 9.2751, 17 b 4 a setback (6.4 feet vs 5 feet) is too close to call with the scan, so it gets taped.",
-    "Eugene table 9.2750 (76 feet) passes.",
-  ].join(" ") },
-  { id: "b3", chapter: "Height cap", text: "Eugene code 9.2751, 17 b 4 a slope (15 feet) isn't measured yet." },
-  { id: "b4", chapter: "The space", text: "Inside setbacks of 5 feet, space is left to build in." },
-  { id: "b5", chapter: "The spot", text: "The unit goes at the client spot, 20 feet from the left and 76 feet back." },
-  { id: "b6", chapter: "The answer", text: "It needs a check. Still open: Eugene code 9.2751, 17 b 4 a setback." },
-];
+const SETBACK = "EUG.9.2751.17.b.4.a.setback";
+const SLOPE = "EUG.9.2751.17.b.4.a.slope";
+const setb = ruleSentence(SETBACK, "keeps the unit back from the lot lines", spoken);
+const slope = ruleSentence(SLOPE, "caps height on sloped lots", spoken);
+ok("too_close_to_call and unknown get their code phrases",
+  setb.endsWith("so it gets taped.") && setb.includes("We measured about 6.4 feet against 5 feet") &&
+  slope.endsWith("which isn't measured yet.") && !slope.includes("We measured"), `${setb} | ${slope}`);
+
+const two = buildSpoken({ constraints: [], beats: [], site: {}, options: [] }, { verdict: "", findings: [
+  { provision_id: "EUG.9.9999.1", outcome: "pass",
+    measures: [{ value: 10, unit: "ft" }, { value: 12, unit: "ft", limit: { value: 15, unit: "ft" } }], citations: [] },
+]});
+ok("two measures join with and",
+  ruleSentence("EUG.9.9999.1", "sets a limit", two).includes("We measured 10 feet and 12 feet against 15 feet"),
+  ruleSentence("EUG.9.9999.1", "sets a limit", two));
+
+const Q800 = "The unit may be at most 800 square feet.";
+ok("gloss checks: quoted number passes, the rest is refused",
+  checkGloss("limits the unit to 800 square feet", Q800).ok &&
+  !checkGloss("limits the unit to 900 square feet", Q800).ok &&
+  !checkGloss("passes the size check", Q800).ok &&
+  !checkGloss("this gloss runs far past the allowed fourteen word cap for a single rule gloss here", "").ok);
+ok("sentence and chapter checks",
+  checkSentence("Space is left to build in inside the setbacks.", []).ok &&
+  !checkSentence("Space of 12 feet is left to build in.", []).ok &&
+  !checkSentence("It fits the envelope.", []).ok &&
+  checkChapter("The lot").ok && !checkChapter("Lot").ok);
+
+const prompt = buildPrompt(trace, report);
+ok("prompt carries ids and quotes only, no measures, limits or outcomes",
+  prompt.includes("EUG.9.2751.17.a.1") && prompt.includes(Q800) &&
+  !prompt.includes("6.36") && !prompt.includes("576 square feet") &&
+  !prompt.includes("too_close_to_call") && !prompt.includes("NEEDS_CHECK"));
+
+const W = (w: { glosses?: Record<string, string>; chapters?: Record<string, string>; sentences?: Record<string, string> }) =>
+  JSON.stringify({ glosses: w.glosses ?? {}, chapters: w.chapters ?? {}, sentences: w.sentences ?? {} });
+const cleanW = {
+  glosses: {
+    "EUG.T9.2740": "covers the zone's permitted uses",
+    "EUG.9.2741.3": "covers the zone's dwelling count",
+    "EUG.9.2751.17.a.1": "limits the unit to 800 square feet",
+    [SETBACK]: "keeps the unit 5 feet from the lot lines",
+    "EUG.T9.2750": "covers the lot's dimensional standards",
+    [SLOPE]: "caps height on sloped lots",
+  },
+  chapters: { b1: "The lot", b2: "The rules", b3: "Height cap", b4: "The space", b5: "The spot", b6: "The answer" },
+  sentences: {
+    b1: "The lot is on screen with the house.",
+    b4: "Space is left to build in inside the setbacks.",
+    b5: "The unit goes at the client spot.",
+  },
+};
 const scripted = (answers: string[]) => createScriptedModelClient((_req, i) => ({ content: answers[Math.min(i, answers.length - 1)]! }));
 
-const c0 = scripted([J(clean)]);
+const c0 = scripted([W(cleanW)]);
 const r0 = await writeNarration(trace, report, c0);
-ok("clean answer passes, one entry per beat, same ids and order",
-  r0.beats.length === trace.beats.length &&
-  r0.beats.every((b, i) => b.id === trace.beats[i].id && b.source === "model"),
-  r0.beats.map((b) => `${b.id}:${b.source}`).join(","));
+const b2 = r0.beats.find((b) => b.id === "b2")!;
+const b2refs = trace.beats.find((b: any) => b.id === "b2").refs;
+ok("24x24 gives 6 beats from one model call",
+  r0.beats.length === 6 && c0.recordedRequests.length === 1 &&
+  r0.beats.every((b, i) => b.id === trace.beats[i].id), r0.beats.map((b) => b.id).join(","));
+ok("constrain beat carries one rule sentence per ref, in order",
+  b2refs.every((r: string, i: number) => {
+    const at = b2.text.indexOf(spoken.provisions.get(r)!.ref);
+    const prev = i === 0 ? -1 : b2.text.indexOf(spoken.provisions.get(b2refs[i - 1])!.ref);
+    return at > prev;
+  }), b2.text);
+ok("setback sentence ends so it gets taped",
+  sentences(b2.text).some((s) => s.endsWith("so it gets taped.")), b2.text);
+ok("clean words stay model, summary stays code",
+  r0.beats.find((b) => b.id === "b1")!.source === "model" && b2.source === "model" &&
+  r0.beats.find((b) => b.id === "b6")!.source === "template" &&
+  r0.beats.find((b) => b.id === "b6")!.text.startsWith("It needs a check."));
 
-const badNum = clean.map((b) => (b.id === "b2" ? { ...b, text: b.text.replace("6.4 feet", "7.5 feet") } : b));
-const c1 = scripted([J(badNum), J(badNum)]);
-const r1 = await writeNarration(trace, report, c1);
+const badOutcome = structuredClone(cleanW);
+badOutcome.glosses[SETBACK] = "passes the setback check";
+const r1 = await writeNarration(trace, report, scripted([W(badOutcome)]));
 const t1 = r1.beats.find((b) => b.id === "b2")!;
-ok("invented number is retried, then templated",
-  c1.recordedRequests.length === 2 && t1.source === "template" && !t1.text.includes("7.5"),
-  `${t1.source}: ${t1.text}`);
-ok("passing beats keep the model line", r1.beats.find((b) => b.id === "b1")!.source === "model");
+ok("an outcome never comes from the model",
+  t1.text.includes(FALLBACK_GLOSS) && !t1.text.includes("passes the setback") &&
+  sentences(t1.text).some((s) => s.endsWith("so it gets taped.")) && t1.source === "template", t1.text);
 
-const badProv = clean.map((b) => (b.id === "b3" ? { ...b, text: "EUG.33.110.220 fails the height check." } : b));
-const c2 = scripted([J(badProv), J(badProv)]);
-const r2 = await writeNarration(trace, report, c2);
-const t2 = r2.beats.find((b) => b.id === "b3")!;
-ok("unknown provision is refused the same way",
-  t2.source === "template" && !t2.text.includes("33.110"), `${t2.source}: ${t2.text}`);
+const badNum = structuredClone(cleanW);
+badNum.glosses["EUG.9.2751.17.a.1"] = "limits the unit to 900 square feet";
+const r2 = await writeNarration(trace, report, scripted([W(badNum)]));
+ok("a gloss with a number outside its quote is refused",
+  r2.beats.find((b) => b.id === "b2")!.text.includes(`Eugene code 9.2751, 17 a 1 ${FALLBACK_GLOSS}.`));
 
-const badSum = clean.map((b) => (b.id === "b6" ? { ...b, text: "It fits." } : b));
-const c3 = scripted([J(badSum), J(clean)]);
-const r3 = await writeNarration(trace, report, c3);
-const t3 = r3.beats.find((b) => b.id === "b6")!;
-ok("fits for NEEDS_CHECK is refused, retry accepted",
-  c3.recordedRequests.length === 2 && t3.source === "model" && t3.text.startsWith("It needs a check."), `${t3.source}: ${t3.text}`);
-
-const b2 = trace.beats.find((b: any) => b.id === "b2");
-const b2tpl = templateLine({ id: "b2", kind: b2.kind, refs: b2.refs ?? [] }, spoken);
-const b2sent = sentences(b2tpl.text);
-ok("constrain beat with 5 refs gives 5 sentences in order, each under 25 words",
-  b2sent.length === 5 &&
-  b2sent.every((s, i) => s.includes(spoken.provisions.get(b2.refs[i])!.ref)) &&
-  b2sent.every((s) => s.split(/\s+/).length <= 25),
-  b2tpl.text);
-ok("template has no bare pass after a number",
-  ![...trace.beats.map((b: any) => templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken).text)]
-    .some((text) => /[\d)]\s+pass\b/i.test(text)));
-
-const tplFails: string[] = [];
-for (const b of trace.beats) {
-  const tpl = b.kind === "summary"
-    ? { chapter: "The answer", text: templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken) }
-    : templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken);
-  const chk = checkBeat(tpl.text, b.refs ?? [], b.kind, spoken);
-  if (!chk.ok) tplFails.push(`${b.id}: ${chk.reasons.join("; ")}`);
-}
-ok("template lines alone pass the number check for every beat", tplFails.length === 0, tplFails.join(" | "));
+const r3 = await writeNarration(trace, report, scripted(["not json at all"]));
+const b2f = r3.beats.find((b) => b.id === "b2")!;
+ok("garbage answer falls back to code, still 6 beats",
+  r3.beats.length === 6 && r3.beats.every((b) => b.source === "template") &&
+  sentences(b2f.text).some((s) => s.endsWith("so it gets taped.")));
 
 const allSent: Array<{ beat: string; s: string }> = [];
-for (const b of trace.beats) {
-  const tpl = b.kind === "summary"
-    ? templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken)
-    : templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken).text;
-  for (const s of sentences(tpl)) allSent.push({ beat: b.id, s: s.toLowerCase() });
-}
-const dup = allSent.find((a, i) => allSent.findIndex((b) => b.s === a.s) !== i && allSent.find((b) => b.s === a.s)!.beat !== a.beat);
+for (const b of r0.beats) for (const s of sentences(b.text)) allSent.push({ beat: b.id, s: s.toLowerCase() });
+const dup = allSent.find((a) => allSent.find((b) => b.s === a.s && b.beat !== a.beat));
 ok("no beat repeats another beat's sentence", dup === undefined, dup ? `${dup.beat}: ${dup.s}` : "");
 
-const env = templateLine({ id: "b4", kind: "envelope", refs: refsOf("b4") }, spoken);
-ok("envelope is one sentence with no rule list",
-  sentences(env.text).length === 1 && !/Eugene|Portland|Oregon|code|table/i.test(env.text), env.text);
-const sum = templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken);
+const sum = templateSummary([SETBACK, SLOPE], spoken);
 ok("summary matches the verdict in at most 35 words",
   /^It needs a check\./.test(sum) && sum.split(/\s+/).length <= 35, sum);
 
 const tmp = mkdtempSync(path.join(tmpdir(), "lotfit-narration-"));
 writeFileSync(path.join(tmp, "trace.json"), JSON.stringify(trace));
-writeFileSync(path.join(tmp, "narration.json"), JSON.stringify({ beats: clean.map((b) => ({ ...b, numbers: [], provisions: [], source: "model" })) }));
+writeFileSync(path.join(tmp, "narration.json"), JSON.stringify(r0));
 execFileSync(process.execPath, [path.join(here, "..", "player", "narrate", "timeline.mjs"), tmp], { stdio: "pipe" });
 const tl = JSON.parse(readFileSync(path.join(tmp, "timeline.json"), "utf8"));
 const starts = tl.beats.map((b: any) => b.start);

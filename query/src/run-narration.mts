@@ -21,6 +21,6 @@ const dir = process.argv[2];
 if (!dir) throw new Error("usage: run-narration.mts <run_dir>");
 const trace = JSON.parse(readFileSync(join(dir, "trace.json"), "utf8"));
 const report = JSON.parse(readFileSync(join(dir, "report.json"), "utf8"));
-const narration = await writeNarration(trace, report, new BasetenModelClient());
+const narration = await writeNarration(trace, report, new BasetenModelClient({ maxTokens: 3000 }));
 writeFileSync(join(dir, "narration.json"), JSON.stringify(narration, null, 2) + "\n");
 console.log(`narration.json: ${narration.beats.length} beats (${narration.beats.filter((b) => b.source === "template").length} template)`);
