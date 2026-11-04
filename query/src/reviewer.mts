@@ -328,3 +328,119 @@ export function projectKindOf(kase: Kase | undefined): string | null {
   if (typeof kind === "string") return kind;
   return null;
 }
+
+export type Rejected = ReviewOutcome["rejected"][number];  // { provision_id: string | null; raw: unknown; reason: RejectReason; detail?: string }
+export interface Judged { flag?: ReviewFlag; sound?: string; unclear?: string; rejected: Rejected[]; warnings?: string[] }
+
+const norm = (s: string) => s.replace(/\s+/g, " ").trim();
+// write the classes with these \u escapes, never as typed glyphs (ADV-14: a typed U+2010 looks like "-" and
+// turns the class into a range that eats every letter)
+const qnorm = (s: string) => norm(s.toLowerCase().replace(/[\u2018\u2019\u201b]/g, "'").replace(/[\u201c\u201d\u201f]/g, '"')
+  .replace(/[\u2010-\u2015\u2212]/g, "-").replace(/\s*-\s*/g, "-"));
+const ANSWER_KEYS = new Set(["item_sha256", "answer", "category", "quote", "fact", "fact_claim", "claim"]);
+
+function parseJsonObject(text: string): Record<string, unknown> | null {
+  const t = text.trim();
+  const m = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const cand = m && m[1] !== undefined ? m[1].trim() : t;
+  const tries = [cand, cand.slice(cand.indexOf("{"), cand.lastIndexOf("}") + 1)];
+  for (const c of tries) {
+    try {
+      const v: unknown = JSON.parse(c);
+      if (v !== null && typeof v === "object" && !Array.isArray(v)) {
+        return v as Record<string, unknown>;
+      }
+    } catch {
+      // swallowed: try the next candidate
+    }
+  }
+  return null;
+}
+
+export function judgeAnswer(raw: string, item: ReviewItem, kase: Record<string, any>, rubric: Rubric): Judged {
+  const pid = item.provision.provision_id;
+  const rejected: Rejected[] = [];
+  const obj = parseJsonObject(raw);
+  if (obj === null) {
+    return { rejected: [{ provision_id: pid, raw: raw.slice(0, 500), reason: "bad_schema", detail: "not a JSON object" }], warnings: [] };
+  }
+  for (const k of Object.keys(obj)) {
+    if (!ANSWER_KEYS.has(k)) {
+      rejected.push({ provision_id: pid, raw: { [k]: obj[k] }, reason: "out_of_authority" });
+      delete obj[k];
+    }
+  }
+  const warnings: string[] = [];
+  if (typeof obj.claim === "string" && obj.claim.length > 300) {
+    obj.claim = obj.claim.slice(0, 300);
+    warnings.push("claim cut at 300 characters");
+  }
+  if (obj.item_sha256 !== item.item_sha256) {
+    warnings.push(`item_sha256 echo ${obj.item_sha256 === undefined ? "missing" : "does not match"}; bound by call`);
+    obj.item_sha256 = item.item_sha256;
+  }
+  const p = C.ReviewerAnswer.safeParse(obj);
+  if (!p.success) {
+    return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "bad_schema", detail: p.error.issues.map((i) => i.message).join("; ") }], warnings };
+  }
+  const a = p.data;
+  const textHay = [item.scope.quote, ...item.text.map((t) => t.quote)].map(qnorm);
+  const hay = a.answer === "sound" ? [qnorm(item.provision.title), ...textHay] : textHay;
+  const q = qnorm(a.quote);
+  if (q.length < rubric.min_quote_chars || !hay.some((h) => h.includes(q))) {
+    const detail = `${q.length} chars` + (a.answer !== "sound" ? "; an unsound or unclear quote comes from the scope sentence or the rule text" : "");
+    return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "quote_not_in_item", detail }], warnings };
+  }
+  let confirmed = false;
+  if (a.fact !== null) {
+    const listed = item.case_facts.some((e) => e.fact === a.fact);
+    const known = listed || registeredFacts().has(a.fact);
+    const actual = factStatus(kase, a.fact).status;
+    if (actual !== a.fact_claim) {
+      return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "fact_claim_false", detail: `${a.fact} is ${actual} in the case, not ${a.fact_claim}` }], warnings };
+    }
+    if (!known) {
+      warnings.push(`${a.fact} is not a fact of this item or of the facts registry; the flag is not confirmed`);
+    }
+    const ruleFact = (item.rule_facts ?? []).includes(a.fact);
+    if (known && !ruleFact) {
+      warnings.push(`${a.fact} is not read by this rule's guards; the flag is not confirmed`);
+    }
+    confirmed = known && ruleFact && (actual !== "absent" || listed);
+    const unsettled = ["unknown", "unconfirmed", "conflicting", "absent"].includes(actual);
+    if (a.category === "exclusion_on_unknown_fact" && !unsettled) {
+      confirmed = false;
+      warnings.push(`${a.fact} is ${actual} in the case; exclusion_on_unknown_fact needs an unsettled fact, so the flag is not confirmed`);
+    }
+    if (a.category === "wrong_exclusion" && unsettled) {
+      confirmed = false;
+      warnings.push(`${a.fact} is ${actual} in the case; wrong_exclusion needs a fact the case holds, so the flag is not confirmed`);
+    }
+  }
+  if (a.answer === "sound") {
+    if (a.fact === null || !["true", "false", "known"].includes(String(a.fact_claim))) {
+      return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "fact_claim_false", detail: "a sound answer rests on a fact the case holds as true, false or known" }], warnings };
+    }
+    if (!(item.rule_facts ?? []).includes(a.fact)) {
+      return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "fact_claim_false", detail: `a sound answer rests on a fact this rule's guards read (${(item.rule_facts ?? []).join(", ") || "none"})` }], warnings };
+    }
+    return { sound: pid, rejected, warnings };
+  }
+  if (a.category === null) {
+    return { unclear: pid, rejected, warnings };
+  }
+  if (!rubric.enabled.has(a.category)) {
+    return { rejected: [...rejected, { provision_id: pid, raw: obj, reason: "category_disabled" }], warnings };
+  }
+  const row = rubric.severity.find((r) => r.category === a.category && r.stages.includes(item.provision.evaluation_stage));
+  const severity = row?.severity ?? "low";
+  const route = row?.route ?? "attach";
+  if (a.category === "scope_sentence_not_scope") {
+    confirmed = false;
+  }
+  return {
+    flag: C.ReviewFlag.parse({ flag_id: makeUuid7(), provision_id: pid, category: a.category, severity, confirmed, quote: a.quote, fact: a.fact, fact_claim: a.fact_claim, claim: a.claim, item_sha256: item.item_sha256, route }),
+    rejected,
+    warnings,
+  };
+}
