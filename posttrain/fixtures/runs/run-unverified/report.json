@@ -1,0 +1,8 @@
+{
+ "case_id": "CASE-BAD",
+ "verdict": "NEEDS_CHECK",
+ "verifier": {
+  "passed": false,
+  "issues": []
+ }
+}

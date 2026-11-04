@@ -1,0 +1,8 @@
+{
+ "case_id": "CASE-TRAIN",
+ "verdict": "NEEDS_CHECK",
+ "verifier": {
+  "passed": true,
+  "issues": []
+ }
+}

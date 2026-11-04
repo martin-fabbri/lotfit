@@ -182,9 +182,19 @@ cd web && pnpm install && pnpm dev   # then open http://localhost:3000
 Environment: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` for sign-in; `LOTFIT_ENGINE=1` on a
 machine with the engine. On Vercel the project root is `web/`.
 
+## Post-training: the planner learns its step
+
+LotFit's planner step is distilled into Muse Glimmer 30B (open weights) with LoRA SFT on
+Fireworks serverless, trained only on runs the deterministic Judge accepted — 1,032 rows
+from 24 verified runs — and scored by code on 2 held-out cases. Today's planner (Muse
+Spark Open) reproduces the verified applies sets at F1 0.952 (decision accuracy 0.725)
+on the hold-outs; the tuned Glimmer is training now. See
+[docs/post-training.md](docs/post-training.md).
+
 ## Repository
 
 ```
+posttrain/        planner SFT data, code-scored eval, training launch scripts
 web/              the web app (Next.js): cases, capture, runs, Rulebook, magic-link sign-in
 graph/            the Rulebook: curated data, the built graph (out/graph-or.json), instruments (tools/), tests
 query/src/        harness, context, model client, Rulebook reader and guard, case check, judge, record, reviewer, narration
@@ -204,7 +214,8 @@ docs/             the deep dives
 | Track | Indie Developer |
 | Build period | October 27 – November 4, 2026 |
 | Meta models used | Muse Spark Open (planner, narration) · Muse Spark 1.3 (reviewer) · Muse Code (every line of code here) |
-| Inference partner used | Fireworks (Muse Spark Open); Baseten supported with `--baseten` |
+| Meta open weights | Muse Glimmer 30B, LoRA-trained on Fireworks serverless for the planner step ([doc](docs/post-training.md)) |
+| Inference partner used | Fireworks (Muse Spark Open, Glimmer training); Baseten supported with `--baseten` |
 | Built this week | everything in this repository; Yardstick (capture) as a separate repo |
 
 ## Team
