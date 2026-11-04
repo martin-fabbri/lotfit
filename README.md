@@ -156,9 +156,27 @@ node src/run-live.mts eug-demo-24x24.scanline
 python3 -m http.server -d viewer   # then open /index.html?run=demo/eug-demo-24x24
 ```
 
+## Web app
+
+A server-rendered app over the repo's own records: cases, recorded runs and the Rulebook. Sign-in is a Supabase
+magic link. Screens: Cases & runs; Case (site plan, every fact with source and tolerance, edit the plan and its
+spot, Check, Run); Capture (3D point cloud of the lot, the tolerance formula, scan against the record); Run
+(Overview, Reading the code, The agent at work, The answer, Checks, Walkthrough); Rulebook (search the four
+layers; each provision with clauses, parameters, operator, relations and its graph neighbourhood). Where
+`LOTFIT_ENGINE=1`, Check case runs the engine's own `checkCase()` and Run LotFit runs `run-live.mts`, with the
+event log following live. The app never re-implements a check.
+
+```bash
+cd web && pnpm install && pnpm dev   # then open http://localhost:3000
+```
+
+Environment: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` for sign-in; `LOTFIT_ENGINE=1` on a
+machine with the engine. On Vercel the project root is `web/`.
+
 ## Repository
 
 ```
+web/              the web app (Next.js): cases, capture, runs, Rulebook, magic-link sign-in
 graph/            the Rulebook: curated data, the built graph (out/graph-or.json), instruments (tools/), tests
 query/src/        harness, context, model client, Rulebook reader and guard, case check, judge, record, reviewer, narration
 query/ontology/   the graph ontology
