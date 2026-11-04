@@ -1,0 +1,137 @@
+{
+ "about": "Typed relations the text states but ingest doesn't derive (GR-15, GR-06): an exception modifies a rule, a preemption can override it, a provision uses a definition. Each quotes the words in its 'from' provision that state the relation. A provisional reading by CC (2026-11-01), for the Portland detached-ADU slice; other relations are not modeled yet and an agent must read the text.",
+ "by": "CC",
+ "date": "2026-11-01",
+ "status": "provisional",
+ "relations": [
+  {
+   "from": "PDX.33.110.220.C.1",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "may extend into a required building setback up to 20 percent of the depth of the setback"
+  },
+  {
+   "from": "PDX.33.110.220.C.2",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "Building eaves may extend up to 2 feet into a required building setback"
+  },
+  {
+   "from": "PDX.33.110.220.C.3",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "may extend into the entire required building setbacks"
+  },
+  {
+   "from": "PDX.33.110.220.D.1",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "The front building setback, and the setback of decks, balconies, and porches may be reduced to the average of the respective setbacks on the abutting lots"
+  },
+  {
+   "from": "PDX.33.110.220.D.4.a",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "the front building setback for the dwelling may be reduced to 10 feet"
+  },
+  {
+   "from": "PDX.33.110.220.D.4.c",
+   "to": "PDX.33.110.220.D.4.a",
+   "kind": "modifies",
+   "quote": "The height limit in the area of the reduced setback is lowered one foot for every foot of reduced setback",
+   "note": "An exception to an exception: it limits the reduced front setback (recursive family membership)."
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.110.220.B",
+   "kind": "modifies",
+   "quote": "are allowed in required side and rear building setbacks if all of the following are met",
+   "note": "For detached covered accessory structures, ADUs among them (33.110.245.C; 33.205.040.C.3)."
+  },
+  {
+   "from": "ORS.197A.400.1",
+   "to": "PDX.33.110.220.B",
+   "kind": "preempts",
+   "quote": "a local government may adopt and apply only clear and objective standards, conditions and procedures regulating: (A) The development of housing",
+   "note": "Overrides a housing standard only where it is not clear and objective; Portland's setbacks are numeric. ORLAW 2025 c.330 s.8(2) excludes setbacks from its design-standard limit, so it is not recorded as a preemption here."
+  },
+  {
+   "from": "PDX.33.110.220.B",
+   "to": "PDX.33.910.030.setback",
+   "kind": "uses",
+   "quote": "required setbacks",
+   "term": "setback"
+  },
+  {
+   "from": "PDX.33.110.220.D.4.a",
+   "to": "PDX.33.910.030.front-setback",
+   "kind": "uses",
+   "quote": "the front building setback",
+   "term": "front setback"
+  },
+  {
+   "from": "PDX.33.110.220.C.2",
+   "to": "PDX.33.910.030.eave",
+   "kind": "uses",
+   "quote": "Building eaves",
+   "term": "eave"
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.910.030.front-lot-line",
+   "kind": "uses",
+   "quote": "from a front lot line",
+   "term": "front lot line"
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.910.030.corner-lot",
+   "kind": "uses",
+   "quote": "if on a corner lot",
+   "term": "corner lot"
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.910.030.side-street-lot-line",
+   "kind": "uses",
+   "quote": "from a side street lot line",
+   "term": "side street lot line"
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.930.050",
+   "kind": "uses",
+   "quote": "The structure is no more than 15 feet high",
+   "term": "height"
+  },
+  {
+   "from": "PDX.33.110.245.C.2",
+   "to": "PDX.33.910.030.eave",
+   "kind": "uses",
+   "quote": "excluding eaves",
+   "term": "eave"
+  },
+  {
+   "from": "PDX.33.910.030.setback",
+   "to": "PDX.33.910.030.lot-lines",
+   "kind": "uses",
+   "quote": "Setbacks are usually measured from lot lines",
+   "term": "lot lines"
+  },
+  {
+   "from": "PDX.33.910.030.corner-lot",
+   "to": "PDX.33.910.030.lot",
+   "kind": "uses",
+   "quote": "A lot, adjusted lot, lot remnant, or lot of record",
+   "term": "lot"
+  },
+  {
+   "from": "PDX.33.205.040.C.3",
+   "to": "PDX.33.110.245.C",
+   "kind": "uses",
+   "quote": "the development standards for covered accessory structures in the base zone",
+   "term": "Detached covered accessory structures",
+   "note": "The ADU's route into 33.110.245's accessory-structure standards."
+  }
+ ]
+}
