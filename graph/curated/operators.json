@@ -1,0 +1,671 @@
+{
+ "about": "Operators (GR-12): each kind of rule names its tool, the facts it reads and the parameters it needs, and lists the provisions it models. A provisional reading by CC (2026-11-01): which provisions an operator models is judgment. The build refuses an operator naming a missing tool, an unregistered fact, a parameter not in its provision, or a placing operator that doesn't read the lot, the house and the structures (GR-29).",
+ "by": "CC",
+ "date": "2026-11-01",
+ "status": "provisional",
+ "operators": [
+  {
+   "id": "op.physical_fit",
+   "kind": "placement",
+   "places": true,
+   "tool": "physical_fit",
+   "reads": [
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures",
+    "plan.outline"
+   ],
+   "params": [],
+   "provisions": [],
+   "note": "A declared property of every placement, not a code rule (GR-29)."
+  },
+  {
+   "id": "op.find_placements",
+   "kind": "placement",
+   "places": true,
+   "tool": "find_placements",
+   "reads": [
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures",
+    "plan.footprint",
+    "site.front_lot_line",
+    "site.side_lot_lines",
+    "site.rear_lot_line"
+   ],
+   "params": [],
+   "provisions": []
+  },
+  {
+   "id": "op.base_setbacks",
+   "kind": "setback",
+   "places": true,
+   "tool": "check_setback",
+   "reads": [
+    "plan.outline",
+    "site.front_lot_line",
+    "site.side_lot_lines",
+    "site.rear_lot_line",
+    "site.zone",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.RF"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.R20"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.R10"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.R7"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.R5"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "front_building_setback.R2.5"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.RF"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.R20"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.R10"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.R7"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.R5"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "side_building_setback.R2.5"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.RF"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.R20"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.R10"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.R7"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.R5"
+    },
+    {
+     "provision": "PDX.T110-4",
+     "param": "rear_building_setback.R2.5"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.220.B",
+    "PDX.T110-4"
+   ],
+   "requires": [
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.front_lot_line"
+     },
+     "param": "PDX.T110-4:front_building_setback.{zone}"
+    },
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.side_lot_lines"
+     },
+     "param": "PDX.T110-4:side_building_setback.{zone}"
+    },
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.rear_lot_line"
+     },
+     "param": "PDX.T110-4:rear_building_setback.{zone}"
+    }
+   ]
+  },
+  {
+   "id": "op.adu_front_or_behind",
+   "kind": "setback",
+   "places": true,
+   "tool": "check_front_or_behind",
+   "reads": [
+    "plan.outline",
+    "site.front_lot_line",
+    "site.house_rear_wall",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.205.040.C.2",
+     "param": "front_lot_line_setback"
+    }
+   ],
+   "provisions": [
+    "PDX.33.205.040.C.2"
+   ],
+   "note": "Either 40 ft from the front lot line, or behind the house's rear wall: the agent checks both and reports which holds.",
+   "requires": [
+    {
+     "tool": "check_front_or_behind",
+     "param": "PDX.33.205.040.C.2:front_lot_line_setback"
+    }
+   ],
+   "covers": [
+    {
+     "provision": "PDX.33.205.040.C.2",
+     "clause": "item:b.",
+     "quote": "b. Located behind the rear building wall of the primary dwelling. For the purpose of this regulation, the rear wall of the primary dwelling unit is the wall furthest from the wall with the main entrance to the street.",
+     "note": "check_front_or_behind evaluates the 'behind the rear building wall' branch from site.house_rear_wall (the wall furthest from the main-entrance wall, a case fact)",
+     "by": "CC on Martin's go (L40)",
+     "date": "2026-11-02",
+     "status": "provisional"
+    }
+   ]
+  },
+  {
+   "id": "op.accessory_in_setback",
+   "kind": "exception_conditions",
+   "places": true,
+   "tool": "check_exception_conditions",
+   "reads": [
+    "plan.outline",
+    "site.front_lot_line",
+    "site.side_street_lot_line",
+    "site.corner_lot",
+    "site.zone",
+    "plan.height_ft",
+    "plan.wall_height_ft",
+    "plan.rooftop_deck",
+    "plan.openings_facing_lot_line",
+    "plan.dormers",
+    "site.screening",
+    "site.other_structures_in_setback",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "min_distance_from_front_lot_line"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "min_distance_from_side_street_lot_line_corner"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "max_footprint_dimension"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "max_height_in_setback"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "max_wall_height_in_setback"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "dormer_min_setback_from_side_rear"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "max_combined_length_in_setback_per_line"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "zones_allowing_structures_in_side_rear_setbacks"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.245.C.2"
+   ],
+   "note": "Each of the eight conditions is checked and reported; one unknown makes the exception NEEDS_CHECK (EN-17).",
+   "covers": [
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "clause": "condition:b.(2)/excluding#1",
+     "quote": "excluding eaves",
+     "note": "check_exception_conditions b.(2) measures the wall outline, which excludes eaves (conventions.json)",
+     "by": "CC on Martin's go (L40)",
+     "date": "2026-11-02",
+     "status": "provisional"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "clause": "item:b.(5)",
+     "quote": "(5) The portion of the structure within the setback must be screened from adjoining lots by a fence, unless it is enclosed within the setback by a wall. Screening is not required for enclosed structures. Screening must comply with the F2 standards of Chapter 33.248, Landscaping and Screening",
+     "note": "check_exception_conditions b.(5): screened, or enclosed (\"Screening is not required for enclosed structures.\")",
+     "by": "CC on Martin's go (L40)",
+     "date": "2026-11-02",
+     "status": "provisional"
+    },
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "clause": "condition:b.(5)/unless#1",
+     "quote": "unless it is enclosed within the setback by a wall",
+     "note": "check_exception_conditions b.(5) holds when the structure is enclosed",
+     "by": "CC on Martin's go (L40)",
+     "date": "2026-11-02",
+     "status": "provisional"
+    }
+   ]
+  },
+  {
+   "id": "op.accessory_height",
+   "kind": "max",
+   "places": false,
+   "tool": "check_max",
+   "reads": [
+    "plan.height_ft"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.110.245.C.1",
+     "param": "max_height"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.245.C.1"
+   ]
+  },
+  {
+   "id": "op.footprint_dimension",
+   "kind": "max",
+   "places": false,
+   "tool": "footprint_dimensions",
+   "reads": [
+    "plan.outline"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.110.245.C.2",
+     "param": "max_footprint_dimension"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.245.C.2"
+   ]
+  },
+  {
+   "id": "op.adu_size",
+   "kind": "formula",
+   "places": false,
+   "tool": "adu_max_living_area",
+   "reads": [
+    "site.primary_living_area_sqft",
+    "plan.living_area_sqft",
+    "plan.basement_conversion"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.205.040.C.1",
+     "param": "max_share_of_primary_living_area"
+    },
+    {
+     "provision": "PDX.33.205.040.C.1",
+     "param": "max_living_area"
+    }
+   ],
+   "provisions": [
+    "PDX.33.205.040.C.1"
+   ]
+  },
+  {
+   "id": "op.accessory_coverage",
+   "kind": "max",
+   "places": false,
+   "tool": "coverage_share",
+   "reads": [
+    "plan.outline",
+    "site.structures",
+    "site.lot_area_sqft"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.110.245.C.3.a",
+     "param": "max_combined_accessory_coverage_pct_of_site"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.245.C.3.a"
+   ]
+  },
+  {
+   "id": "op.total_building_coverage",
+   "kind": "max",
+   "places": false,
+   "tool": "total_building_coverage",
+   "reads": [
+    "plan.outline",
+    "site.house_outline",
+    "site.structures",
+    "site.lot_area_sqft"
+   ],
+   "params": [],
+   "cells": [
+    {
+     "provision_id": "PDX.T110-5",
+     "cell_id": "Table 110-5 · 5,000 sq. ft. or more but less than 20,000 sq. ft. · Maximum Building Coverage"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.225.B",
+    "PDX.T110-5"
+   ],
+   "note": "The maximum building coverage is a piecewise formula in Table 110-5's cells (no parameter): the tool picks nothing; the harness resolves the row whose range holds the lot area, and the tool refuses any other row. W4, 2026-11-01."
+  },
+  {
+   "id": "op.flag_lot_setbacks",
+   "kind": "setback",
+   "places": true,
+   "tool": "check_setback",
+   "reads": [
+    "plan.outline",
+    "site.front_lot_line",
+    "site.side_lot_lines",
+    "site.rear_lot_line",
+    "site.zone",
+    "site.flag_lot",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.RF"
+    },
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.R20"
+    },
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.R10"
+    },
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.R7"
+    },
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.R5"
+    },
+    {
+     "provision": "PDX.33.110.255.B.1.a",
+     "param": "setback.R2.5"
+    }
+   ],
+   "provisions": [
+    "PDX.33.110.255.B.1.a"
+   ],
+   "requires": [
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.front_lot_line"
+     },
+     "param": "PDX.33.110.255.B.1.a:setback.{zone}"
+    },
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.side_lot_lines"
+     },
+     "param": "PDX.33.110.255.B.1.a:setback.{zone}"
+    },
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.rear_lot_line"
+     },
+     "param": "PDX.33.110.255.B.1.a:setback.{zone}"
+    }
+   ],
+   "note": "Large flag lots: 'required building setbacks that are the same along all lot lines' (item a); RF/R20/R10 15 ft, R7/R5/R2.5 10 ft."
+  },
+  {
+   "id": "op.eug_front_setback",
+   "kind": "setback",
+   "places": true,
+   "tool": "check_setback",
+   "reads": [
+    "plan.outline",
+    "site.front_lot_line",
+    "site.zone",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "EUG.T9.2750",
+     "param": "front_yard_setback_excluding_garages_and.R-1"
+    },
+    {
+     "provision": "EUG.T9.2750",
+     "param": "front_yard_setback_excluding_garages_and.R-2"
+    },
+    {
+     "provision": "EUG.T9.2750",
+     "param": "front_yard_setback_excluding_garages_and.R-3"
+    },
+    {
+     "provision": "EUG.T9.2750",
+     "param": "front_yard_setback_excluding_garages_and.R-4"
+    }
+   ],
+   "provisions": [
+    "EUG.T9.2750"
+   ],
+   "requires": [
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.front_lot_line"
+     },
+     "param": "EUG.T9.2750:front_yard_setback_excluding_garages_and.{zone}"
+    }
+   ],
+   "note": "Eugene Table 9.2750 front yard setback (excluding garages and carports), 10 ft in R-1..R-4."
+  },
+  {
+   "id": "op.eug_adu_interior_setback",
+   "kind": "setback",
+   "places": true,
+   "tool": "check_setback",
+   "reads": [
+    "plan.outline",
+    "site.side_lot_lines",
+    "site.rear_lot_line",
+    "site.lot_outline",
+    "site.house_outline",
+    "site.structures"
+   ],
+   "params": [
+    {
+     "provision": "EUG.9.2751.17.b.4.a.setback",
+     "param": "min_interior_setback"
+    }
+   ],
+   "provisions": [
+    "EUG.9.2751.17.b.4.a.setback"
+   ],
+   "requires": [
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.side_lot_lines"
+     },
+     "param": "EUG.9.2751.17.b.4.a.setback:min_interior_setback"
+    },
+    {
+     "tool": "check_setback",
+     "match": {
+      "lines": "site.rear_lot_line"
+     },
+     "param": "EUG.9.2751.17.b.4.a.setback:min_interior_setback"
+    }
+   ],
+   "note": "Eugene has only front and interior lot lines (9.0500): the detached ADU's 5-ft interior setback is checked against the side lines AND the rear line."
+  },
+  {
+   "id": "op.eug_adu_size",
+   "kind": "formula",
+   "places": false,
+   "tool": "adu_max_living_area",
+   "reads": [
+    "site.lot_area_sqft",
+    "plan.total_building_sqft"
+   ],
+   "params": [
+    {
+     "provision": "EUG.9.2751.17.a.1",
+     "param": "max_share_of_lot_area"
+    },
+    {
+     "provision": "EUG.9.2751.17.a.1",
+     "param": "max_building_sqft"
+    }
+   ],
+   "provisions": [
+    "EUG.9.2751.17.a.1"
+   ],
+   "note": "Same arithmetic as Portland's ('the lesser of a share of a base and a cap'); Eugene's base is the total lot area (10 %) and the measured quantity is the total building square footage at the exterior perimeter walls. The tool's argument primary_living_area_sqft carries site.lot_area_sqft here."
+  },
+  {
+   "id": "op.eug_adu_height",
+   "kind": "max",
+   "places": false,
+   "tool": "check_max",
+   "reads": [
+    "plan.height_ft"
+   ],
+   "params": [
+    {
+     "provision": "EUG.9.2751.17.b.4.a.slope",
+     "param": "max_height"
+    }
+   ],
+   "provisions": [
+    "EUG.9.2751.17.b.4.a.slope"
+   ],
+   "note": "Only the 25-ft cap. The sloped part of the envelope (15 ft at the 5-ft line, rising 10 in per 12 in) has no tool yet, so that clause stays not modeled and the provision cannot pass on the cap alone.",
+   "partial": "checks the 25-ft cap only; the sloped setback plane (15 ft at the 5-ft line, rising 10 in per 12 in, EC 9.2751(17)(b)4.a) has no tool yet"
+  },
+  {
+   "id": "op.eug_lot_coverage",
+   "kind": "max",
+   "places": false,
+   "tool": "coverage_share",
+   "reads": [
+    "plan.outline",
+    "site.house_outline",
+    "site.structures",
+    "site.lot_area_sqft"
+   ],
+   "params": [
+    {
+     "provision": "EUG.T9.2750",
+     "param": "all_lots_except_where_specifically_addressed_below.R-1"
+    },
+    {
+     "provision": "EUG.T9.2750",
+     "param": "all_lots_except_where_specifically_addressed_below.R-2"
+    }
+   ],
+   "provisions": [
+    "EUG.T9.2750"
+   ],
+   "note": "Table 9.2750 maximum lot coverage, all lots: 50 % of lot (R-1, R-2). Lot coverage per 9.0500 excludes roof eaves and parts without a roof."
+  },
+  {
+   "id": "op.eug_adu_per_dwelling",
+   "kind": "max",
+   "places": false,
+   "tool": "check_max",
+   "reads": [
+    "plan.accessory_dwellings_on_lot"
+   ],
+   "params": [
+    {
+     "provision": "EUG.9.2741.3",
+     "param": "max_accessory_dwellings_per_dwelling"
+    }
+   ],
+   "provisions": [
+    "EUG.9.2741.3"
+   ],
+   "note": "One accessory dwelling per detached single-unit dwelling: the count after the plan is built must not exceed the cap. The 'detached single-unit dwelling' condition is read from site.primary_is_attached_house / site.primary_is_duplex, not by this operator."
+  },
+  {
+   "id": "op.adu_allowed",
+   "kind": "allowed",
+   "places": false,
+   "tool": "check_allowed",
+   "reads": [
+    "site.zone"
+   ],
+   "params": [],
+   "provisions": [
+    "PDX.T110-2",
+    "PDX.33.205.020.B.1.a"
+   ],
+   "note": "Martin 2026-11-03 (build review §4.1, 'yes, fix it'): 33.205.020.B.1.a allows one ADU 'on a site with a house or manufactured home in the R20 through R2.5 zones'; whether an ADU is allowed in the zone is the Table 110-2 cell, read by check_allowed. The house-or-manufactured condition is its scope guard (site.house_outline nonempty); 'when the lot complies with Section 33.110.202' is the 33.110.202 provisions in the index. AG to review. AG 2026-11-03 (build review r1, 4b): only the ADU row of Table 110-2 counts (args_match use); AG ruled the 33.110.202 condition an existing-lot-legality premise for a lot with a lawful house (4a, not yet signed).",
+   "args_match": {
+    "use": "accessory_dwelling_unit_see_chapter_33_205"
+   }
+  }
+ ],
+ "changes": [
+  {
+   "date": "2026-11-01",
+   "by": "CC",
+   "what": "W4: op.adu_front_or_behind -> check_front_or_behind (signed 'behind'); op.accessory_in_setback -> check_exception_conditions (three-valued); op.total_building_coverage added (T110-5 cells)"
+  },
+  {
+   "date": "2026-11-02",
+   "by": "CC",
+   "what": "Measure 2 (Martin, 11-02): `requires` = the checks a pass needs (tool, matched args, parameter by zone) on op.base_setbacks and op.adu_front_or_behind; op.flag_lot_setbacks added (33.110.255.B.1.a setback.<zone> on every lot-line group)."
+  },
+  {
+   "date": "2026-11-02",
+   "by": "CC",
+   "what": "Eugene (EUG): front setback, ADU interior setback on side and rear lines, ADU size (10 % of lot or 800 sq ft), the 25-ft cap, lot coverage 50 %. The sloped setback and the solar setback have no tool yet."
+  }
+ ]
+}

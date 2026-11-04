@@ -1,0 +1,36 @@
+{
+ "about": "What the code states in one section about another, which a regular expression should not guess. Each entry quotes the words it rests on; build.py checks the quote is in the source provision and the date is in the quote. Added by CC, 2026-10-31; provisional until a person confirms.",
+ "zones": [
+  {
+   "id": "MDR-24",
+   "layer": "GRE",
+   "name": "Moderate Density Residential-24",
+   "single_dwelling": false,
+   "allows_detached_house": false,
+   "document": "DOC-GRE-4.0100",
+   "quote": "The Moderate Density Residential District-24 is primarily intended for middle housing and multi-family housing at a maximum net density of 24.2 units per acre and a minimum net density of 12.1 units per acre"
+  }
+ ],
+ "operative": [
+  {
+   "version_of": "ORLAW.2026.79.12",
+   "operative_from": "2028-01-01",
+   "source_provision": "ORLAW.2026.79.14",
+   "quote": "sections 8 and 9, chapter 330, Oregon Laws 2025, by sections 5 to 13 of this 2026 Act become operative on January 1, 2028",
+   "reading": "Section 12 of 2026 c.79 amends section 8, chapter 330, Oregon Laws 2025, and lies within sections 5 to 13; so the amended text is operative on 2028-01-01, a year after the Act's effective date.",
+   "by": "CC",
+   "date": "2026-10-31",
+   "status": "provisional"
+  },
+  {
+   "version_of": "ORLAW.2026.79.12.part2",
+   "operative_from": "2028-01-01",
+   "source_provision": "ORLAW.2026.79.14",
+   "quote": "sections 8 and 9, chapter 330, Oregon Laws 2025, by sections 5 to 13 of this 2026 Act become operative on January 1, 2028",
+   "reading": "Page-split continuation (page 8) of Section 12 of 2026 c.79; operative on 2028-01-01 under Section 14.",
+   "by": "AG",
+   "date": "2026-10-31",
+   "status": "provisional"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "schema": "lotfit.review-item/1",
+ "item_sha256": "1901c3da7d2179114f88bbc3e8265c5feadeffcf10123f1ab02f1560bb09b838",
+ "run": {
+  "thread_id": "019a4a00-0000-7000-8000-000000000001",
+  "graph_load_id": "94ee5cce@file-graph",
+  "config_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "as_of": "2026-11-15"
+ },
+ "provision": {
+  "provision_id": "EUG.9.2751.17.c",
+  "title": "Area-specific accessory dwelling standards (Amazon, Fairmount, South University)",
+  "section": "9.2751(17)(c)",
+  "type": "constraint",
+  "evaluation_stage": "placement_constraint",
+  "zones": [
+   "R-1"
+  ],
+  "project_kinds": []
+ },
+ "scope": {
+  "clause_id": "EUG.9.2751.17.c#v1::sentence:2",
+  "quote": "within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association"
+ },
+ "text": [
+  {
+   "clause_id": "EUG.9.2751.17.c#v1::sentence:1",
+   "quote": "Area-Specific Accessory Dwelling Standards."
+  },
+  {
+   "clause_id": "EUG.9.2751.17.c#v1::sentence:2",
+   "quote": "Except as provided in this subsection (c), the standards at (a) and (b) do not apply to accessory dwellings within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association."
+  },
+  {
+   "clause_id": "EUG.9.2751.17.c#v1::condition:s2/except#1",
+   "quote": "Except as provided in this subsection (c)"
+  },
+  {
+   "clause_id": "EUG.9.2751.17.c#v1::sentence:3",
+   "quote": "The following standards apply to all new attached or detached accessory dwellings in the R-1 zone within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association:"
+  }
+ ],
+ "exclusion": {
+  "basis": "planner_reading",
+  "planner_quote": "within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association"
+ },
+ "text_truncated": false,
+ "rule_facts": [
+  "site.zone"
+ ],
+ "case_facts": [
+  {
+   "fact": "plan.detached",
+   "value": true,
+   "status": "true"
+  },
+  {
+   "fact": "plan.footprint",
+   "status": "known"
+  },
+  {
+   "fact": "plan.height_ft",
+   "value": 14,
+   "status": "known"
+  },
+  {
+   "fact": "plan.kind",
+   "value": "adu",
+   "status": "known"
+  },
+  {
+   "fact": "site.corner_lot",
+   "value": false,
+   "status": "false"
+  },
+  {
+   "fact": "site.flag_lot",
+   "value": false,
+   "status": "false"
+  },
+  {
+   "fact": "site.house_outline",
+   "status": "unconfirmed"
+  },
+  {
+   "fact": "site.lot_outline",
+   "status": "unconfirmed"
+  },
+  {
+   "fact": "site.primary_living_area_sqft",
+   "value": 1400,
+   "status": "known"
+  },
+  {
+   "fact": "site.slope_pct",
+   "status": "unknown"
+  },
+  {
+   "fact": "site.trees",
+   "status": "unknown"
+  },
+  {
+   "fact": "site.zone",
+   "value": "R-1",
+   "status": "unconfirmed"
+  }
+ ],
+ "rubric": {
+  "id": "lotfit.reviewer-rubric",
+  "version": "1.1",
+  "sha256": "18b8b450f5286a81c5b00c89b2861bd73091f34025962673bd159adef6c0fcce"
+ }
+}

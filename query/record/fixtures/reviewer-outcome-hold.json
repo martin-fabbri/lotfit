@@ -1,0 +1,40 @@
+{
+ "status": "flagged",
+ "answered": 1,
+ "warnings": [],
+ "model": "muse-spark-1.3",
+ "rubric": {
+  "id": "lotfit.reviewer-rubric",
+  "version": "1.1",
+  "sha256": "18b8b450f5286a81c5b00c89b2861bd73091f34025962673bd159adef6c0fcce"
+ },
+ "items": 1,
+ "flags": [
+  {
+   "flag_id": "019a4a00-0000-7000-8000-0000000000f1",
+   "provision_id": "EUG.9.2751.17.c",
+   "category": "exclusion_on_unknown_fact",
+   "severity": "high",
+   "confirmed": true,
+   "quote": "within the city-recognized boundaries of Amazon Neighbors",
+   "fact": "site.zone",
+   "fact_claim": "unconfirmed",
+   "claim": "Whether 17.c applies turns on the lot's zone, which the case holds unconfirmed.",
+   "item_sha256": "1901c3da7d2179114f88bbc3e8265c5feadeffcf10123f1ab02f1560bb09b838",
+   "route": "hold_if_fits"
+  }
+ ],
+ "sound": [],
+ "unclear": [],
+ "rejected": [],
+ "hold": true,
+ "error": null,
+ "usage": [
+  {
+   "model": "muse-spark-1.3",
+   "prompt_tokens": 0,
+   "completion_tokens": 0,
+   "duration_ms": 0
+  }
+ ]
+}

@@ -1,0 +1,229 @@
+{
+ "schema": "lotfit.index-scope/1",
+ "entries": [
+  {
+   "provision_id": "PDX.T110-2",
+   "scope_clause_id": "PDX.T110-2#v1::sentence:1",
+   "scope_quote": "Table 110-2 Housing Types Allowed In The Single-Dwelling Zones",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.B",
+   "scope_clause_id": "PDX.33.110.220.B#v1::sentence:2",
+   "scope_quote": "The required setbacks for buildings and garage entrances are stated in Table 110-4.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.T110-4",
+   "scope_clause_id": "PDX.T110-4#v1::sentence:1",
+   "scope_quote": "Table 110-4 Summary of Development Standards In Single-Dwelling Zones",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.225.B",
+   "scope_clause_id": "PDX.33.110.225.B#v1::sentence:2",
+   "scope_quote": "The maximum combined building coverage allowed on a site for all covered structures is stated in Table 110-5.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.T110-5",
+   "scope_clause_id": "PDX.T110-5#v1::sentence:1",
+   "scope_quote": "Table 110-5 Maximum Building Coverage Allowed in the RF through R2.5 Zones",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050",
+   "scope_clause_id": "PDX.33.930.050#v1::sentence:2",
+   "scope_quote": "The height of a building is the vertical distance between the base reference point and the highest roof-type reference point.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.910.030.living-area",
+   "scope_clause_id": "PDX.33.910.030.living-area#v1::sentence:2",
+   "scope_quote": "The total gross building area of a residential structure excluding the following:",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.11.50.020",
+   "scope_clause_id": "PDX.11.50.020#v1::sentence:1",
+   "scope_quote": "A tree plan is required in conjunction with all development permits, unless there are no private trees 12 inches or more in diameter, no City trees six inches or more in diameter, and/or no street trees three inches or more in diameter, and the site or activity is exempt from Section 11.50.050 On-Site Tree Density Standards;",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.11.50.040.A",
+   "scope_clause_id": "PDX.11.50.040.A#v1::item:A.1.",
+   "scope_quote": "1. This Section applies to trees within the City and trees on sites within the County Urban Pocket Areas in the following situations.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1) — chosen over the first sentence, which is a heading or a caption"
+  },
+  {
+   "provision_id": "PDX.11.50.050.A",
+   "scope_clause_id": "PDX.11.50.050.A#v1::item:A.",
+   "scope_quote": "A. Where these regulations apply.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part2",
+   "scope_clause_id": "PDX.33.930.050.part2#v1::sentence:1",
+   "scope_quote": "portion of a building is within 25 feet of an existing or proposed sidewalk, the base reference point is determined using the method described in Subparagraph A.1.b.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part3",
+   "scope_clause_id": "PDX.33.930.050.part3#v1::sentence:1",
+   "scope_quote": "When the lowest grade of the existing or proposed sidewalk located within 25 feet of the building is not more than 10 feet below the highest grade of the sidewalk adjacent to the site within 25 feet of the building, the base reference point is the highest grade of the sidewalk.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part4",
+   "scope_clause_id": "PDX.33.930.050.part4#v1::sentence:1",
+   "scope_quote": "In all other situations, the base reference point is determined using the method described in Subparagraphs A.1.b(1) and A.1.b(2).",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part5",
+   "scope_clause_id": "PDX.33.930.050.part5#v1::item:c.",
+   "scope_quote": "c. Gabled, hipped, gambrel, or pyramidal roof:",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part6",
+   "scope_clause_id": "PDX.33.930.050.part6#v1::sentence:3",
+   "scope_quote": "The height of other structures such as flag poles and fences is the vertical distance from the ground level immediately under the structure to the top of a structure, excluding exempted portions.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1) — chosen over the first sentence, which is a heading or a caption"
+  },
+  {
+   "provision_id": "PDX.33.930.050.part7",
+   "scope_clause_id": "PDX.33.930.050.part7#v1::sentence:1",
+   "scope_quote": "Measuring height of retaining walls and fences.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.418.040.part2",
+   "scope_clause_id": "PDX.33.418.040.part2#v1::sentence:1",
+   "scope_quote": "A. 33.110.265.D.2 which allows duplexes consisting of two detached primary dwelling units in the R20 through R2.5 zones;",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.255.B.1.b-e",
+   "scope_clause_id": "PDX.33.110.255.B.1.b-e#v1::sentence:2",
+   "scope_quote": "A landscaped area is required around the perimeter of a flag lot that is 10,000 square feet or less in area to buffer the flag portion from surrounding lots.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.C.1",
+   "scope_clause_id": "PDX.33.110.220.C.1#v1::sentence:1",
+   "scope_quote": "The following features of a building may extend into a required building setback up to 20 percent of the depth of the setback.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.C.2",
+   "scope_clause_id": "PDX.33.110.220.C.2#v1::sentence:1",
+   "scope_quote": "Building eaves may extend up to 2 feet into a required building setback provided the eave is at least three feet from a lot line.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.C.3",
+   "scope_clause_id": "PDX.33.110.220.C.3#v1::sentence:1",
+   "scope_quote": "The following minor features of a building may extend into the entire required building setbacks:",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.D.1",
+   "scope_clause_id": "PDX.33.110.220.D.1#v1::sentence:2",
+   "scope_quote": "The front building setback, and the setback of decks, balconies, and porches may be reduced to the average of the respective setbacks on the abutting lots.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.220.D.4.a",
+   "scope_clause_id": "PDX.33.110.220.D.4.a#v1::sentence:1",
+   "scope_quote": "In the RF, R20, R10, and R7 zones, the front building setback for the dwelling may be reduced to 10 feet.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.245.C",
+   "scope_clause_id": "PDX.33.110.245.C#v1::sentence:3",
+   "scope_quote": "Detached covered accessory structures are items such as garages, carports, greenhouses, artist's studios, guest houses, accessory dwelling units, storage buildings, wood sheds, water collection cisterns, and covered decks or patios that are not connected to the",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1) — chosen over the first sentence, which is a heading or a caption"
+  },
+  {
+   "provision_id": "PDX.33.110.202.C.1",
+   "scope_clause_id": "PDX.33.110.202.C.1#v1::sentence:2",
+   "scope_quote": "Development of a primary structure is allowed as follows:",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.202.C.2-4",
+   "scope_clause_id": "PDX.33.110.202.C.2-4#v1::sentence:1",
+   "scope_quote": "On a lot created through the Planned Development or Planned Unit Development process",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.202.C.5",
+   "scope_clause_id": "PDX.33.110.202.C.5#v1::sentence:1",
+   "scope_quote": "On a lot of record or lot remnant or combination thereof that meets the minimum lot size requirements of Table 110-3.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  },
+  {
+   "provision_id": "PDX.33.110.202.D",
+   "scope_clause_id": "PDX.33.110.202.D#v1::sentence:2",
+   "scope_quote": "Development is prohibited on plots that are not lots, adjusted lots, lots of record, lot remnants, or tracts.",
+   "by": "CC on Martin's delegation (L18)",
+   "date": "2026-11-01",
+   "reason": "no applies_to_quote in the graph; the index needs the provision's own scope sentence (ARCHITECTURE.md §6, M12; panel round 4 F1)"
+  }
+ ]
+}

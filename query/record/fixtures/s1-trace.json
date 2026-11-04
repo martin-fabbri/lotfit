@@ -1,0 +1,778 @@
+{
+  "beats": [
+    {
+      "id": "b1",
+      "kind": "establish",
+      "refs": [
+        "house",
+        "shed"
+      ]
+    },
+    {
+      "id": "b2",
+      "kind": "constrain",
+      "refs": [
+        "PDX.33.205.020.B.1.a",
+        "PDX.11.50.020",
+        "PDX.33.205.040.C.1",
+        "PDX.33.110.220.B",
+        "PDX.33.205.040.C.2",
+        "PDX.33.110.245.C.3.a",
+        "PDX.33.110.225.B"
+      ]
+    },
+    {
+      "id": "b3",
+      "kind": "height",
+      "refs": [
+        "PDX.33.110.245.C.1",
+        "PDX.33.110.245.C.2"
+      ]
+    },
+    {
+      "id": "b4",
+      "kind": "envelope",
+      "refs": [
+        "PDX.33.110.220.B",
+        "PDX.33.205.040.C.2"
+      ]
+    },
+    {
+      "id": "b5",
+      "kind": "reject",
+      "refs": [
+        "client_spot",
+        "PDX.33.110.220.B",
+        "PDX.33.110.245.C.2"
+      ]
+    },
+    {
+      "id": "b6",
+      "kind": "place",
+      "refs": [
+        "selected_placement"
+      ]
+    },
+    {
+      "id": "b7",
+      "kind": "summary",
+      "refs": [
+        "PDX.33.205.020.B.1.a",
+        "PDX.11.50.020",
+        "PDX.33.205.040.C.1",
+        "PDX.33.110.245.C.1",
+        "PDX.33.110.220.B",
+        "PDX.33.110.245.C.2",
+        "PDX.33.205.040.C.2",
+        "PDX.33.110.245.C.3.a",
+        "PDX.33.110.225.B",
+        "client_spot",
+        "selected_placement"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "gate",
+      "measures": [],
+      "outcome": "pass",
+      "provision_id": "PDX.33.205.020.B.1.a",
+      "unit": null,
+      "value": null,
+      "zone": null
+    },
+    {
+      "kind": "gate",
+      "measures": [],
+      "outcome": "not_applicable",
+      "provision_id": "PDX.11.50.020",
+      "unit": null,
+      "value": null,
+      "zone": null
+    },
+    {
+      "kind": "plan_constraint",
+      "measures": [
+        {
+          "details": {
+            "binding": "cap",
+            "cap_sqft": 800,
+            "share_sqft": 1050
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_living_area",
+            "provision_id": "PDX.33.205.040.C.1",
+            "unit": "sqft",
+            "value": 800
+          },
+          "margin": 224,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "sqft",
+          "value": 576
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.205.040.C.1",
+      "unit": "sqft",
+      "value": 576,
+      "zone": null
+    },
+    {
+      "kind": "plan_constraint",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_height",
+            "provision_id": "PDX.33.110.245.C.1",
+            "unit": "ft",
+            "value": 20
+          },
+          "margin": 5,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 15
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.245.C.1",
+      "unit": "ft",
+      "value": 15,
+      "zone": null
+    },
+    {
+      "kind": "setback",
+      "measures": [
+        {
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 13,
+                "margin_ft": 8
+              },
+              {
+                "distance_ft": 13,
+                "margin_ft": 8
+              }
+            ]
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "side_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 8,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 13
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "rear_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 6,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 11
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.220.B",
+      "unit": "ft",
+      "value": 5,
+      "zone": [
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          5,
+          100
+        ],
+        [
+          0,
+          100
+        ]
+      ]
+    },
+    {
+      "kind": "setback",
+      "measures": [],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.220.B",
+      "unit": "ft",
+      "value": 5,
+      "zone": [
+        [
+          45,
+          0
+        ],
+        [
+          50,
+          0
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          45,
+          100
+        ]
+      ]
+    },
+    {
+      "kind": "setback",
+      "measures": [],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.220.B",
+      "unit": "ft",
+      "value": 5,
+      "zone": [
+        [
+          0,
+          95
+        ],
+        [
+          50,
+          95
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          0,
+          100
+        ]
+      ]
+    },
+    {
+      "kind": "exception",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_wall_height_in_setback",
+            "provision_id": "PDX.33.110.245.C.2",
+            "unit": "ft",
+            "value": 10
+          },
+          "margin": -2,
+          "pass": false,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 12
+        }
+      ],
+      "outcome": "fail",
+      "provision_id": "PDX.33.110.245.C.2",
+      "unit": "ft",
+      "value": 12,
+      "zone": null
+    },
+    {
+      "kind": "setback",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "front_lot_line_setback",
+            "provision_id": "PDX.33.205.040.C.2",
+            "unit": "ft",
+            "value": 40
+          },
+          "margin": 25,
+          "pass": true,
+          "tolerance": 0.25,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 65
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.205.040.C.2",
+      "unit": "ft",
+      "value": 40,
+      "zone": [
+        [
+          0,
+          0
+        ],
+        [
+          50,
+          0
+        ],
+        [
+          50,
+          40
+        ],
+        [
+          0,
+          40
+        ]
+      ]
+    },
+    {
+      "kind": "placement_constraint",
+      "measures": [
+        {
+          "details": {
+            "allowed_sqft": 1000,
+            "covered_sqft": 656
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_combined_accessory_coverage_pct_of_site",
+            "provision_id": "PDX.33.110.245.C.3.a",
+            "unit": "%",
+            "value": 20
+          },
+          "margin": 6.88,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "%",
+          "value": 13.12
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.245.C.3.a",
+      "unit": "%",
+      "value": 13.12,
+      "zone": null
+    },
+    {
+      "kind": "placement_constraint",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "T110-5:R3",
+            "provision_id": "PDX.T110-5",
+            "unit": "sqft",
+            "value": 2250
+          },
+          "margin": 684,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "sqft",
+          "value": 1566
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "PDX.33.110.225.B",
+      "unit": "sqft",
+      "value": 1566,
+      "zone": null
+    }
+  ],
+  "frame": {
+    "origin": "front-left",
+    "three": {
+      "X": "x",
+      "Y": "z",
+      "Z": "-y"
+    },
+    "units": "ft",
+    "x": "along the front lot line",
+    "y": "to the rear",
+    "z": "up"
+  },
+  "options": [
+    {
+      "id": "client_spot",
+      "margins": [
+        {
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 2,
+                "margin_ft": -3
+              },
+              {
+                "distance_ft": 24,
+                "margin_ft": 19
+              }
+            ]
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "side_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": -3,
+          "pass": false,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 2
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "rear_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": -3,
+          "pass": false,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 2
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_wall_height_in_setback",
+            "provision_id": "PDX.33.110.245.C.2",
+            "unit": "ft",
+            "value": 10
+          },
+          "margin": -2,
+          "pass": false,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 12
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "front_lot_line_setback",
+            "provision_id": "PDX.33.205.040.C.2",
+            "unit": "ft",
+            "value": 40
+          },
+          "margin": 34,
+          "pass": true,
+          "tolerance": 0.25,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 74
+        },
+        {
+          "details": {
+            "allowed_sqft": 1000,
+            "covered_sqft": 656
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_combined_accessory_coverage_pct_of_site",
+            "provision_id": "PDX.33.110.245.C.3.a",
+            "unit": "%",
+            "value": 20
+          },
+          "margin": 6.88,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "%",
+          "value": 13.12
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "T110-5:R3",
+            "provision_id": "PDX.T110-5",
+            "unit": "sqft",
+            "value": 2250
+          },
+          "margin": 684,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "sqft",
+          "value": 1566
+        }
+      ],
+      "outline": [
+        [
+          2,
+          74
+        ],
+        [
+          26,
+          74
+        ],
+        [
+          26,
+          98
+        ],
+        [
+          2,
+          98
+        ]
+      ],
+      "placement": {
+        "rotation": 0,
+        "x": 2,
+        "y": 74
+      },
+      "status": "rejected",
+      "why": [
+        "PDX.33.110.220.B [fail]: 2 ft vs limit 5 ft (side_building_setback.R5), margin -3 ft; 2 ft vs limit 5 ft (rear_building_setback.R5), margin -3 ft",
+        "PDX.33.110.245.C.2 [fail]: 12 ft vs limit 10 ft (max_wall_height_in_setback), margin -2 ft",
+        "PDX.33.205.040.C.2 [pass]: 74 ft vs limit 40 ft (front_lot_line_setback), margin +34 ft",
+        "PDX.33.110.245.C.3.a [pass]: 13.12 % vs limit 20 % (max_combined_accessory_coverage_pct_of_site), margin +6.88 %",
+        "PDX.33.110.225.B [pass]: 1566 sqft vs limit 2250 sqft (T110-5:R3), margin +684 sqft"
+      ]
+    },
+    {
+      "id": "selected_placement",
+      "margins": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "side_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 8,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 13
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "side_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 8,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 13
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "rear_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 6,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 11
+        },
+        {
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 13,
+                "margin_ft": 8
+              },
+              {
+                "distance_ft": 13,
+                "margin_ft": 8
+              }
+            ]
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "side_building_setback.R5",
+            "provision_id": "PDX.T110-4",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 8,
+          "pass": true,
+          "tolerance": 0.5,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 13
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "front_lot_line_setback",
+            "provision_id": "PDX.33.205.040.C.2",
+            "unit": "ft",
+            "value": 40
+          },
+          "margin": 25,
+          "pass": true,
+          "tolerance": 0.25,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 65
+        },
+        {
+          "details": {
+            "allowed_sqft": 1000,
+            "covered_sqft": 656
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_combined_accessory_coverage_pct_of_site",
+            "provision_id": "PDX.33.110.245.C.3.a",
+            "unit": "%",
+            "value": 20
+          },
+          "margin": 6.88,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "%",
+          "value": 13.12
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "T110-5:R3",
+            "provision_id": "PDX.T110-5",
+            "unit": "sqft",
+            "value": 2250
+          },
+          "margin": 684,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "sqft",
+          "value": 1566
+        }
+      ],
+      "outline": [
+        [
+          13,
+          65
+        ],
+        [
+          37,
+          65
+        ],
+        [
+          37,
+          89
+        ],
+        [
+          13,
+          89
+        ]
+      ],
+      "placement": {
+        "rotation": 0,
+        "x": 13,
+        "y": 65
+      },
+      "status": "selected",
+      "why": [
+        "PDX.33.110.220.B [pass]: 13 ft vs limit 5 ft (side_building_setback.R5), margin +8 ft; 11 ft vs limit 5 ft (rear_building_setback.R5), margin +6 ft",
+        "PDX.33.205.040.C.2 [pass]: 65 ft vs limit 40 ft (front_lot_line_setback), margin +25 ft",
+        "PDX.33.110.245.C.3.a [pass]: 13.12 % vs limit 20 % (max_combined_accessory_coverage_pct_of_site), margin +6.88 %",
+        "PDX.33.110.225.B [pass]: 1566 sqft vs limit 2250 sqft (T110-5:R3), margin +684 sqft"
+      ]
+    }
+  ],
+  "report_sha256": "2bcba7da59300cf835ed8bf12007da23b5e2fe2236922afdddf98176c4dd8396",
+  "schema": "buildnexus.decision-trace/1",
+  "site": {
+    "existing": [
+      {
+        "height_ft": null,
+        "id": "house",
+        "kind": "house",
+        "outline": [
+          [
+            12,
+            20
+          ],
+          [
+            38,
+            20
+          ],
+          [
+            38,
+            55
+          ],
+          [
+            12,
+            55
+          ]
+        ]
+      },
+      {
+        "height_ft": null,
+        "id": "shed",
+        "kind": "shed",
+        "outline": [
+          [
+            40,
+            85
+          ],
+          [
+            48,
+            85
+          ],
+          [
+            48,
+            95
+          ],
+          [
+            40,
+            95
+          ]
+        ]
+      }
+    ],
+    "lot": [
+      [
+        0,
+        0
+      ],
+      [
+        50,
+        0
+      ],
+      [
+        50,
+        100
+      ],
+      [
+        0,
+        100
+      ]
+    ],
+    "north_deg": null,
+    "north_uncertainty_deg": null
+  }
+}

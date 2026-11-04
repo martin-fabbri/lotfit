@@ -1,0 +1,393 @@
+{
+  "schema": "lotfit.case/1",
+  "case_id": "01a1a318-cabd-728d-b1cb-67aad7414e96",
+  "as_of": {
+    "date": "2026-11-15",
+    "meaning": "planned_submittal"
+  },
+  "jurisdiction": {
+    "state_layer": "OR",
+    "city_layer": "PDX"
+  },
+  "mode": "check_spot",
+  "capture": null,
+  "site": {
+    "zone": {
+      "value": "R5",
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "zoning",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "overlays": {
+      "value": [],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "overlay zones",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "lot_outline": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          50,
+          0
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          0,
+          100
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "lot dimensions",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "front_lot_line": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          50,
+          0
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "lot dimensions",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "rear_lot_line": {
+      "value": [
+        [
+          0,
+          100
+        ],
+        [
+          50,
+          100
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "lot dimensions",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "side_lot_lines": {
+      "value": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            100
+          ]
+        ],
+        [
+          [
+            50,
+            0
+          ],
+          [
+            50,
+            100
+          ]
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "lot dimensions",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "house_outline": {
+      "value": [
+        [
+          12,
+          20
+        ],
+        [
+          38,
+          20
+        ],
+        [
+          38,
+          55
+        ],
+        [
+          12,
+          55
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick capture (illustration)",
+          "where": "house walls",
+          "when": "2026-10-31",
+          "by": "Martin Fabbri",
+          "tolerance": {
+            "value": 0.25,
+            "unit": "ft"
+          }
+        }
+      ]
+    },
+    "structures": {
+      "value": [
+        {
+          "id": "shed",
+          "outline": [
+            [
+              40,
+              85
+            ],
+            [
+              48,
+              85
+            ],
+            [
+              48,
+              95
+            ],
+            [
+              40,
+              95
+            ]
+          ]
+        }
+      ],
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick capture (illustration)",
+          "where": "shed walls",
+          "when": "2026-10-31",
+          "by": "Martin Fabbri",
+          "tolerance": {
+            "value": 0.25,
+            "unit": "ft"
+          }
+        }
+      ]
+    },
+    "primary_living_area_sqft": {
+      "observations": [
+        {
+          "value": 1400,
+          "prov": [
+            {
+              "kind": "official_record",
+              "document": "PortlandMaps property report (illustration)",
+              "where": "building: living area",
+              "when": "2026-10-20",
+              "by": "Martin Fabbri",
+              "issuer": "City of Portland",
+              "status": "current"
+            }
+          ]
+        },
+        {
+          "value": 1450,
+          "prov": [
+            {
+              "kind": "capture",
+              "document": "Yardstick capture (illustration)",
+              "where": "floor plan sketch, interior",
+              "when": "2026-10-31",
+              "by": "Martin Fabbri",
+              "tolerance": {
+                "value": 0.25,
+                "unit": "ft"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "corner_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "PortlandMaps property report (illustration)",
+          "where": "street frontage",
+          "when": "2026-10-20",
+          "by": "Martin Fabbri",
+          "issuer": "City of Portland",
+          "status": "current"
+        }
+      ]
+    },
+    "trees": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick capture (illustration)",
+          "where": "tree survey",
+          "when": "2026-10-31",
+          "by": "Martin Fabbri",
+          "tolerance": {
+            "value": 0.25,
+            "unit": "ft"
+          }
+        }
+      ]
+    }
+  },
+  "plan": {
+    "kind": {
+      "value": "adu",
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session (illustration)",
+          "where": "what",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "client's wish"
+        }
+      ]
+    },
+    "detached": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "footprint": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          24,
+          0
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          0,
+          24
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+          "where": "sheet A1",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "placement": {
+      "value": {
+        "x": 13,
+        "y": 65,
+        "rotation": 0
+      },
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session (illustration)",
+          "where": "client's spot",
+          "when": "2026-11-01",
+          "by": "Martin Fabbri",
+          "status": "client's wish"
+        }
+      ]
+    },
+    "height_ft": {
+      "value": 15,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+          "where": "sheet A3, measured per 33.930.050",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    },
+    "living_area_sqft": {
+      "value": 576,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+          "where": "sheet A1 area table",
+          "when": "2026-10-30",
+          "by": "Martin Fabbri",
+          "status": "as drawn"
+        }
+      ]
+    }
+  },
+  "unknowns": []
+}

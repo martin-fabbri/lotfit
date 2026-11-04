@@ -1,0 +1,672 @@
+{
+ "about": "The registry of facts (GR-11). Every fact a rule, operator or tool may read is registered here with its scope, type, unit and the kinds of source that may supply it; a computed fact says how and from what. Input files use these names. CC, 2026-11-01. The draft 4.2 extension (dimensions, the name lint) is parked with the ontology (L25).",
+ "source_kinds": {
+  "capture": "measured on site (Yardstick), with a tolerance",
+  "official_record": "a public record or map from the issuing agency (names its issuer)",
+  "plan_document": "the plan set for the structure",
+  "owner_statement": "what the owner says",
+  "entered": "typed in by a named person, with what it rests on",
+  "computed": "derived by a named tool or formula from other facts"
+ },
+ "markers_not_facts": [
+  "unrecognised: no fact in the lexicon matches these words; read the clause",
+  "the footnote's own conditions"
+ ],
+ "facts": [
+  {
+   "name": "site.zone",
+   "scope": "site",
+   "type": "enum",
+   "unit": null,
+   "accepted_sources": [
+    "official_record"
+   ],
+   "description": "The lot's base zone (Portland RF..R2.5; Eugene R-1..R-4).",
+   "values": [
+    "RF",
+    "R20",
+    "R10",
+    "R7",
+    "R5",
+    "R2.5",
+    "R-1",
+    "R-2",
+    "R-3",
+    "R-4"
+   ],
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.zone_family",
+   "scope": "site",
+   "type": "enum",
+   "unit": null,
+   "accepted_sources": [
+    "computed",
+    "official_record"
+   ],
+   "description": "The family of the base zone.",
+   "computed": {
+    "how": "single_dwelling for RF through R2.5 (Portland 33.110.020) and R-1 (Eugene 9.2700)",
+    "from": [
+     "site.zone"
+    ]
+   },
+   "values": [
+    "single_dwelling",
+    "multi_dwelling",
+    "commercial_mixed_use",
+    "industrial"
+   ]
+  },
+  {
+   "name": "site.overlays",
+   "scope": "site",
+   "type": "list",
+   "unit": null,
+   "accepted_sources": [
+    "official_record"
+   ],
+   "description": "Overlay zones and plan districts on any part of the lot.",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.lot_outline",
+   "scope": "site",
+   "type": "polygon",
+   "unit": "ft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "entered"
+   ],
+   "description": "The lot's outline in the lot frame (curated/conventions.json).",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.lot_area_sqft",
+   "scope": "site",
+   "type": "quantity",
+   "unit": "sqft",
+   "accepted_sources": [
+    "computed",
+    "official_record"
+   ],
+   "description": "The site's area.",
+   "computed": {
+    "how": "area of site.lot_outline (33.930.025)",
+    "from": [
+     "site.lot_outline"
+    ]
+   }
+  },
+  {
+   "name": "site.front_lot_line",
+   "scope": "site",
+   "type": "line",
+   "unit": "ft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "entered"
+   ],
+   "description": "The front lot line as a segment in the lot frame (33.910.030 Front Lot Line).",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.side_street_lot_line",
+   "scope": "site",
+   "type": "line",
+   "unit": "ft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "entered"
+   ],
+   "description": "The side street lot line on a corner lot, or null."
+  },
+  {
+   "name": "site.rear_lot_line",
+   "scope": "site",
+   "type": "line",
+   "unit": "ft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "entered"
+   ],
+   "description": "The rear lot line as a segment in the lot frame."
+  },
+  {
+   "name": "site.side_lot_lines",
+   "scope": "site",
+   "type": "lines",
+   "unit": "ft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "entered"
+   ],
+   "description": "The side lot lines as segments in the lot frame."
+  },
+  {
+   "name": "site.house_outline",
+   "scope": "site",
+   "type": "polygon",
+   "unit": "ft",
+   "accepted_sources": [
+    "capture",
+    "official_record",
+    "entered"
+   ],
+   "description": "The primary dwelling's outline at grade in the lot frame.",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.structures",
+   "scope": "site",
+   "type": "structures",
+   "unit": "ft",
+   "accepted_sources": [
+    "capture",
+    "owner_statement",
+    "entered"
+   ],
+   "description": "Existing structures other than the house: [{id, outline}].",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.primary_living_area_sqft",
+   "scope": "site",
+   "type": "quantity",
+   "unit": "sqft",
+   "accepted_sources": [
+    "official_record",
+    "capture",
+    "plan_document"
+   ],
+   "description": "The primary dwelling's living area (33.910.030 Living Area), after the ADU is created.",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "site.corner_lot",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record",
+    "capture"
+   ],
+   "description": "The lot is a corner lot (33.910.030 Corner Lot)."
+  },
+  {
+   "name": "site.flag_lot",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record"
+   ],
+   "description": "The lot is a flag lot."
+  },
+  {
+   "name": "site.through_lot",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record"
+   ],
+   "description": "The lot is a through lot."
+  },
+  {
+   "name": "site.alley",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record",
+    "capture"
+   ],
+   "description": "The lot abuts an alley."
+  },
+  {
+   "name": "site.trees",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "capture",
+    "owner_statement"
+   ],
+   "description": "Trees at or over Title 11's diameter thresholds are on or near the site."
+  },
+  {
+   "name": "site.slope_pct",
+   "scope": "site",
+   "type": "quantity",
+   "unit": "%",
+   "accepted_sources": [
+    "capture",
+    "official_record"
+   ],
+   "description": "Average slope of the lot from the street."
+  },
+  {
+   "name": "site.historic_resource",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record"
+   ],
+   "description": "The lot holds a designated historic resource or is in a historic or conservation district."
+  },
+  {
+   "name": "site.primary_is_duplex",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record",
+    "owner_statement"
+   ],
+   "description": "The primary structure is a duplex."
+  },
+  {
+   "name": "site.primary_is_attached_house",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record",
+    "owner_statement"
+   ],
+   "description": "The primary structure is an attached house."
+  },
+  {
+   "name": "site.primary_is_manufactured",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "official_record",
+    "owner_statement"
+   ],
+   "description": "The primary dwelling is a manufactured home."
+  },
+  {
+   "name": "site.screening",
+   "scope": "site",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "capture",
+    "plan_document"
+   ],
+   "description": "The part of the structure within a setback is screened from adjoining lots (fence or enclosing wall)."
+  },
+  {
+   "name": "site.other_structures_in_setback",
+   "scope": "site",
+   "type": "count",
+   "unit": "count",
+   "accepted_sources": [
+    "capture",
+    "owner_statement"
+   ],
+   "description": "Other structures already within the same setback."
+  },
+  {
+   "name": "site.house_main_entrance",
+   "scope": "site",
+   "type": "point",
+   "unit": "ft",
+   "accepted_sources": [
+    "capture",
+    "owner_statement",
+    "entered"
+   ],
+   "description": "The primary dwelling's main entrance to the street, in the lot frame."
+  },
+  {
+   "name": "site.house_rear_wall",
+   "scope": "site",
+   "type": "line",
+   "unit": "ft",
+   "accepted_sources": [
+    "computed",
+    "capture"
+   ],
+   "description": "The primary dwelling's rear wall: the wall furthest from the main-entrance wall (33.205.040.C.2).",
+   "computed": {
+    "how": "the house wall furthest from the wall with the main entrance",
+    "from": [
+     "site.house_outline",
+     "site.house_main_entrance"
+    ]
+   }
+  },
+  {
+   "name": "plan.kind",
+   "scope": "plan",
+   "type": "enum",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "What is being placed.",
+   "values": [
+    "adu",
+    "accessory_structure"
+   ],
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "plan.detached",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The ADU is detached.",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "plan.footprint",
+   "scope": "plan",
+   "type": "polygon",
+   "unit": "ft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The plan's full outline at grade in the plan frame, porches and stoops included (curated/conventions.json).",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "plan.placement",
+   "scope": "plan",
+   "type": "placement",
+   "unit": null,
+   "accepted_sources": [
+    "entered"
+   ],
+   "description": "Where the plan goes: {x, y, rotation} in the lot frame (curated/conventions.json)."
+  },
+  {
+   "name": "plan.outline",
+   "scope": "plan",
+   "type": "polygon",
+   "unit": "ft",
+   "accepted_sources": [
+    "computed"
+   ],
+   "description": "The plan's outline in the lot frame.",
+   "computed": {
+    "how": "tool placed_outline",
+    "from": [
+     "plan.footprint",
+     "plan.placement"
+    ]
+   }
+  },
+  {
+   "name": "plan.height_ft",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "ft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure's height, measured per the city's definition (Portland 33.930.050; Eugene 9.0500 Building Height: to the highest point of the roof in residential zones).",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "plan.wall_height_ft",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "ft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The tallest wall, excluding the portion within a gable."
+  },
+  {
+   "name": "plan.living_area_sqft",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "sqft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The ADU's living area (33.910.030 Living Area).",
+   "required_for": [
+    "adu_evaluation"
+   ]
+  },
+  {
+   "name": "plan.eave_ft",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "ft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "How far eaves project beyond the walls."
+  },
+  {
+   "name": "plan.setbacks_used",
+   "scope": "plan",
+   "type": "list",
+   "unit": null,
+   "accepted_sources": [
+    "computed"
+   ],
+   "description": "The setbacks the plan sits in, if any (front, side, rear, street).",
+   "computed": {
+    "how": "each lot line whose required setback the outline enters",
+    "from": [
+     "plan.outline",
+     "site.front_lot_line",
+     "site.side_lot_lines",
+     "site.rear_lot_line"
+    ]
+   }
+  },
+  {
+   "name": "plan.parking",
+   "scope": "plan",
+   "type": "count",
+   "unit": "count",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "Parking spaces the plan adds."
+  },
+  {
+   "name": "plan.is_garage",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure is a garage or carport."
+  },
+  {
+   "name": "plan.is_cistern",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure is a water collection cistern."
+  },
+  {
+   "name": "plan.gable_walls",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure has gable walls."
+  },
+  {
+   "name": "plan.dormers",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure has dormers."
+  },
+  {
+   "name": "plan.rooftop_deck",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The structure has a rooftop deck."
+  },
+  {
+   "name": "plan.openings_facing_lot_line",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "Walls within a setback have doors or windows facing the adjacent lot line."
+  },
+  {
+   "name": "plan.basement_conversion",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The ADU is a converted basement of the primary dwelling."
+  },
+  {
+   "name": "plan.vacation_occupancy",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "entered",
+    "owner_statement"
+   ],
+   "description": "The unit is for vacation occupancy."
+  },
+  {
+   "name": "plan.owner_occupancy_required",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "entered"
+   ],
+   "description": "An owner-occupancy requirement is imposed."
+  },
+  {
+   "name": "plan.sloped_ceiling",
+   "scope": "plan",
+   "type": "bool",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "Part of the ADU's floor area sits under a ceiling lower than 5 feet (33.910.030 Living Area's attic exclusion)."
+  },
+  {
+   "name": "plan.openings_by_face",
+   "scope": "plan",
+   "type": "list",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The plan faces (front, rear, left, right; curated/conventions.json plan_frame) that have doors or windows. 33.110.245.C.2.b.(6) reads it per wall within the setback, after rotation."
+  },
+  {
+   "name": "plan.dormer_faces",
+   "scope": "plan",
+   "type": "list",
+   "unit": null,
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "The plan faces that carry dormers, with each dormer's setback from the nearest side or rear lot line once placed. 33.110.245.C.2.b.(8)."
+  },
+  {
+   "name": "plan.total_building_sqft",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "sqft",
+   "accepted_sources": [
+    "plan_document",
+    "entered"
+   ],
+   "description": "Eugene 9.2751(17)(a)1.: the accessory dwelling's total building square footage, measured at the exterior perimeter walls, all square footage inside the dwelling (hallways, entries, closets, utility rooms, stairways, bathrooms); up to 300 sq ft of attached unheated storage is not counted (9.2751(17)(b)1.)."
+  },
+  {
+   "name": "plan.accessory_dwellings_on_lot",
+   "scope": "plan",
+   "type": "quantity",
+   "unit": "count",
+   "accepted_sources": [
+    "owner_statement",
+    "official_record",
+    "entered"
+   ],
+   "description": "Eugene 9.2741(3): how many accessory dwellings the lot will have for its detached single-unit dwelling if this plan is built (existing ones plus the planned one). Counted by the owner or from records, never by the model."
+  }
+ ]
+}

@@ -1,0 +1,846 @@
+{
+ "schema": "lotfit.evaluation-report/1",
+ "case_id": "019a4000-0000-7000-8000-000000000001",
+ "case_hash": "c0d40163ebed0000000000000000000000000000000000000000000000000001",
+ "graph_load_id": "3e6c8679@2026-11-01T20:14:59Z",
+ "config_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+ "as_of": {
+  "date": "2026-11-15",
+  "meaning": "planned_submittal"
+ },
+ "verdict": "FITS_IF",
+ "model_verdict": "FITS_IF",
+ "verdict_note": null,
+ "banner": "Pre-feasibility only; not a permit decision.",
+ "plan_limit": null,
+ "placement": {
+  "client_spot": {
+   "placement": {
+    "x": 2,
+    "y": 74,
+    "rotation": 0
+   },
+   "passes": false,
+   "failing": [
+    "PDX.33.110.220.B",
+    "PDX.33.110.250.X"
+   ],
+   "rejected_exceptions": [
+    "PDX.33.110.245.C.2",
+    "PDX.33.110.245.C.9"
+   ]
+  },
+  "recommended": {
+   "placement": {
+    "x": 40,
+    "y": 60,
+    "rotation": 90
+   },
+   "margins": [
+    {
+     "value": 13,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "side_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 8,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    },
+    {
+     "value": 13,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "side_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 8,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    },
+    {
+     "value": 11,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "rear_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 6,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "solar": {
+    "winter_noon_shadow_ft": 21.5
+   }
+  },
+  "search": {
+   "count": 478,
+   "clear_count": 408,
+   "client_spot": {
+    "passes": false,
+    "failing": [
+     "PDX.33.110.220.B"
+    ]
+   },
+   "nearest_to_client": {
+    "x": 13,
+    "y": 65,
+    "rotation": 0
+   },
+   "max_clearance": {
+    "x": 13,
+    "y": 65,
+    "rotation": 0
+   },
+   "envelope_artifact": null
+  }
+ },
+ "findings": [
+  {
+   "provision_id": "PDX.33.205.020.B.1.a",
+   "target": "case",
+   "outcome": "pass",
+   "evaluation_stage": "gate",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.205.020.B.1.a#v1::sentence:1",
+     "quote": "An accessory dwelling unit may be added to a house in RF through R2.5 zones.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [],
+   "measures": [],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000101"
+   ]
+  },
+  {
+   "provision_id": "PDX.11.50.020",
+   "target": "case",
+   "outcome": "not_applicable",
+   "evaluation_stage": "gate",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.11.50.020#v1::sentence:1",
+     "quote": "Tree preservation requirements apply when trees are present on the site.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [],
+   "measures": [],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000102"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.205.040.C.1",
+   "target": "case",
+   "outcome": "pass",
+   "evaluation_stage": "plan_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.205.040.C.1#v1::sentence:1",
+     "quote": "The maximum living area for an ADU is 75 percent of the living area of the primary structure or 800 square feet, whichever is less.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.205.040.C.1",
+     "param": "max_living_area",
+     "value": 800,
+     "unit": "sqft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 576,
+     "unit": "sqft",
+     "limit": {
+      "provision_id": "PDX.33.205.040.C.1",
+      "param": "max_living_area",
+      "value": 800,
+      "unit": "sqft"
+     },
+     "margin": 224,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "share_sqft": 1050,
+      "cap_sqft": 800,
+      "binding": "cap"
+     }
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000104"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.245.C.1",
+   "target": "case",
+   "outcome": "pass",
+   "evaluation_stage": "plan_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.245.C.1#v1::sentence:1",
+     "quote": "The maximum height allowed for all detached covered accessory structures is 20 feet.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.110.245.C.1",
+     "param": "max_height",
+     "value": 20,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 15,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.33.110.245.C.1",
+      "param": "max_height",
+      "value": 20,
+      "unit": "ft"
+     },
+     "margin": 5,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000105"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.220.B",
+   "target": "client_spot",
+   "outcome": "fail",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.220.B#v1::sentence:1",
+     "quote": "The required building setbacks are stated in Table 110-4.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.T110-4",
+     "param": "side_building_setback.R5",
+     "value": 5,
+     "unit": "ft"
+    },
+    {
+     "provision_id": "PDX.T110-4",
+     "param": "rear_building_setback.R5",
+     "value": 5,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 2,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "side_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": -3,
+     "tolerance": 0.5,
+     "pass": false,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "nearest_segment": 0,
+      "per_segment": [
+       {
+        "distance_ft": 2,
+        "margin_ft": -3
+       },
+       {
+        "distance_ft": 24,
+        "margin_ft": 19
+       }
+      ]
+     }
+    },
+    {
+     "value": 2,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "rear_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": -3,
+     "tolerance": 0.5,
+     "pass": false,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000107",
+    "019a4000-0000-7000-8000-000000000108"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.245.C.2",
+   "target": "client_spot",
+   "outcome": "fail",
+   "evaluation_stage": "exception",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.245.C.2#v1::item:b.(4)",
+     "quote": "The structure is no more than 15 feet high, and the walls of the structure are no more than 10 feet high, excluding the portion of the wall within a gable.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.110.245.C.2",
+     "param": "max_wall_height_in_setback",
+     "value": 10,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 12,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.33.110.245.C.2",
+      "param": "max_wall_height_in_setback",
+      "value": 10,
+      "unit": "ft"
+     },
+     "margin": -2,
+     "tolerance": 0,
+     "pass": false,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000109"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.205.040.C.2",
+   "target": "client_spot",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.205.040.C.2#v1::sentence:1",
+     "quote": "Detached ADUs must be at least 40 feet from a front lot line or behind the rear wall of the primary structure.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.205.040.C.2",
+     "param": "front_lot_line_setback",
+     "value": 40,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 74,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.33.205.040.C.2",
+      "param": "front_lot_line_setback",
+      "value": 40,
+      "unit": "ft"
+     },
+     "margin": 34,
+     "tolerance": 0.25,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-00000000010a"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.245.C.3.a",
+   "target": "client_spot",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.245.C.3.a#v1::sentence:1",
+     "quote": "The combined building coverage of all detached covered accessory structures may not exceed 20 percent of the total area of the site.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.110.245.C.3.a",
+     "param": "max_combined_accessory_coverage_pct_of_site",
+     "value": 20,
+     "unit": "%"
+    }
+   ],
+   "measures": [
+    {
+     "value": 13.12,
+     "unit": "%",
+     "limit": {
+      "provision_id": "PDX.33.110.245.C.3.a",
+      "param": "max_combined_accessory_coverage_pct_of_site",
+      "value": 20,
+      "unit": "%"
+     },
+     "margin": 6.88,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "covered_sqft": 656,
+      "allowed_sqft": 1000
+     }
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-00000000010b"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.225.B",
+   "target": "client_spot",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.225.B#v1::sentence:1",
+     "quote": "The maximum combined building coverage for all covered structures on the site is stated in Table 110-5.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.T110-5",
+     "param": "T110-5:R3",
+     "value": 2250,
+     "unit": "sqft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 1566,
+     "unit": "sqft",
+     "limit": {
+      "provision_id": "PDX.T110-5",
+      "param": "T110-5:R3",
+      "value": 2250,
+      "unit": "sqft"
+     },
+     "margin": 684,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-00000000010c"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.220.B",
+   "target": "selected_placement",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.220.B#v1::sentence:1",
+     "quote": "The required building setbacks are stated in Table 110-4.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.T110-4",
+     "param": "side_building_setback.R5",
+     "value": 5,
+     "unit": "ft"
+    },
+    {
+     "provision_id": "PDX.T110-4",
+     "param": "rear_building_setback.R5",
+     "value": 5,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 13,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "side_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 8,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "nearest_segment": 0,
+      "per_segment": [
+       {
+        "distance_ft": 13,
+        "margin_ft": 8
+       },
+       {
+        "distance_ft": 13,
+        "margin_ft": 8
+       }
+      ]
+     }
+    },
+    {
+     "value": 11,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "rear_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 6,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    },
+    {
+     "value": 14,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.T110-4",
+      "param": "side_building_setback.R5",
+      "value": 5,
+      "unit": "ft"
+     },
+     "margin": 9,
+     "tolerance": 0.5,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "nearest_segment": 0,
+      "per_segment": [
+       {
+        "distance_ft": 13,
+        "margin_ft": 8
+       },
+       {
+        "distance_ft": 13,
+        "margin_ft": 8
+       }
+      ]
+     }
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-00000000010e",
+    "019a4000-0000-7000-8000-00000000010f"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.205.040.C.2",
+   "target": "selected_placement",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.205.040.C.2#v1::sentence:1",
+     "quote": "Detached ADUs must be at least 40 feet from a front lot line or behind the rear wall of the primary structure.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.205.040.C.2",
+     "param": "front_lot_line_setback",
+     "value": 40,
+     "unit": "ft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 65,
+     "unit": "ft",
+     "limit": {
+      "provision_id": "PDX.33.205.040.C.2",
+      "param": "front_lot_line_setback",
+      "value": 40,
+      "unit": "ft"
+     },
+     "margin": 25,
+     "tolerance": 0.25,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000110"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.245.C.3.a",
+   "target": "selected_placement",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.245.C.3.a#v1::sentence:1",
+     "quote": "The combined building coverage of all detached covered accessory structures may not exceed 20 percent of the total area of the site.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.33.110.245.C.3.a",
+     "param": "max_combined_accessory_coverage_pct_of_site",
+     "value": 20,
+     "unit": "%"
+    }
+   ],
+   "measures": [
+    {
+     "value": 13.12,
+     "unit": "%",
+     "limit": {
+      "provision_id": "PDX.33.110.245.C.3.a",
+      "param": "max_combined_accessory_coverage_pct_of_site",
+      "value": 20,
+      "unit": "%"
+     },
+     "margin": 6.88,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null,
+     "details": {
+      "covered_sqft": 656,
+      "allowed_sqft": 1000
+     }
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000111"
+   ]
+  },
+  {
+   "provision_id": "PDX.33.110.225.B",
+   "target": "selected_placement",
+   "outcome": "pass",
+   "evaluation_stage": "placement_constraint",
+   "citations": [
+    {
+     "document": "Portland Zoning Code Title 33",
+     "page": null,
+     "clause_id": "PDX.33.110.225.B#v1::sentence:1",
+     "quote": "The maximum combined building coverage for all covered structures on the site is stated in Table 110-5.",
+     "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+   ],
+   "params": [
+    {
+     "provision_id": "PDX.T110-5",
+     "param": "T110-5:R3",
+     "value": 2250,
+     "unit": "sqft"
+    }
+   ],
+   "measures": [
+    {
+     "value": 1566,
+     "unit": "sqft",
+     "limit": {
+      "provision_id": "PDX.T110-5",
+      "param": "T110-5:R3",
+      "value": 2250,
+      "unit": "sqft"
+     },
+     "margin": 684,
+     "tolerance": 0,
+     "pass": true,
+     "too_close_to_call": false,
+     "dimension_to_tape": null
+    }
+   ],
+   "confirmation": "confirmed",
+   "evidence_call_ids": [
+    "019a4000-0000-7000-8000-000000000112"
+   ]
+  }
+ ],
+ "dispositions_relied_on": [
+  {
+   "clause_id": "PDX.33.110.220.B#v1::sentence:1",
+   "disposition": {
+    "kind": "inert_for",
+    "scope": "detached_adu",
+    "reason": "sample",
+    "by": "sample",
+    "date": "2026-11-01"
+   }
+  }
+ ],
+ "conflicts": [
+  {
+   "fact": "site.slope_pct",
+   "observations": [
+    {
+     "value": 3
+    },
+    {
+     "value": 6
+    }
+   ]
+  }
+ ],
+ "assumptions": [
+  {
+   "fact": "site.trees",
+   "value": false,
+   "flips": false
+  }
+ ],
+ "conditions": [
+  {
+   "ambiguity_id": "amb.sample.reading",
+   "provision_id": "PDX.33.110.220.B",
+   "phrase": "behind the house",
+   "readings": [
+    {
+     "index": 0,
+     "reading": "behind the rear wall",
+     "verdict": "FITS"
+    },
+    {
+     "index": 1,
+     "reading": "behind the whole house",
+     "verdict": "NO_LEGS"
+    }
+   ],
+   "settled_by": "the city"
+  }
+ ],
+ "questions": [
+  {
+   "question_id": "019a4a00-0000-7000-8000-0000000000a1",
+   "fact": "site.alley",
+   "prompt": "Is there an alley behind the lot?",
+   "clause_id": null,
+   "who_can_settle": "owner",
+   "answers": [
+    {
+     "label": "yes",
+     "value": true,
+     "verdict": "FITS"
+    },
+    {
+     "label": "no",
+     "value": false,
+     "verdict": "NO_LEGS"
+    }
+   ],
+   "skip": {
+    "assumed_value": false,
+    "verdict": "NEEDS_CHECK"
+   }
+  }
+ ],
+ "not_found": [],
+ "unchecked": [],
+ "verifier": {
+  "passed": true,
+  "issues": []
+ },
+ "critic": null,
+ "telemetry": {
+  "tokens": 24500,
+  "calls": 19,
+  "turns": 7,
+  "wall_s_plan_execute": 28.4,
+  "wall_s_total": 34.1,
+  "cost_usd": 0.032,
+  "models": {
+   "agent": "meta-models/muse-spark-open-1026"
+  }
+ }
+}
