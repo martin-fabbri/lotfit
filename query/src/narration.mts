@@ -115,7 +115,7 @@ export const OUTCOME_PHRASE: Record<string, string> = {
 export function ruleSentence(pid: string, gloss: string, spoken: SpokenData): string {
   const p = spoken.provisions.get(pid);
   const ref = p?.ref ?? spokenRef(pid);
-  const clean = gloss.trim().replace(/\.+$/, "");
+  const clean = gloss.trim().replace(/\.+$/, "").replace(/^[A-Z]/, (c) => c.toLowerCase());
   const head = `${ref} ${clean}.`;
   const phrase = OUTCOME_PHRASE[p?.outcome ?? ""] ?? OUTCOME_PHRASE.unknown!;
   if ((p?.outcome ?? "unknown") === "unknown") return `${ref} ${clean}, which isn't measured yet.`;
@@ -141,9 +141,15 @@ export function checkGloss(gloss: string, quote: string): WordCheck {
   return checkWords(gloss, [quote], 14);
 }
 
-/** A model beat sentence: no digit outside the beat refs' quotes, no outcome word, at most 30 words. */
-export function checkSentence(sentence: string, quotes: string[]): WordCheck {
-  return checkWords(sentence, quotes, 30);
+const INVENTED_FEATURE = /\b(trees?|landscaping|gardens?|fences?|driveways?|pools?|decks?|sheds?|garages?|patios?)\b/i;
+
+/** A model beat sentence: digits only from the refs' quotes or the beat's facts, no outcome
+ *  word, no feature that isn't in the trace, at most 30 words. */
+export function checkSentence(sentence: string, quotes: string[], facts: string[] = []): WordCheck {
+  const chk = checkWords(sentence, [...quotes, ...facts], 30);
+  const feat = sentence.match(INVENTED_FEATURE);
+  if (feat) chk.reasons.push(`names "${feat[0]}", which is not in the trace`);
+  return { ok: chk.ok && !feat, reasons: chk.reasons };
 }
 
 function checkWords(text: string, quotes: string[], maxWords: number): WordCheck {
@@ -210,22 +216,43 @@ function beatSentenceAsk(kind: string): string | null {
   return null;
 }
 
-/** Short prompt: per provision only its id and quote; no measures, limits or outcomes. */
-export function buildPrompt(trace: any, report: any): string {
+/** Facts a sentence beat may use: establish gets the lot size and the house, envelope the
+ *  setbacks, place the spot's distance from the left and from the front. */
+export function beatFacts(kind: string, refs: string[], spoken: SpokenData): string[] {
+  if (kind === "establish") {
+    return spoken.lot.length === 2
+      ? [`the lot measures ${spoken.lot[0]} by ${spoken.lot[1]}`, `the ${spoken.houseId}`]
+      : ["the lot", "the house"];
+  }
+  if (kind === "place") {
+    return spoken.spot.length === 2
+      ? [`${spoken.spot[0]} from the left`, `${spoken.spot[1]} from the front`]
+      : ["the client spot"];
+  }
+  const withLimits = refs.map((r) => spoken.provisions.get(r)).filter((p) => p && p.limits.length);
+  const setbacks = withLimits.filter((p) => /setback/i.test(p!.ref));
+  const limits = [...new Set((setbacks.length ? setbacks : withLimits).flatMap((p) => p!.limits))];
+  return limits.length ? [`setbacks of ${limits.join(" and ")}`] : ["the setbacks"];
+}
+
+/** Short prompt: per provision only its id and quote; per sentence beat the facts it may use. */
+export function buildPrompt(trace: any, report: any, spoken: SpokenData): string {
   const pids = new Set<string>();
   for (const b of trace?.beats ?? []) for (const r of b.refs ?? []) if (isProvisionId(r)) pids.add(r);
   for (const f of report?.findings ?? []) if (f.provision_id) pids.add(f.provision_id);
   const rules = [...pids].map((pid) => `- ${pid}: "${findingQuote(report, pid)}"`).join("\n");
   const asks = (trace?.beats ?? [])
-    .map((b: any) => beatSentenceAsk(b.kind) ? `- ${b.id} (${b.kind}): one sentence about ${beatSentenceAsk(b.kind)}` : null)
+    .map((b: any) => beatSentenceAsk(b.kind)
+      ? `- ${b.id} (${b.kind}): one sentence about ${beatSentenceAsk(b.kind)}. Use only these facts: ${beatFacts(b.kind, b.refs ?? [], spoken).join("; ")}`
+      : null)
     .filter(Boolean).join("\n");
   const chapters = (trace?.beats ?? []).map((b: any) => b.id).join(", ");
   return `Write walkthrough words as JSON {"glosses": {"<provision_id>": "..."}, "chapters": {"<beat_id>": "..."}, "sentences": {"<beat_id>": "..."}}.
-Per provision: a gloss of what the rule asks, plain words, at most 14 words, starting with a verb.
+Per provision: a gloss of what the rule asks, plain words, at most 14 words, third person present starting with a verb ("limits", "sets", "requires").
 Per beat (${chapters}): a chapter title of 2-4 words.
-One sentence each, at most 30 words:
+One sentence each, at most 30 words, using only the given facts:
 ${asks}
-Glosses and sentences: no numbers except numbers in the rule's own quote; never write pass, fail, fits, complies, allowed or too close. Reply JSON only.
+Glosses: no numbers except numbers in the rule's own quote. Sentences: no numbers except numbers in the given facts or the beat's quotes, and no feature that isn't in the trace. Never write pass, fail, fits, complies, allowed or too close. Reply JSON only.
 
 ${rules}`;
 }
@@ -283,7 +310,7 @@ export async function writeNarration(trace: any, report: any, client: ModelClien
   const beats: Array<{ id: string; kind: string; refs: string[] }> = trace.beats ?? [];
   const words = parseWords((await client.complete(requestWith([
     { role: "system", content: "You write walkthrough words as JSON: rule glosses, chapter titles, bridge sentences." },
-    { role: "user", content: buildPrompt(trace, report) },
+    { role: "user", content: buildPrompt(trace, report, spoken) },
   ]))).content);
 
   const glossFor = (pid: string): { gloss: string; model: boolean } => {
@@ -319,7 +346,7 @@ export async function writeNarration(trace: any, report: any, client: ModelClien
       model = false;
     } else {
       const s = words.sentences.get(b.id);
-      if (s !== undefined && checkSentence(s, quotesFor(refs)).ok) text = s;
+      if (s !== undefined && checkSentence(s, quotesFor(refs), beatFacts(b.kind, refs, spoken)).ok) text = s;
       else { text = templateLine(b.kind, refs, spoken); model = false; }
     }
     out.push({ id: b.id, chapter: ch.chapter, text, numbers: textNumbers(text), provisions: beatProvisions(text, refs, spoken), source: model ? "model" : "template" });
