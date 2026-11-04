@@ -7,7 +7,7 @@ let n = 0, t = 0;
 const ok = (name: string, cond: boolean, detail = "") => { t++; if (cond) n++; console.log(`${cond ? "PASS" : "FAIL"}  ${name}${cond || !detail ? "" : " — " + detail}`); };
 try {
   const load = await graphLoadId(g);
-  ok("graph load is the reloaded graph (L31; reloaded 11-02 for the flag-lot setbacks)", load.startsWith("ad9a4b7a"), load);
+  ok("graph load is the reloaded graph (reloaded 11-04 with Eugene)", load.startsWith("777403f1"), load);
 
   const guide = await readReadingGuide(g);
   ok("reading guide states the three stages (M13)", guide.text.includes("Plan constraints next") && guide.text.includes("Placement constraints"));
