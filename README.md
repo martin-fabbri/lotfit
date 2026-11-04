@@ -112,6 +112,17 @@ different trace, and the default is `demo/eug-demo-24x24.trace.json`. Stills and
 render with `python3 render.py stills <t…>` and `python3 render.py video <name>`
 (playwright, Chromium, and ffmpeg).
 
+## Run viewer
+
+`query/viewer/` plays one run folder as four screens: the case (site plan and facts with
+sources), which rules apply (applies and excluded, with scope quotes), the agent at work
+(the event log replayed with running counts and model cost), and the answer (each finding
+with measured value, limit, margin, tolerance, outcome and quote; the verdict with its
+reasons). Open one run by serving that folder over HTTP, for example
+`python3 -m http.server` inside it, then opening `index.html?run=demo/eug-demo-24x24`.
+Stills and video render with `python3 render.py stills <t…>` and
+`python3 render.py video <name>`.
+
 ## Narrated walkthrough
 
 Muse Spark writes one spoken line per beat of a run's trace (`query/src/narration.mts`),
@@ -140,4 +151,5 @@ query/
   contracts/    contract fixtures
   py/           the Python case validator
   player/       3D walkthrough of a decision trace
+  viewer/       run viewer: case, rules, agent log and verdict screens
 ```
