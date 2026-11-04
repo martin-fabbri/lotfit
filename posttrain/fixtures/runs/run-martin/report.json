@@ -1,0 +1,8 @@
+{
+ "case_id": "eug-martin-1",
+ "verdict": "NEEDS_CHECK",
+ "verifier": {
+  "passed": true,
+  "issues": []
+ }
+}

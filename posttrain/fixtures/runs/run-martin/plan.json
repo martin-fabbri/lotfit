@@ -1,0 +1,28 @@
+{
+ "applies": [
+  {
+   "provision_id": "P.1",
+   "scope_quote": "gates the zone",
+   "facts_needed": [
+    "site.zone"
+   ]
+  },
+  {
+   "provision_id": "P.2",
+   "scope_quote": "sets the setback",
+   "facts_needed": [
+    "site.zone"
+   ]
+  }
+ ],
+ "excluded_at_index": [
+  {
+   "provision_id": "P.3",
+   "scope_quote": "caps the size"
+  }
+ ],
+ "order": [
+  "P.1",
+  "P.2"
+ ]
+}

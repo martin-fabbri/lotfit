@@ -1,0 +1,30 @@
+{
+ "index_hash": "abc",
+ "layers": [
+  {
+   "provisions": [
+    {
+     "provision_id": "P.1",
+     "evaluation_stage": "gate",
+     "scope": {
+      "scope_quote": "gates the zone"
+     }
+    },
+    {
+     "provision_id": "P.2",
+     "evaluation_stage": "placement_constraint",
+     "scope": {
+      "scope_quote": "sets the setback"
+     }
+    },
+    {
+     "provision_id": "P.3",
+     "evaluation_stage": "plan_constraint",
+     "scope": {
+      "scope_quote": "caps the size"
+     }
+    }
+   ]
+  }
+ ]
+}

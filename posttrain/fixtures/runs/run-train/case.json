@@ -1,0 +1,70 @@
+{
+ "case_id": "x",
+ "site": {
+  "zone": {
+   "value": "R5"
+  },
+  "lot_outline": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     50,
+     0
+    ],
+    [
+     50,
+     100
+    ],
+    [
+     0,
+     100
+    ]
+   ]
+  },
+  "slope_pct": {
+   "value": 2
+  },
+  "address": "SHOULD NEVER APPEAR",
+  "tax_lot": "NOPE"
+ },
+ "plan": {
+  "kind": {
+   "value": "adu"
+  },
+  "detached": {
+   "value": true
+  },
+  "footprint": {
+   "value": [
+    [
+     2,
+     74
+    ],
+    [
+     26,
+     74
+    ],
+    [
+     26,
+     98
+    ],
+    [
+     2,
+     98
+    ]
+   ]
+  },
+  "height_ft": {
+   "value": 15
+  },
+  "placement": {
+   "value": {
+    "x": 2,
+    "y": 74
+   }
+  }
+ }
+}
