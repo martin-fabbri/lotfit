@@ -174,11 +174,12 @@ export class BasetenModelClient implements ModelClient {
     this.costCachedPerM = opts.costPerMillionCachedUsd ?? 0.15;
 
     // CC 2026-11-03: Fireworks stalled one call 5 min without headers; undici's 300 s headers timeout then killed the
-    // run (no retry). The SDK's own timeout now fires first (240 s), and the SDK retries timeouts and 5xx up to 3 times.
+    // run (no retry). The SDK's own timeout fires first (600 s: a long plan turn took over 4 min), and the SDK
+    // retries timeouts and 5xx up to 3 times. Responses stream so a slow turn keeps arriving instead of timing out.
     this.client = new OpenAI({
       apiKey,
       baseURL,
-      timeout: 240_000,
+      timeout: 600_000,
       maxRetries: 3,
     });
   }
@@ -194,15 +195,100 @@ export class BasetenModelClient implements ModelClient {
 
     const tools = req.allowed_tools.length > 0 ? buildOpenAiTools(req.allowed_tools) : undefined;
 
-    const completion = await this.client.chat.completions.create({
+    const stream = await this.client.chat.completions.create({
       model: this.modelId,
       messages: cleanMessages,
       temperature: 0,
       max_tokens: this.maxTokens,
       ...(tools ? { tools, tool_choice: "auto" } : {}),
+      stream: true,
+      stream_options: { include_usage: true },
     });
+    const completion = await foldChatCompletionStream(stream);
 
     const durationMs = Math.max(0, Date.now() - t0);
+    return modelResponseFromCompletion(completion, {
+      modelId: this.modelId,
+      costPromptPerM: this.costPromptPerM,
+      costCompletionPerM: this.costCompletionPerM,
+      costCachedPerM: this.costCachedPerM,
+      durationMs,
+    });
+  }
+}
+
+/** Folded stream: the same shape a non-streamed completion has. */
+export interface FoldedCompletion {
+  choices: Array<{
+    message: {
+      content: string;
+      reasoning_content?: string;
+      tool_calls: Array<{ id: string; type: "function"; function: { name: string; arguments: string } }>;
+    };
+    finish_reason: string | null;
+  }>;
+  usage: Record<string, any>;
+}
+
+/** Join stream chunks: content and reasoning concatenate, tool calls join by index, usage comes last. */
+export async function foldChatCompletionStream(stream: AsyncIterable<any>): Promise<FoldedCompletion> {
+  let content = "";
+  let reasoning = "";
+  const parts = new Map<number, { id: string; name: string; args: string }>();
+  let finishReason: string | null = null;
+  let usage: Record<string, any> = {};
+  for await (const chunk of stream) {
+    const delta = chunk?.choices?.[0]?.delta as
+      | { content?: unknown; reasoning_content?: unknown; reasoning?: unknown; tool_calls?: Array<Record<string, any>> }
+      | undefined;
+    if (typeof delta?.content === "string") content += delta.content;
+    const r = delta?.reasoning_content ?? delta?.reasoning;
+    if (typeof r === "string") reasoning += r;
+    for (const tc of delta?.tool_calls ?? []) {
+      const idx = typeof tc.index === "number" ? tc.index : 0;
+      const part = parts.get(idx) ?? { id: "", name: "", args: "" };
+      if (!part.id && typeof tc.id === "string") part.id = tc.id;
+      const fn = tc.function as Record<string, any> | undefined;
+      if (typeof fn?.name === "string") part.name += fn.name;
+      if (typeof fn?.arguments === "string") part.args += fn.arguments;
+      parts.set(idx, part);
+    }
+    const fr = chunk?.choices?.[0]?.finish_reason;
+    if (typeof fr === "string") finishReason = fr;
+    if (chunk && typeof chunk === "object" && (chunk as Record<string, any>).usage) {
+      usage = (chunk as Record<string, any>).usage as Record<string, any>;
+    }
+  }
+  return {
+    choices: [
+      {
+        message: {
+          content,
+          ...(reasoning.length > 0 ? { reasoning_content: reasoning } : {}),
+          tool_calls: [...parts.entries()]
+            .sort(([a], [b]) => a - b)
+            .map(([, p]) => ({ id: p.id, type: "function" as const, function: { name: p.name, arguments: p.args } })),
+        },
+        finish_reason: finishReason,
+      },
+    ],
+    usage,
+  };
+}
+
+export interface CompletionCosts {
+  modelId: string;
+  costPromptPerM: number;
+  costCompletionPerM: number;
+  costCachedPerM: number;
+  durationMs: number;
+}
+
+/** Map a completion (folded stream or not) to the harness ModelResponse. Pure. */
+export function modelResponseFromCompletion(
+  completion: { choices: Array<{ message?: unknown }>; usage?: unknown },
+  costs: CompletionCosts,
+): ModelResponse {
     const choice = completion.choices[0];
     const msg = (choice?.message ?? {}) as unknown as Record<string, any>;
     const rawContent = typeof msg["content"] === "string" ? msg["content"] : "";
@@ -296,20 +382,20 @@ export class BasetenModelClient implements ModelClient {
     );
     const costUsd = Number(
       (
-        (Math.max(0, promptTokens - cachedTokens) * this.costPromptPerM + cachedTokens * this.costCachedPerM +
-          completionTokens * this.costCompletionPerM) /
+        (Math.max(0, promptTokens - cachedTokens) * costs.costPromptPerM + cachedTokens * costs.costCachedPerM +
+          completionTokens * costs.costCompletionPerM) /
         1_000_000
       ).toFixed(6),
     );
 
     const usage = C.UsageRecord.parse({
-      model: this.modelId,
+      model: costs.modelId,
       prompt_tokens: promptTokens,
       completion_tokens: completionTokens,
       prompt_cached_tokens: cachedTokens,
       completion_reasoning_tokens: reasoningTokens,
       cost_usd: costUsd,
-      duration_ms: durationMs,
+      duration_ms: costs.durationMs,
     });
 
     return {
@@ -319,7 +405,6 @@ export class BasetenModelClient implements ModelClient {
       usage,
       ...(reasoningContent ? { reasoning_content: reasoningContent } : {}),
     };
-  }
 }
 
 export function createBasetenModelClient(opts?: BasetenModelClientOptions): BasetenModelClient {
