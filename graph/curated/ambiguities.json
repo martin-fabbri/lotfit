@@ -1,0 +1,162 @@
+{
+ "about": "When a recorded gray area matters (GR-30). Each entry points at a reading in the graph (same provision and phrase), says whether it is active, when it matters (matters_when; an unknown fact counts as 'may matter'), what each reading changes (effects; empty = not modeled: the agent reads both readings and judges whether the outcome differs), and who can settle it. A provisional reading by CC (2026-11-01) for the Portland detached-ADU slice.",
+ "by": "CC",
+ "date": "2026-11-01",
+ "status": "provisional",
+ "ambiguities": [
+  {
+   "id": "amb.living-area.sloped-ceiling",
+   "provision": "PDX.33.910.030.living-area",
+   "phrase": "attic area, and other building area, that is not accessible by a stairway or where the floor to ceiling height is less than 5 feet",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "plan.sloped_ceiling",
+     "op": "==",
+     "value": true
+    }
+   ],
+   "effects": [
+    {
+     "fact": "plan.living_area_sqft",
+     "per_reading": "the input gives the ADU's living area under each reading: plan.living_area_sqft.by_reading[amb id] = [reading 1, reading 2]"
+    }
+   ],
+   "settled_by": "Portland BDS (a written determination), or a Code Interpretation"
+  },
+  {
+   "id": "amb.reduced-front-setback.the-dwelling",
+   "provision": "PDX.33.110.220.D.4.a",
+   "phrase": "the front building setback for the dwelling may be reduced to 10 feet",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "site.slope_pct",
+     "op": ">=",
+     "value": 20
+    },
+    {
+     "fact": "site.zone",
+     "op": "in",
+     "value": [
+      "RF",
+      "R20",
+      "R10",
+      "R7"
+     ]
+    },
+    {
+     "fact": "plan.kind",
+     "op": "==",
+     "value": "adu"
+    }
+   ],
+   "effects": [
+    {
+     "param": "front_setback_ft",
+     "by_reading": [
+      10,
+      null
+     ],
+     "note": "reading 1 lets the ADU's front setback drop to 10 ft (with 220.D.4.c's height limit); reading 2 leaves the ADU on 33.205.040.C.2 (null: no change)"
+    }
+   ],
+   "settled_by": "Portland BDS"
+  },
+  {
+   "id": "amb.adu-size.common-area",
+   "provision": "PDX.33.205.040.C.1",
+   "phrase": "The living area of the accessory dwelling unit",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "plan.detached",
+     "op": "==",
+     "value": false
+    }
+   ],
+   "effects": [],
+   "settled_by": "Portland BDS"
+  },
+  {
+   "id": "amb.corner-lot.curve-angle",
+   "provision": "PDX.33.910.030.corner-lot",
+   "phrase": "A street that curves with angles that are 120 degrees or less, measured from the center line of the street",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "site.corner_lot",
+     "op": "unknown"
+    }
+   ],
+   "effects": [],
+   "settled_by": "Portland BDS"
+  },
+  {
+   "id": "amb.tree-plan.when-not-required",
+   "provision": "PDX.11.50.020",
+   "phrase": "unless there are no private trees 12 inches or more in diameter, no City trees six inches or more in diameter, and/or no street trees three inches or more in diameter, and the site or activity is exempt from Section 11.50.050",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "site.trees",
+     "op": "!=",
+     "value": false
+    }
+   ],
+   "effects": [],
+   "settled_by": "Urban Forestry"
+  },
+  {
+   "id": "amb.tree-density.new-development",
+   "provision": "PDX.11.50.050.A",
+   "phrase": "New development;",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "site.trees",
+     "op": "!=",
+     "value": false
+    }
+   ],
+   "effects": [],
+   "settled_by": "Urban Forestry"
+  },
+  {
+   "id": "amb.constrained-sites.r25",
+   "provision": "PDX.33.418.040.part2",
+   "phrase": "R.25",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "site.overlays",
+     "op": "contains",
+     "value": "Constrained Sites"
+    },
+    {
+     "fact": "site.primary_is_duplex",
+     "op": "==",
+     "value": true
+    }
+   ],
+   "effects": [],
+   "settled_by": "Portland BDS"
+  },
+  {
+   "id": "amb.adu-definition.smaller-by",
+   "provision": "PDX.33.910.030.accessory-dwelling-unit",
+   "phrase": "The additional unit is smaller than the primary dwelling unit",
+   "status": "active",
+   "matters_when": [
+    {
+     "fact": "plan.basement_conversion",
+     "op": "==",
+     "value": true
+    }
+   ],
+   "effects": [],
+   "settled_by": "Portland BDS",
+   "note": "Matters mainly where 33.205.040.C.1's size cap is lifted (a basement conversion); otherwise the cap keeps the ADU smaller in living area."
+  }
+ ]
+}

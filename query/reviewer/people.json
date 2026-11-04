@@ -1,0 +1,6 @@
+{
+  "note": "Who may close a Reviewer flag (CONTRACT-REVIEWER.md §7, B6; L42). An allowlist, not a denylist. An agent counts only when on_behalf_of names a person on this list exactly; the note is never read for authority.",
+  "people": [
+    { "name": "Martin Fabbri", "role": "owner" }
+  ]
+}

@@ -1,0 +1,1022 @@
+# LotFit query eval set v0: natural-language questions an ADU evaluator asks the code graph, each with a gold Cypher
+# query and the rows that query returned on the graph load named below. Written blind to the query ontology.
+# Scoring: run the candidate query, project each row onto `compare_on`, compare as a multiset (order-insensitive)
+# to `expected`. Lists inside a cell compare order-insensitively too. `expect_empty: true` means the right answer is
+# "nothing in the graph", and any returned row is wrong.
+# Regenerate or verify `expected`: node run-gold.mjs [--write]   (read-only session; see README.md)
+schema: lotfit.query-eval/0
+written_by: CC
+written_on: "2026-11-01"
+graph_load:
+  id: "ad9a4b7a7b68a551cac9ffde0a0ec6357943c175d6782a7dff5da712ca6e17a4@2026-11-02T08:52:31.555642+00:00"
+  loaded_at: "2026-11-02T04:45:30.448796+00:00"
+items:
+
+  # ---------------------------------------------------------------- numeric standards by zone (tables)
+  - id: E001
+    patterns: [ param-by-zone, table-cell, in-force ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX R5 base-zone max height, in force 2026-11-01?"
+      - "What is the maximum building height in Portland's R5 zone today?"
+      - "How tall may a structure be under the R5 base-zone development standards as of November 1, 2026?"
+    gold_cypher: |
+      MATCH (p:Provision)-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)-[:APPLIES_TO_ZONE]->(:Zone {id: 'PDX:R5'})
+      MATCH (pa)-[:FROM_CELL]->(c:TableCell)
+      WHERE c.row = 'Maximum Height'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.value_num AS value, pa.unit AS unit, p.id AS provision_id, c.table AS table, pa.footnotes AS footnotes
+    compare_on: [ value, unit, provision_id, footnotes ]
+    expected:
+      - { "value": 30, "unit": "ft", "provision_id": "PDX.T110-4", "footnotes": [ "3" ] }
+    expect_empty: false
+    notes: |-
+      Table 110-4 row Maximum Height, column R5 reads "30 ft. [3]" (DOC-PDX-33110 p.11, checked against the text). This is the base-zone height, not the detached-ADU height (that is 20 ft, E010): a classic trap. Footnote [3] must come back.
+
+  - id: E002
+    patterns: [ param-by-zone, table-cell, in-force ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX R7 side + rear building setbacks?"
+      - "How far must a building stay from the side and rear lot lines in Portland's R7 zone?"
+      - "Minimum interior-side and back-yard setbacks for the R7 single-dwelling zone, current edition?"
+    gold_cypher: |
+      MATCH (p:Provision)-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)-[:APPLIES_TO_ZONE]->(:Zone {id: 'PDX:R7'})
+      MATCH (pa)-[:FROM_CELL]->(c:TableCell)
+      WHERE c.row IN ['Side building setback', 'Rear building setback']
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN c.row AS row, pa.value_num AS value, pa.unit AS unit, p.id AS provision_id
+    compare_on: [ row, value, unit, provision_id ]
+    expected:
+      - { "row": "Rear building setback", "value": 5, "unit": "ft", "provision_id": "PDX.T110-4" }
+      - { "row": "Side building setback", "value": 5, "unit": "ft", "provision_id": "PDX.T110-4" }
+    expect_empty: false
+    notes: |-
+      5 ft each (Table 110-4). SCHEMA.md warns the side and rear rows read identically in pdftotext, so the row label is the extraction's claim backed by row_sequence evidence; the values match the PDF text order.
+
+  - id: E003
+    patterns: [ param-by-zone, table-cell, zone-enumeration ]
+    as_of: "2026-11-01"
+    questions:
+      - "Front building setback, every PDX single-dwelling zone."
+      - "List the minimum front setback for each of Portland's single-dwelling zones."
+      - "Across RF through R2.5, how deep is the required front yard for a building?"
+    gold_cypher: |
+      MATCH (z:Zone {layer: 'PDX', single_dwelling: true})<-[:APPLIES_TO_ZONE]-(pa:Parameter)-[:FROM_CELL]->(c:TableCell {row: 'Front building setback'})
+      MATCH (v:Version)-[:HAS_PARAMETER]->(pa)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN z.zone_code AS zone, pa.value_num AS value, pa.unit AS unit
+    compare_on: [ zone, value, unit ]
+    expected:
+      - { "zone": "R2.5", "value": 10, "unit": "ft" }
+      - { "zone": "R5", "value": 10, "unit": "ft" }
+      - { "zone": "R7", "value": 15, "unit": "ft" }
+      - { "zone": "R10", "value": 20, "unit": "ft" }
+      - { "zone": "R20", "value": 20, "unit": "ft" }
+      - { "zone": "RF", "value": 20, "unit": "ft" }
+    expect_empty: false
+    notes: |-
+      RF/R20/R10 20 ft, R7 15 ft, R5/R2.5 10 ft (Table 110-4 p.11). For a detached ADU the 40-ft rule of 33.205.040.C.2 (E026) governs placement instead; this question is about the base setback only.
+
+  - id: E004
+    patterns: [ footnote, table-cell, clause-ledger ]
+    as_of: "2026-11-01"
+    questions:
+      - "Footnote on PDX R10 max-height cell: text?"
+      - "The R10 height in Table 110-4 has a footnote marker. What does the footnote say?"
+      - "What note is attached to the ten-thousand zone's height limit in Portland's summary table?"
+    gold_cypher: |
+      MATCH (c:TableCell {table: 'Table 110-4', row: 'Maximum Height', column: 'R10'})<-[:ON_CELL]-(f:Clause {kind: 'footnote'})
+      RETURN c.cell AS cell, f.footnote_text AS footnote_text, f.status AS status
+    compare_on: [ cell, footnote_text, status ]
+    expected:
+      - { "cell": "30 ft. [3]", "footnote_text": "[3] Additional FAR and height may be allowed. See 33.110.265.F.", "status": "not_modeled" }
+    expect_empty: false
+    notes: |-
+      "[3] Additional FAR and height may be allowed. See 33.110.265.F." (DOC-PDX-33110 line ~1152, verified). The footnote clause is not_modeled, so an evaluator must treat it as NEEDS_CHECK.
+
+  - id: E005
+    patterns: [ footnote, table-cell, param-by-zone ]
+    as_of: "2026-11-01"
+    questions:
+      - "Which PDX zones have a footnoted max-height cell?"
+      - "In which Portland single-dwelling zones does the maximum height carry a footnote?"
+      - "For which zones is the height limit in the summary table qualified by a note?"
+    gold_cypher: |
+      MATCH (p:Provision {id: 'PDX.T110-4'})-[:HAS_VERSION]->(:Version)-[:HAS_TABLE_CELL]->(c:TableCell {row: 'Maximum Height'})
+      WHERE size(c.footnotes) > 0
+      RETURN c.column AS zone, c.footnotes AS footnotes
+    compare_on: [ zone, footnotes ]
+    expected:
+      - { "zone": "R10", "footnotes": [ "3" ] }
+      - { "zone": "R20", "footnotes": [ "3" ] }
+      - { "zone": "R5", "footnotes": [ "3" ] }
+      - { "zone": "R7", "footnotes": [ "3" ] }
+    expect_empty: false
+    notes: "R20, R10, R7, R5 carry [3]; RF (30 ft) and R2.5 (35 ft) carry none (p.11)."
+
+  - id: E006
+    patterns: [ param-by-zone, table-cell, footnote, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "GRE LDR-7 max building height + footnote text?"
+      - "What is Gresham's maximum building height in LDR-7, and what does its footnote say?"
+      - "In Gresham's Low Density Residential-7 district, how tall can a building be and what qualifies that number?"
+    gold_cypher: |
+      MATCH (v:Version)-[:HAS_PARAMETER]->(pa:Parameter)-[:APPLIES_TO_ZONE]->(:Zone {id: 'GRE:LDR-7'})
+      MATCH (pa)-[:FROM_CELL]->(c:TableCell)
+      WHERE c.row_group STARTS WITH 'H. Maximum Building Height'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      OPTIONAL MATCH (c)<-[:ON_CELL]-(f:Clause {kind: 'footnote'})
+      RETURN pa.value_num AS value, pa.unit AS unit, pa.provision_id AS provision_id, f.footnote_text AS footnote_text
+    compare_on: [ value, unit, provision_id, footnote_text ]
+    expected:
+      - { "value": 35, "unit": "ft", "provision_id": "GRE.T4.0130", "footnote_text": "[11] A height bonus applies to affordable housing development. See Section 10.1700." }
+    expect_empty: false
+    notes: |-
+      35 ft, Table 4.0130 row H, footnote [11] "A height bonus applies to affordable housing development. See Section 10.1700." For an ADU, 10.0110.D adds "shall not exceed the height of the primary dwelling" (E044).
+
+  - id: E007
+    patterns: [ table-cell, gresham, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "GRE freestanding ADU setbacks, all columns (Table 10.0110)."
+      - "What setbacks apply to a detached accessory dwelling in Gresham?"
+      - "How close to the street, side and back lot lines can a freestanding granny flat sit in Gresham?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.T10.0110'})-[:HAS_VERSION]->(v:Version)-[:HAS_TABLE_CELL]->(c:TableCell {row: 'B. Freestanding Accessory Dwellings'})
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN c.column AS column, c.cell AS cell
+    compare_on: [ column, cell ]
+    expected:
+      - { "column": "REAR NO ALLEY", "cell": "10 ft." }
+      - { "column": "INTERIOR SIDE", "cell": "5 ft." }
+      - { "column": "REAR WITH ALLEY", "cell": "5 ft." }
+      - { "column": "STREET", "cell": "No closer than the primary dwelling" }
+    expect_empty: false
+    notes: |-
+      Interior side 5 ft, rear no alley 10 ft, rear with alley 5 ft, street "No closer than the primary dwelling". The street cell is text, not a parameter, so a query over Parameters alone misses one of four answers. That cell has a gray-area Reading (E029).
+
+  - id: E008
+    patterns: [ param, gresham, adu-standard, citation ]
+    as_of: "2026-11-01"
+    questions:
+      - "GRE ADU max floor area params + quotes."
+      - "How big can an accessory dwelling be in Gresham?"
+      - "What size ceiling does Gresham put on an ADU's floor area, and how are the two limits combined?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.10.0110.F'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.name AS name, pa.value_json AS value_json, pa.unit AS unit, pa.quote AS quote
+    compare_on: [ value_json, unit, quote ]
+    expected:
+      - { "value_json": "75", "unit": "%", "quote": "75 percent of the floor area of the primary dwelling" }
+      - { "value_json": "900", "unit": "sqft", "quote": "maximum floor area of 900 square feet" }
+      - { "value_json": "\"whichever is less\"", "unit": null, "quote": "whichever is less" }
+    expect_empty: false
+    notes: |-
+      900 sq ft or 75 percent of the primary dwelling's floor area, "whichever is less" (stored as a third, string-valued parameter). Compared on value_json, not name, so a model need not guess the parameter names.
+
+  # ---------------------------------------------------------------- Portland ADU standards, citations, multi-hop
+  - id: E009
+    patterns: [ param, citation, document ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX ADU size cap: values, doc title, page, quote."
+      - "What is the maximum size of an ADU in Portland, and where exactly is that written?"
+      - "Give me the living-area limits for a Portland accessory unit with the source document, page and the words that set them."
+    gold_cypher: |
+      MATCH (p:Provision {id: 'PDX.33.205.040.C.1'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      MATCH (v)-[:FROM_DOCUMENT]->(d:Document)
+      WHERE pa.unit IN ['%', 'sqft']
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.value_num AS value, pa.unit AS unit, d.title AS document, pa.page AS page, pa.quote AS quote
+    compare_on: [ value, unit, document, page, quote ]
+    expected:
+      - { "value": 75, "unit": "%", "document": "Title 33, Chapter 33.205 Accessory Dwelling Units", "page": 3, "quote": "may be no more than 75 percent of the living area of the primary dwelling unit" }
+      - { "value": 800, "unit": "sqft", "document": "Title 33, Chapter 33.205 Accessory Dwelling Units", "page": 3, "quote": "or 800 square feet of living area, whichever is less" }
+    expect_empty: false
+    notes: |-
+      75 percent of the primary unit's living area or 800 sq ft, whichever is less; Title 33 Chapter 33.205, p.3. The basement-conversion parameter (5 years) is a carve-out, excluded by unit.
+
+  - id: E010
+    patterns: [ multi-hop, refers-to, param, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "Detached ADU max height PDX, via 33.205.040.C.3's cross-references."
+      - "How tall can a detached ADU be in Portland?"
+      - "Following the ADU chapter's pointer to the accessory-structure standards, what height limit does a backyard cottage get?"
+    gold_cypher: |
+      MATCH (adu:Provision {id: 'PDX.33.205.040.C.3'})-[:REFERS_TO]->(acc:Provision)-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE pa.unit = 'ft' AND pa.name = 'max_height'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN acc.id AS provision_id, pa.value_num AS value, pa.unit AS unit, pa.quote AS quote
+    compare_on: [ provision_id, value, unit ]
+    expected:
+      - { "provision_id": "PDX.33.110.245.C.1", "value": 20, "unit": "ft" }
+    expect_empty: false
+    notes: |-
+      20 ft from 33.110.245.C.1 (p.25), reached through 33.205.040.C.3 ("must meet the development standards for covered accessory structures"). Not the 30 ft base-zone height and not the 15 ft in-setback limit of C.2. The gold filter on pa.name is a convenience; a candidate that returns only the 20-ft row from C.1 is right.
+
+  - id: E011
+    patterns: [ in-force, before-edition, empty ]
+    as_of: "2026-10-15"
+    questions:
+      - "PDX ADU size cap in force 2026-10-15?"
+      - "What was Portland's maximum ADU size on October 15, 2026?"
+      - "Before the November 2026 edition took effect, what living-area limit applied to a Portland accessory unit?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'PDX'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE 'T03' IN p.topics
+        AND (v.when_from IS NULL OR v.when_from <= '2026-10-15') AND (v.when_to IS NULL OR v.when_to > '2026-10-15')
+      RETURN p.id AS provision_id, pa.name AS name, pa.value_num AS value
+    compare_on: [ provision_id, name, value ]
+    expected: []
+    expect_empty: true
+    notes: |-
+      The graph holds only the 11/1/26 edition of 33.205; the earlier text is not loaded, so on 2026-10-15 nothing is in force (SCHEMA.md: NOT_MODELED for that date). Returning the 75%/800 sq ft values ignores the date and is wrong.
+
+  - id: E012
+    patterns: [ in-force, before-edition, topic ]
+    as_of: "2026-10-15"
+    questions:
+      - "PDX ADU short-term-rental provisions in force 2026-10-15."
+      - "Which Portland rules on renting out an ADU short-term were already in force in mid-October 2026?"
+      - "On 15 Oct 2026, what Portland accessory short-term rental provisions mention accessory dwelling units?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'PDX'})-[:HAS_VERSION]->(v:Version)
+      WHERE 'T12' IN p.topics AND toLower(p.title) CONTAINS 'accessory dwelling'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-10-15') AND (v.when_to IS NULL OR v.when_to > '2026-10-15')
+      RETURN p.id AS provision_id, v.when_from AS in_force_from
+    compare_on: [ provision_id, in_force_from ]
+    expected:
+      - { "provision_id": "PDX.33.207.040.B.2.part2", "in_force_from": "2024-10-01" }
+      - { "provision_id": "PDX.33.207.040.B.2", "in_force_from": "2024-10-01" }
+      - { "provision_id": "PDX.33.207.050.B.2", "in_force_from": "2024-10-01" }
+    expect_empty: false
+    notes: |-
+      Chapter 33.207 is dated 10/1/24 and so is in force before Portland's 11/1/26 edition; the contrast case to E011.
+
+  - id: E013
+    patterns: [ in-force, not-stated-date, state-law, versions ]
+    as_of: "2027-06-01"
+    questions:
+      - "OR design-standards limit (2025 c.330 s.8): version in force 2027-06-01, date stated?"
+      - "Which version of Oregon's limit on residential design standards applies on June 1, 2027?"
+      - "Mid-2027, which text of the state rule capping design standards for housing is the operative one, and is its start date known?"
+    gold_cypher: |
+      MATCH (p:Provision {id: 'ORLAW.2025.330.8'})-[:HAS_VERSION]->(v:Version)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2027-06-01') AND (v.when_to IS NULL OR v.when_to > '2027-06-01')
+      RETURN v.version AS version, v.when_from IS NULL AS date_not_stated, v.when_to AS in_force_until
+    compare_on: [ version, date_not_stated, in_force_until ]
+    expected:
+      - { "version": 1, "date_not_stated": true, "in_force_until": "2028-01-01" }
+    expect_empty: false
+    notes: |-
+      Version 1: no effective date in the extracted text (included but flagged), ends 2028-01-01. Version 2 is effective 2027-01-01 but operative only 2028-01-01, so a query on effective_from alone wrongly returns v2 too.
+
+  - id: E014
+    patterns: [ in-force, operative-date, state-law, versions, multi-hop ]
+    as_of: "2028-06-01"
+    questions:
+      - "OR design-standards limit in force 2028-06-01: version, params, operative-by section."
+      - "From 2028, which version of Oregon's residential design-standard limit applies, what number does it carry, and which section made it operative?"
+      - "After the 2026 amendment kicks in, what unit threshold does the state's design-standards cap use, and what provision set its operative date?"
+    gold_cypher: |
+      MATCH (p:Provision {id: 'ORLAW.2025.330.8'})-[:HAS_VERSION]->(v:Version)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2028-06-01') AND (v.when_to IS NULL OR v.when_to > '2028-06-01')
+      OPTIONAL MATCH (v)-[:HAS_PARAMETER]->(pa:Parameter)
+      OPTIONAL MATCH (v)-[:OPERATIVE_BY]->(ov:Version)
+      RETURN v.version AS version, v.operative_from AS operative_from, pa.value_num AS value, ov.provision_id AS operative_by
+    compare_on: [ version, operative_from, value, operative_by ]
+    expected:
+      - { "version": 2, "operative_from": "2028-01-01", "value": 20, "operative_by": "ORLAW.2026.79.14" }
+    expect_empty: false
+    notes: |-
+      v2, operative 2028-01-01 by ORLAW.2026.79.14 (SB 1521 s.14: "become operative on January 1, 2028"), parameter design_standards_max_units = 20 ("fewer than 20 residential units"). v1 carries no parameter.
+
+  - id: E015
+    patterns: [ not-stated-date, provision-type, state-law ]
+    as_of: null
+    questions:
+      - "OR preemption provisions with no stated effective date."
+      - "Which state preemption rules in the graph have no effective date printed?"
+      - "For which state-law overrides do we not know when they took effect?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'OR', type: 'preemption'})-[:HAS_VERSION]->(v:Version)
+      WHERE v.when_from IS NULL
+      RETURN p.id AS provision_id, v.version AS version
+    compare_on: [ provision_id, version ]
+    expected:
+      - { "provision_id": "ORLAW.2025.330.8", "version": 1 }
+      - { "provision_id": "ORS.105.880", "version": 1 }
+      - { "provision_id": "ORS.197A.400.1", "version": 1 }
+      - { "provision_id": "ORS.197A.420.4", "version": 1 }
+      - { "provision_id": "ORS.197A.425", "version": 1 }
+      - { "provision_id": "ORS.227.175.4.b", "version": 1 }
+    expect_empty: false
+    notes: |-
+      ORS sections from the 2025 Edition print no date; ORLAW.2025.330.8 v1 too. Asked per version: ORLAW.2025.330.8 v2 has a date and must not appear.
+
+  - id: E016
+    patterns: [ not-stated-date, provision-type, gresham ]
+    as_of: null
+    questions:
+      - "GRE gates with no stated effective date."
+      - "Which Gresham applicability or prohibition rules have no known effective date?"
+      - "Among Gresham's threshold rules (the ones that decide whether something applies at all), which lack a start date?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'GRE', type: 'gate'})-[:HAS_VERSION]->(v:Version)
+      WHERE v.when_from IS NULL
+      RETURN p.id AS provision_id, p.title AS title
+    compare_on: [ provision_id ]
+    expected:
+      - { "provision_id": "GRE.5.0703.A" }
+      - { "provision_id": "GRE.5.0704" }
+    expect_empty: false
+    notes: "The Natural Resource Overlay pages are footed (07/26), not covered by the June 4, 2026 effective-date page."
+
+  # ---------------------------------------------------------------- state law and layering
+  - id: E017
+    patterns: [ provision-type, state-law, param, topic ]
+    as_of: "2026-11-01"
+    questions:
+      - "OR ADU mandate (S01): provision + numeric params."
+      - "What does Oregon's ADU statute require, in numbers?"
+      - "Under the state law forcing cities to allow ADUs, which cities and counties are covered and how many units per house?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'OR'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE 'S01' IN p.topics
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN p.id AS provision_id, p.type AS type, pa.value_num AS value, pa.unit AS unit, pa.quote AS quote, v.when_from IS NULL AS date_not_stated
+    compare_on: [ provision_id, type, value, unit, date_not_stated ]
+    expected:
+      - { "provision_id": "ORS.197A.425", "type": "preemption", "value": 1, "unit": "count", "date_not_stated": true }
+      - { "provision_id": "ORS.197A.425", "type": "preemption", "value": 15000, "unit": "count", "date_not_stated": true }
+      - { "provision_id": "ORS.197A.425", "type": "preemption", "value": 2500, "unit": "count", "date_not_stated": true }
+    expect_empty: false
+    notes: |-
+      ORS 197A.425: city population over 2,500 or county over 15,000; at least one ADU per detached single-unit dwelling. Date not stated (2025 Edition), so it is included and flagged.
+
+  - id: E018
+    patterns: [ layering, under-state, provision-type, in-force, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "State over Gresham: preemption provisions in force 2026-11-01 (flag undated)."
+      - "Which state preemption rules sit above Gresham's code on November 1, 2026?"
+      - "Through Gresham's parent jurisdiction, what state-level overrides are in effect today, and which have no printed date?"
+    gold_cypher: |
+      MATCH (:Jurisdiction {id: 'OR-GRESHAM'})-[:UNDER_STATE]->(s:Jurisdiction)<-[:IN_JURISDICTION]-(p:Provision {type: 'preemption'})-[:HAS_VERSION]->(v:Version)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN s.id AS state, p.id AS provision_id, v.when_from IS NULL AS date_not_stated
+    compare_on: [ state, provision_id, date_not_stated ]
+    expected:
+      - { "state": "OR-STATE", "provision_id": "ORLAW.2025.38.25.cont", "date_not_stated": false }
+      - { "state": "OR-STATE", "provision_id": "ORLAW.2025.38.25", "date_not_stated": false }
+      - { "state": "OR-STATE", "provision_id": "ORLAW.2025.38.9.cont", "date_not_stated": false }
+      - { "state": "OR-STATE", "provision_id": "ORLAW.2025.38.9", "date_not_stated": false }
+      - { "state": "OR-STATE", "provision_id": "ORLAW.2025.330.8", "date_not_stated": true }
+      - { "state": "OR-STATE", "provision_id": "ORS.105.880", "date_not_stated": true }
+      - { "state": "OR-STATE", "provision_id": "ORS.197A.400.1", "date_not_stated": true }
+      - { "state": "OR-STATE", "provision_id": "ORS.197A.420.4", "date_not_stated": true }
+      - { "state": "OR-STATE", "provision_id": "ORS.197A.425", "date_not_stated": true }
+      - { "state": "OR-STATE", "provision_id": "ORS.227.175.4.b", "date_not_stated": true }
+    expect_empty: false
+    notes: |-
+      ORLAW.2026.79.12.part2 and ORLAW.2025.330.8 v2 start 2028-01-01 and must be absent; v1 of 330.8 is present and flagged. This is the provision type, not the curated PREEMPTS edge (E019).
+
+  - id: E019
+    patterns: [ preempts, layering, modeled-layer ]
+    as_of: null
+    questions:
+      - "PREEMPTS edges: state provision -> city provision, with quote and status."
+      - "Which Portland rule does state law override, and on what words?"
+      - "Is any city standard in the graph recorded as displaced by Oregon law? Give the statute, the city rule and the quoted basis."
+    gold_cypher: |
+      MATCH (s:Provision)-[r:PREEMPTS]->(c:Provision)
+      RETURN s.id AS state_provision, c.id AS city_provision, r.quote AS quote, r.status AS status
+    compare_on: [ state_provision, city_provision, status ]
+    expected:
+      - { "state_provision": "ORS.197A.400.1", "city_provision": "PDX.33.110.220.B", "status": "provisional" }
+    expect_empty: false
+    notes: |-
+      ORS 197A.400(1) (clear and objective standards) -> PDX.33.110.220.B, provisional. The edge note says it bites only where a standard is not clear and objective; Portland's setbacks are numeric. A judgment by CC, recorded as such.
+
+  - id: E020
+    patterns: [ preempts, empty, direction ]
+    as_of: null
+    questions:
+      - "City provisions that preempt state provisions?"
+      - "Does any Portland or Gresham rule override a state statute?"
+      - "Is there anything in the city codes recorded as displacing Oregon law?"
+    gold_cypher: |
+      MATCH (c:Provision)-[:PREEMPTS]->(s:Provision)
+      WHERE c.layer IN ['PDX', 'GRE'] AND s.layer = 'OR'
+      RETURN c.id AS city_provision, s.id AS state_provision
+    compare_on: [ city_provision, state_provision ]
+    expected: []
+    expect_empty: true
+    notes: "Direction trap: preemption runs state -> city only. Empty is right."
+
+  # ---------------------------------------------------------------- exceptions (MODIFIES) and the setback family
+  - id: E021
+    patterns: [ modifies, exception, modeled-layer ]
+    as_of: null
+    questions:
+      - "Exceptions that MODIFY PDX.33.110.220.B directly."
+      - "Which exceptions relax Portland's required setbacks?"
+      - "What carve-outs loosen the base setback rule of 33.110.220.B (one step, not exceptions to exceptions)?"
+    gold_cypher: |
+      MATCH (e:Provision)-[r:MODIFIES]->(:Provision {id: 'PDX.33.110.220.B'})
+      RETURN e.id AS exception_id, r.quote AS quote
+    compare_on: [ exception_id ]
+    expected:
+      - { "exception_id": "PDX.33.110.220.C.1" }
+      - { "exception_id": "PDX.33.110.220.C.2" }
+      - { "exception_id": "PDX.33.110.220.C.3" }
+      - { "exception_id": "PDX.33.110.220.D.1" }
+      - { "exception_id": "PDX.33.110.220.D.4.a" }
+      - { "exception_id": "PDX.33.110.245.C.2" }
+    expect_empty: false
+    notes: |-
+      Six: 245.C.2 (accessory structures in side/rear setbacks), 220.D.1 (averaging), 220.D.4.a (steep lots), 220.C.1, C.2 (eaves), C.3. 220.D.4.c modifies D.4.a, not 220.B, so it is excluded here (see E022).
+
+  - id: E022
+    patterns: [ modifies, exception, multi-hop, variable-length ]
+    as_of: null
+    questions:
+      - "All provisions that modify PDX.33.110.220.B directly or through another exception, with depth."
+      - "Which rules change Portland's base setbacks, counting exceptions to exceptions?"
+      - "Trace every carve-out that ends up altering the required-setback rule, however many steps removed."
+    gold_cypher: |
+      MATCH path = (e:Provision)-[:MODIFIES*1..]->(:Provision {id: 'PDX.33.110.220.B'})
+      RETURN e.id AS exception_id, length(path) AS depth
+    compare_on: [ exception_id, depth ]
+    expected:
+      - { "exception_id": "PDX.33.110.220.C.1", "depth": 1 }
+      - { "exception_id": "PDX.33.110.220.C.2", "depth": 1 }
+      - { "exception_id": "PDX.33.110.220.C.3", "depth": 1 }
+      - { "exception_id": "PDX.33.110.220.D.1", "depth": 1 }
+      - { "exception_id": "PDX.33.110.220.D.4.a", "depth": 1 }
+      - { "exception_id": "PDX.33.110.245.C.2", "depth": 1 }
+      - { "exception_id": "PDX.33.110.220.D.4.c", "depth": 2 }
+    expect_empty: false
+    notes: "The six of E021 at depth 1 plus 220.D.4.c at depth 2 (it lowers the height limit inside a reduced front setback)."
+
+  - id: E023
+    patterns: [ param, exception, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX 33.110.245.C.2 thresholds for accessory structures in side/rear setbacks."
+      - "What limits must a detached accessory structure meet to sit inside the side or rear setback in Portland?"
+      - "If I want the backyard cottage in the side yard, what height, wall, footprint and distance numbers does Portland impose?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.110.245.C.2'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.value_json AS value_json, pa.unit AS unit, pa.quote AS quote
+    compare_on: [ value_json, unit ]
+    expected:
+      - { "value_json": "10", "unit": "ft" }
+      - { "value_json": "15", "unit": "ft" }
+      - { "value_json": "20", "unit": "ft" }
+      - { "value_json": "24", "unit": "ft" }
+      - { "value_json": "24", "unit": "ft" }
+      - { "value_json": "40", "unit": "ft" }
+      - { "value_json": "5", "unit": "ft" }
+      - { "value_json": "6", "unit": "ft" }
+      - { "value_json": "[\"R7\", \"R5\", \"R2.5\"]", "unit": null }
+    expect_empty: false
+    notes: |-
+      40 ft from front lot line, 20 ft from a side street lot line (corner), 24x24 ft footprint, 24 ft combined length per line, 15 ft high, 10 ft walls, dormers 5 ft back, zones R7/R5/R2.5, and cisterns 6 ft (item a). Verified against p.25 text. Items (5)-(7) (screening, openings, rooftop deck) carry no number (E025).
+
+  - id: E024
+    patterns: [ param, coverage, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX accessory structure coverage limits (33.110.245.C.3)."
+      - "How much of the lot can accessory buildings cover in Portland?"
+      - "What caps apply to the combined and per-building footprint of detached accessory structures?"
+    gold_cypher: |
+      MATCH (p:Provision)-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE p.id STARTS WITH 'PDX.33.110.245.C.3'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN p.id AS provision_id, pa.value_num AS value, pa.unit AS unit
+    compare_on: [ provision_id, value, unit ]
+    expected:
+      - { "provision_id": "PDX.33.110.245.C.3.a", "value": 20, "unit": "%" }
+      - { "provision_id": "PDX.33.110.245.C.3.b", "value": 900, "unit": "sqft" }
+    expect_empty: false
+    notes: |-
+      C.3.a 20 percent of site area combined; C.3.b 900 sq ft ("or 900 square feet, whichever is greater", p.26; the other branch of that comparison is not a parameter). Overall building coverage is Table 110-5, cell text only.
+
+  # ---------------------------------------------------------------- clause ledger: what is not modeled
+  - id: E025
+    patterns: [ clause-ledger, not-modeled, facts-needed ]
+    as_of: "2026-11-01"
+    questions:
+      - "Not-modeled clauses in PDX.33.110.245.C.2 + needs."
+      - "Which parts of Portland's accessory-structure setback exception aren't modeled, and what facts would we need?"
+      - "For the side/rear setback exception, list the conditions the engine can't evaluate yet and the inputs each one asks for."
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.110.245.C.2'})-[:HAS_VERSION]->(v:Version)-[:HAS_CLAUSE]->(c:Clause {status: 'not_modeled'})
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN c.clause_id AS clause_id, c.needs AS needs
+    compare_on: [ clause_id, needs ]
+    expected:
+      - { "clause_id": "condition:b.(2)/excluding#1", "needs": [ "plan.eave_ft" ] }
+      - { "clause_id": "condition:b.(3)/if#1", "needs": [ "site.other_structures_in_setback", "plan.setbacks_used" ] }
+      - { "clause_id": "condition:b.(4)/excluding#1", "needs": [ "plan.gable_walls" ] }
+      - { "clause_id": "condition:b.(5)/unless#1", "needs": [ "plan.setbacks_used" ] }
+      - { "clause_id": "condition:b./other_than#1", "needs": [ "plan.is_cistern", "plan.setbacks_used" ] }
+      - { "clause_id": "item:b.(5)", "needs": [ "site.screening", "plan.setbacks_used" ] }
+      - { "clause_id": "item:b.(6)", "needs": [ "plan.openings_facing_lot_line", "plan.setbacks_used" ] }
+      - { "clause_id": "item:b.(7)", "needs": [ "plan.rooftop_deck" ] }
+      - { "clause_id": "sentence:2", "needs": [ "plan.setbacks_used" ] }
+    expect_empty: false
+    notes: |-
+      The setback sentence, the cistern carve-out, "excluding eaves", the multiple-structure condition, the gable exclusion, screening (5) and its "unless", openings (6), rooftop deck (7). Needs come from the lexicon, not a model.
+
+  - id: E026
+    patterns: [ clause-ledger, not-modeled, facts-needed, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX.33.205.040.C.2 not-modeled clauses + needs + quote."
+      - "What part of Portland's ADU front-setback rule can't be checked automatically, and what does it need?"
+      - "The ADU must be 40 ft back or behind the house: which branch is unmodeled and which site facts would settle it?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.205.040.C.2'})-[:HAS_VERSION]->(v:Version)-[:HAS_CLAUSE]->(c:Clause {status: 'not_modeled'})
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN c.clause_id AS clause_id, c.needs AS needs, c.quote AS quote, c.page AS page
+    compare_on: [ clause_id, needs, page ]
+    expected:
+      - { "clause_id": "item:b.", "needs": [ "site.house_main_entrance", "site.house_rear_wall" ], "page": 3 }
+    expect_empty: false
+    notes: "Item b (behind the rear building wall): needs site.house_main_entrance and site.house_rear_wall; p.3."
+
+  - id: E027
+    patterns: [ clause-ledger, guards, not-modeled ]
+    as_of: "2026-11-01"
+    questions:
+      - "Clauses in PDX ADU size rule guarded on site.primary_is_duplex."
+      - "Which parts of Portland's ADU size cap only matter when the main house is a duplex?"
+      - "If the primary structure is a two-unit building, what extra clause in the size limit wakes up, and is it modeled?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.205.040.C.1'})-[:HAS_VERSION]->(v:Version)-[:HAS_CLAUSE]->(c:Clause)
+      WHERE c.guards_json CONTAINS 'site.primary_is_duplex'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN c.clause_id AS clause_id, c.status AS status, c.quote AS quote
+    compare_on: [ clause_id, status ]
+    expected:
+      - { "clause_id": "condition:s5/when#1", "status": "not_modeled" }
+    expect_empty: false
+    notes: |-
+      Only the condition "When the primary dwelling unit is a duplex" carries the guard; its parent sentence 5 has no guard of its own (it is ruled out through its opener). Both are not_modeled. Guards live as a JSON string.
+
+  # ---------------------------------------------------------------- gray areas
+  - id: E028
+    patterns: [ reading, gray-area, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "Readings on GRE ADU height rule (10.0110.D): phrases + options."
+      - "Is Gresham's ADU height rule ambiguous anywhere? What are the possible readings?"
+      - "Where does Gresham's 'no taller than the house' rule leave room for interpretation, and what are the competing views?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.10.0110.D'})-[:HAS_VERSION]->(v:Version)-[:HAS_READING]->(r:Reading)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN r.phrase AS phrase, size(r.readings) AS n_readings
+    compare_on: [ phrase, n_readings ]
+    expected:
+      - { "phrase": "applicable height standards of the land use district", "n_readings": 2 }
+      - { "phrase": "shall not exceed the height of the primary dwelling", "n_readings": 2 }
+    expect_empty: false
+    notes: |-
+      Two phrases: "shall not exceed the height of the primary dwelling" (own-grade height vs absolute elevation) and "applicable height standards of the land use district". Two readings each. Readings are never settled in the graph.
+
+  - id: E029
+    patterns: [ reading, gray-area, table-cell, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "Reading on GRE Table 10.0110 street setback for freestanding ADUs."
+      - "What does 'no closer than the primary dwelling' mean for a Gresham ADU's street setback? Is it settled?"
+      - "Gresham's detached-ADU street setback is relative to the house: what are the recorded interpretations?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.T10.0110'})-[:HAS_VERSION]->(v:Version)-[:HAS_READING]->(r:Reading)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      UNWIND r.readings AS reading
+      RETURN r.id AS reading_id, reading
+    compare_on: [ reading_id, reading ]
+    expected:
+      - { "reading_id": "GRE.T10.0110#v1::reading:0", "reading": "The ADU may be no closer to the street lot line than the closest point of the primary dwelling" }
+      - { "reading_id": "GRE.T10.0110#v1::reading:0", "reading": "The ADU may be no closer to the street than the primary dwelling's front facade/wall (its front setback line), as in 10.0203.C for accessory structures" }
+    expect_empty: false
+    notes: |-
+      Closest point of the primary dwelling vs its front facade line (as in 10.0203.C). The Reading's phrase is the table caption, not the cell text, so a match on phrase CONTAINS 'closer' fails: a deliberate trap.
+
+  - id: E030
+    patterns: [ gray-area-effect, settled-by, modeled-layer ]
+    as_of: null
+    questions:
+      - "Gray-area effects settled by Urban Forestry."
+      - "Which open interpretation questions does Portland's Urban Forestry have to decide?"
+      - "For which unresolved code readings is the tree office the body that settles them, and on which provisions?"
+    gold_cypher: |
+      MATCH (g:GrayAreaEffect)-[:EFFECT_OF]->(r:Reading)
+      WHERE g.settled_by CONTAINS 'Urban Forestry'
+      RETURN g.id AS effect_id, g.provision_id AS provision_id, g.status AS status
+    compare_on: [ effect_id, provision_id, status ]
+    expected:
+      - { "effect_id": "amb.tree-density.new-development", "provision_id": "PDX.11.50.050.A", "status": "active" }
+      - { "effect_id": "amb.tree-plan.when-not-required", "provision_id": "PDX.11.50.020", "status": "active" }
+    expect_empty: false
+    notes: "Two, both active: the tree-plan 'and/or' (11.50.020) and 'New development' (11.50.050.A)."
+
+  - id: E031
+    patterns: [ gray-area-effect, settled-by, matters-when, modeled-layer ]
+    as_of: null
+    questions:
+      - "Gray-area effect on PDX ADU size cap: status, settled_by, matters_when."
+      - "Is there an open question in Portland's ADU size rule, who decides it, and when does it matter?"
+      - "For the ADU living-area cap, what unresolved reading exists, which office settles it, and under what plan condition does it bite?"
+    gold_cypher: |
+      MATCH (g:GrayAreaEffect {provision_id: 'PDX.33.205.040.C.1'})-[:EFFECT_OF]->(r:Reading)
+      RETURN g.id AS effect_id, g.status AS status, g.settled_by AS settled_by, g.matters_when_json AS matters_when, r.phrase AS phrase
+    compare_on: [ effect_id, status, settled_by, matters_when ]
+    expected:
+      - { "effect_id": "amb.adu-size.common-area", "status": "active", "settled_by": "Portland BDS", "matters_when": "[{\"fact\": \"plan.detached\", \"op\": \"==\", \"value\": false}]" }
+    expect_empty: false
+    notes: |-
+      amb.adu-size.common-area, active, Portland BDS; matters only when plan.detached is false (a common area in an attached or internal ADU). For a detached ADU it does not bite.
+
+  - id: E032
+    patterns: [ gray-area-effect, empty, gresham ]
+    as_of: null
+    questions:
+      - "GRE gray-area effects with settled_by."
+      - "Who settles Gresham's open ADU interpretation questions?"
+      - "For Gresham's ambiguous ADU rules, has anyone been named to decide them?"
+    gold_cypher: |
+      MATCH (g:GrayAreaEffect)
+      WHERE g.layer = 'GRE' OR g.provision_id STARTS WITH 'GRE.'
+      RETURN g.id AS effect_id, g.settled_by AS settled_by
+    compare_on: [ effect_id, settled_by ]
+    expected: []
+    expect_empty: true
+    notes: |-
+      Gresham has 24 Readings but no curated gray-area effects yet (SCHEMA.md: curated relations and effects cover only the Portland detached-ADU slice). Answering from Readings invents a settler.
+
+  # ---------------------------------------------------------------- operators, tools, facts
+  - id: E033
+    patterns: [ operator, tool, facts-needed, modeled-layer ]
+    as_of: null
+    questions:
+      - "Operator + tool for PDX.33.205.040.C.2 and facts read."
+      - "How does the engine check Portland's 40-ft-or-behind-the-house ADU rule, and what inputs does it need?"
+      - "Which operator evaluates the ADU front placement rule, what tool does it run, and which site/plan facts does it consume?"
+    gold_cypher: |
+      MATCH (o:Operator)-[:MODELS]->(:Provision {id: 'PDX.33.205.040.C.2'})
+      MATCH (o)-[:RUNS_TOOL]->(t:Tool)
+      MATCH (o)-[:READS_FACT]->(f:Fact)
+      RETURN o.id AS operator, t.id AS tool, f.id AS fact
+    compare_on: [ operator, tool, fact ]
+    expected:
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "plan.outline" }
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "site.front_lot_line" }
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "site.house_outline" }
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "site.house_rear_wall" }
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "site.lot_outline" }
+      - { "operator": "op.adu_front_or_behind", "tool": "check_front_or_behind", "fact": "site.structures" }
+    expect_empty: false
+    notes: |-
+      op.adu_front_or_behind runs check_front_or_behind (signed "behind the rear wall", W4 2026-11-01; was check_setback); reads lot outline, front lot line, house outline, structures, house rear wall, plan outline. One row per fact.
+
+  - id: E034
+    patterns: [ operator, fact, computed-from, multi-hop, modeled-layer ]
+    as_of: null
+    questions:
+      - "Computed facts read by op for PDX.33.205.040.C.2, and their inputs."
+      - "For checking the ADU front-or-behind rule, which inputs are derived, and from what?"
+      - "Of the facts the ADU placement check reads, which must be computed, and what raw facts feed each?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.205.040.C.2'})<-[:MODELS]-(o:Operator)-[:READS_FACT]->(f:Fact)-[:COMPUTED_FROM]->(src:Fact)
+      RETURN f.id AS fact, src.id AS computed_from
+    compare_on: [ fact, computed_from ]
+    expected:
+      - { "fact": "plan.outline", "computed_from": "plan.footprint" }
+      - { "fact": "plan.outline", "computed_from": "plan.placement" }
+      - { "fact": "site.house_rear_wall", "computed_from": "site.house_main_entrance" }
+      - { "fact": "site.house_rear_wall", "computed_from": "site.house_outline" }
+    expect_empty: false
+    notes: |-
+      site.house_rear_wall from site.house_outline + site.house_main_entrance; plan.outline from plan.footprint + plan.placement. Three relationships plus the back-edge to the provision.
+
+  - id: E035
+    patterns: [ operator, parameter, modeled-layer ]
+    as_of: null
+    questions:
+      - "Params taken by the operator modeling PDX.33.205.040.C.1."
+      - "Which numbers does the ADU size check plug in?"
+      - "What parameters feed the tool that computes Portland's maximum ADU living area?"
+    gold_cypher: |
+      MATCH (o:Operator)-[:MODELS]->(:Provision {id: 'PDX.33.205.040.C.1'})
+      MATCH (o)-[:TAKES_PARAMETER]->(pa:Parameter)
+      MATCH (o)-[:RUNS_TOOL]->(t:Tool)
+      RETURN o.id AS operator, t.id AS tool, pa.value_num AS value, pa.unit AS unit
+    compare_on: [ operator, tool, value, unit ]
+    expected:
+      - { "operator": "op.adu_size", "tool": "adu_max_living_area", "value": 75, "unit": "%" }
+      - { "operator": "op.adu_size", "tool": "adu_max_living_area", "value": 800, "unit": "sqft" }
+    expect_empty: false
+    notes: "op.adu_size / adu_max_living_area: 75 % and 800 sqft. The basement-age parameter is not taken (it gates, not sizes)."
+
+  - id: E036
+    patterns: [ operator, empty, gresham, modeled-layer ]
+    as_of: null
+    questions:
+      - "Operators modeling any GRE provision."
+      - "Which engine check evaluates Gresham's ADU setback table?"
+      - "Is there a modeled operator for any Gresham accessory-dwelling rule?"
+    gold_cypher: |
+      MATCH (o:Operator)-[:MODELS]->(p:Provision {layer: 'GRE'})
+      RETURN o.id AS operator, p.id AS provision_id
+    compare_on: [ operator, provision_id ]
+    expected: []
+    expect_empty: true
+    notes: "Operators exist only for the Portland detached-ADU slice. The right answer is none (so NOT_MODELED / NEEDS_CHECK)."
+
+  - id: E037
+    patterns: [ modifies, operator, not-modeled, multi-hop, modeled-layer ]
+    as_of: null
+    questions:
+      - "Exceptions MODIFYING PDX.33.110.220.B with no operator."
+      - "Which carve-outs to Portland's base setbacks does the engine have no check for?"
+      - "Of the exceptions that relax the required-setback rule, which ones would force a manual check because nothing models them?"
+    gold_cypher: |
+      MATCH (e:Provision)-[:MODIFIES]->(:Provision {id: 'PDX.33.110.220.B'})
+      WHERE NOT EXISTS { MATCH (:Operator)-[:MODELS]->(e) }
+      RETURN e.id AS exception_id
+    compare_on: [ exception_id ]
+    expected:
+      - { "exception_id": "PDX.33.110.220.C.1" }
+      - { "exception_id": "PDX.33.110.220.C.2" }
+      - { "exception_id": "PDX.33.110.220.C.3" }
+      - { "exception_id": "PDX.33.110.220.D.1" }
+      - { "exception_id": "PDX.33.110.220.D.4.a" }
+    expect_empty: false
+    notes: |-
+      Five: 220.C.1, C.2 (eaves), C.3, D.1 (averaging), D.4.a (steep lots). 245.C.2 is modeled (op.accessory_in_setback, op.footprint_dimension). An exception with no operator is a NEEDS_CHECK candidate when its conditions can hold.
+
+  # ---------------------------------------------------------------- definitions and terms
+  - id: E038
+    patterns: [ definition, uses-definition, adu-standard ]
+    as_of: null
+    questions:
+      - "Definitions used by PDX.33.205.040.C.1."
+      - "Which definitions does Portland's ADU size rule depend on?"
+      - "To apply the ADU living-area cap, which defined terms must I look up?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.205.040.C.1'})-[:USES_DEFINITION]->(d:Provision)
+      RETURN d.id AS definition_id, d.type AS type
+    compare_on: [ definition_id, type ]
+    expected:
+      - { "definition_id": "PDX.33.910.030.accessory-dwelling-unit.part2", "type": "definition" }
+      - { "definition_id": "PDX.33.910.030.accessory-dwelling-unit", "type": "definition" }
+      - { "definition_id": "PDX.33.910.030.living-area", "type": "definition" }
+    expect_empty: false
+    notes: "ADU definition (two page-split parts) and Living Area (33.910.030)."
+
+  - id: E039
+    patterns: [ definition, uses-definition, multi-hop, variable-length ]
+    as_of: null
+    questions:
+      - "Transitive definition closure of PDX.33.205.040.C.1."
+      - "Following definitions inside definitions, everything the ADU size rule ultimately relies on?"
+      - "Chase the definition chain from Portland's ADU size cap to the bottom: which definitions are reachable?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.33.205.040.C.1'})-[:USES_DEFINITION*1..]->(d:Provision)
+      RETURN DISTINCT d.id AS definition_id
+    compare_on: [ definition_id ]
+    expected:
+      - { "definition_id": "PDX.33.910.030.accessory-dwelling-unit.part2" }
+      - { "definition_id": "PDX.33.910.030.accessory-dwelling-unit" }
+      - { "definition_id": "PDX.33.910.030.basement" }
+      - { "definition_id": "PDX.33.910.030.building" }
+      - { "definition_id": "PDX.33.910.030.dwelling-unit" }
+      - { "definition_id": "PDX.33.910.030.grade" }
+      - { "definition_id": "PDX.33.910.030.gross-building-area" }
+      - { "definition_id": "PDX.33.910.030.living-area" }
+      - { "definition_id": "PDX.33.910.030.lot" }
+      - { "definition_id": "PDX.33.910.030.structure" }
+    expect_empty: false
+    notes: |-
+      Reaches ADU, living area, then basement, dwelling unit, lot, gross building area, grade, building, structure. DISTINCT matters: several paths reach the same definition.
+
+  - id: E040
+    patterns: [ definition, defines, term, citation ]
+    as_of: null
+    questions:
+      - "PDX term 'living area': defining provision, document, page."
+      - "Where does Portland define 'living area'?"
+      - "Which section, document and page give Portland's meaning of living area for ADU sizing?"
+    gold_cypher: |
+      MATCH (d:Provision)-[:DEFINES]->(t:Term {id: 'PDX:living area'})
+      MATCH (d)-[:HAS_VERSION]->(v:Version)-[:FROM_DOCUMENT]->(doc:Document)
+      RETURN d.id AS provision_id, doc.id AS document_id, v.page AS page
+    compare_on: [ provision_id, document_id, page ]
+    expected:
+      - { "provision_id": "PDX.33.910.030.living-area", "document_id": "DOC-PDX-T33COMPLETE", "page": 1836 }
+    expect_empty: false
+    notes: |-
+      PDX.33.910.030.living-area in the compiled Title 33 (DOC-PDX-T33COMPLETE), page 1836 of that PDF. Term ids are layer-prefixed and lower-case.
+
+  - id: E041
+    patterns: [ term, uses-term, defines, empty ]
+    as_of: null
+    questions:
+      - "Defining provision for PDX term 'primary dwelling unit'."
+      - "Where does Portland define 'primary dwelling unit'?"
+      - "The ADU definition leans on 'primary dwelling unit': which provision in the graph defines that phrase?"
+    gold_cypher: |
+      MATCH (d:Provision)-[:DEFINES]->(t:Term {id: 'PDX:primary dwelling unit'})
+      RETURN d.id AS provision_id
+    compare_on: [ provision_id ]
+    expected: []
+    expect_empty: true
+    notes: |-
+      The Term exists (USES_TERM from both ADU definition parts) but nothing DEFINES it in the graph. Answering with 'primary structure' or 'dwelling unit' substitutes a different term. Not-stated is the answer.
+
+  - id: E042
+    patterns: [ definition, defines, quote, gresham ]
+    as_of: null
+    questions:
+      - "GRE accessory dwelling definition text."
+      - "How does Gresham define an accessory dwelling?"
+      - "Quote me Gresham's definition of the term for a granny flat."
+    gold_cypher: |
+      MATCH (d:Provision)-[:DEFINES]->(:Term {id: 'GRE:accessory dwelling'})
+      MATCH (d)-[:HAS_VERSION]->(v:Version)
+      RETURN d.id AS provision_id, v.text AS text, v.page AS page
+    compare_on: [ provision_id, page ]
+    expected:
+      - { "provision_id": "GRE.3.0100.ACCESSORY-DWELLING", "page": 24 }
+    expect_empty: false
+    notes: "GRE.3.0100.ACCESSORY-DWELLING; the text says it is accessory to a single detached dwelling (see Reading on 10.0110)."
+
+  # ---------------------------------------------------------------- cross-references and Gresham multi-hop
+  - id: E043
+    patterns: [ refers-to, gresham ]
+    as_of: null
+    questions:
+      - "REFERS_TO targets of GRE.10.0110.D."
+      - "What does Gresham's ADU height rule point to?"
+      - "Which other part of the Gresham code does the ADU height standard send me to?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.10.0110.D'})-[:REFERS_TO]->(t:Provision)
+      RETURN t.id AS provision_id
+    compare_on: [ provision_id ]
+    expected:
+      - { "provision_id": "GRE.T4.0130" }
+    expect_empty: false
+    notes: |-
+      GRE.T4.0130 (district standards). Its USES_DEFINITION to Building Height is a different edge and should not be returned for "points to".
+
+  - id: E044
+    patterns: [ multi-hop, refers-to, param-by-zone, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "GRE ADU height cap in LDR-5 via 10.0110.D's referenced table."
+      - "In Gresham's LDR-5, what is the district height limit an ADU must also respect?"
+      - "Follow Gresham's ADU height rule to its district table: what number applies on an LDR-5 lot?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'GRE.10.0110.D'})-[:REFERS_TO]->(t:Provision)-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)-[:APPLIES_TO_ZONE]->(:Zone {id: 'GRE:LDR-5'})
+      WHERE pa.name STARTS WITH 'h_maximum_building_height'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN t.id AS provision_id, pa.value_num AS value, pa.unit AS unit, pa.footnotes AS footnotes
+    compare_on: [ provision_id, value, unit, footnotes ]
+    expected:
+      - { "provision_id": "GRE.T4.0130", "value": 35, "unit": "ft", "footnotes": [ "12", "11" ] }
+    expect_empty: false
+    notes: |-
+      35 ft with footnotes [11] and [12]; the LDR-5 cell prints "35 ft.12". The ADU is further capped at the house's height (10.0110.D), which is a comparison, not a number.
+
+  # ---------------------------------------------------------------- types and topics
+  - id: E045
+    patterns: [ provision-type, topic, gresham ]
+    as_of: "2026-11-01"
+    questions:
+      - "GRE exceptions on height (T04)."
+      - "Which Gresham exceptions bear on building height?"
+      - "What carve-outs from Gresham's height rules are in the graph?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'GRE', type: 'exception'})-[:HAS_VERSION]->(v:Version)
+      WHERE 'T04' IN p.topics
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN p.id AS provision_id, p.title AS title
+    compare_on: [ provision_id ]
+    expected:
+      - { "provision_id": "GRE.10.0110.L.2" }
+      - { "provision_id": "GRE.9.0901.B.p1" }
+      - { "provision_id": "GRE.9.0901.B.p2" }
+    expect_empty: false
+    notes: "10.0110.L.2 (rear roof height reductions) and 9.0901.B (projections above the maximum height, two page parts)."
+
+  - id: E046
+    patterns: [ provision-type, gate, in-force, adu-standard ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX gates in the ADU chapter (title mentions accessory dwelling units), in force 2026-11-01."
+      - "Which Portland rules decide whether an ADU is allowed at all?"
+      - "In Portland's accessory-dwelling chapter, which provisions are pass/fail conditions on having an ADU, as of today?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'PDX', type: 'gate'})-[:HAS_VERSION]->(v:Version)
+      WHERE toLower(p.title) CONTAINS 'accessory dwelling'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN p.id AS provision_id, p.title AS title
+    compare_on: [ provision_id ]
+    expected:
+      - { "provision_id": "PDX.33.205.020.A" }
+      - { "provision_id": "PDX.33.205.020.B.1.a" }
+      - { "provision_id": "PDX.33.205.020.B.1.b" }
+      - { "provision_id": "PDX.33.205.020.B.1.c.1" }
+      - { "provision_id": "PDX.33.205.020.B.1.c.2" }
+      - { "provision_id": "PDX.33.205.020.B.2.a" }
+      - { "provision_id": "PDX.33.205.020.B.2.b" }
+      - { "provision_id": "PDX.33.205.030.A" }
+      - { "provision_id": "PDX.33.205.030.B" }
+      - { "provision_id": "PDX.33.205.040.C.4.b" }
+    expect_empty: false
+    notes: |-
+      The 33.205.020 "Where ... Allowed" family plus the 33.205.030/040 gates. Table 110-2 (E047) is also a gate but its title does not name ADUs; the question scopes to the ADU chapter, so it is excluded. Type comes from the extraction.
+
+  - id: E047
+    patterns: [ param-by-zone, table-cell, gate ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX Table 110-2: ADU allowed in RF?"
+      - "Is an accessory dwelling unit allowed in Portland's RF zone?"
+      - "Does the housing-types table permit an ADU on a farm/forest-zoned lot?"
+    gold_cypher: |
+      MATCH (v:Version)-[:HAS_PARAMETER]->(pa:Parameter)-[:APPLIES_TO_ZONE]->(:Zone {id: 'PDX:RF'})
+      MATCH (pa)-[:FROM_CELL]->(c:TableCell)
+      WHERE c.table = 'Table 110-2' AND toLower(c.row) CONTAINS 'accessory dwelling'
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.value_bool AS allowed, c.cell AS cell, pa.provision_id AS provision_id
+    compare_on: [ allowed, cell, provision_id ]
+    expected:
+      - { "allowed": true, "cell": "Yes", "provision_id": "PDX.T110-2" }
+    expect_empty: false
+    notes: |-
+      Yes (cell "Yes", p.8). Note 33.205.020.B.1.a speaks of R20 through R2.5; RF has its own paragraph, not in the slice. The table answers the question asked.
+
+  - id: E048
+    patterns: [ param, gate, in-force, trees ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX tree-plan trigger diameters (11.50.020)."
+      - "At what tree sizes does Portland require a tree plan for development?"
+      - "Which trunk diameters for private, City and street trees trigger Portland's tree plan?"
+    gold_cypher: |
+      MATCH (:Provision {id: 'PDX.11.50.020'})-[:HAS_VERSION]->(v:Version)-[:HAS_PARAMETER]->(pa:Parameter)
+      WHERE (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN pa.value_num AS value, pa.unit AS unit, pa.quote AS quote
+    compare_on: [ value, unit ]
+    expected:
+      - { "value": 12, "unit": "in" }
+      - { "value": 3, "unit": "in" }
+      - { "value": 6, "unit": "in" }
+    expect_empty: false
+    notes: |-
+      12 in private, 6 in City, 3 in street trees (in force from 2025-10-24). The "and/or" joining them is a gray area (E030), so the thresholds are facts but their combination is not.
+
+  - id: E049
+    patterns: [ topic, empty, solar ]
+    as_of: "2026-11-01"
+    questions:
+      - "PDX solar setback provisions (T16) in force."
+      - "Does Portland have a solar setback rule that limits where a new ADU can go?"
+      - "Is there any Portland rule protecting the lot to the north from new shade by a structure?"
+    gold_cypher: |
+      MATCH (p:Provision {layer: 'PDX'})-[:HAS_VERSION]->(v:Version)
+      WHERE 'T16' IN p.topics
+        AND (v.when_from IS NULL OR v.when_from <= '2026-11-01') AND (v.when_to IS NULL OR v.when_to > '2026-11-01')
+      RETURN p.id AS provision_id
+    compare_on: [ provision_id ]
+    expected: []
+    expect_empty: true
+    notes: |-
+      None in the graph. Chapter 33.639 Solar Access is tagged T25/T20 and its deletion notice says it was deleted; returning it is wrong. "Not in the graph" is the honest answer, not "no such rule exists" (coverage not checked here).
+
+  - id: E050
+    patterns: [ citation, table-cell, document ]
+    as_of: "2026-11-01"
+    questions:
+      - "Cite PDX R5 side setback: doc title, edition, page, cell text."
+      - "Where does the 5-ft side setback for R5 come from, exactly?"
+      - "Give the source for the R5 side-yard number: which document, which edition, which page, and what the cell says."
+    gold_cypher: |
+      MATCH (c:TableCell {table: 'Table 110-4', row: 'Side building setback', column: 'R5'})<-[:HAS_TABLE_CELL]-(v:Version)-[:FROM_DOCUMENT]->(d:Document)
+      RETURN d.title AS document, d.version AS edition, c.page AS page, c.cell AS cell, c.position AS position
+    compare_on: [ document, edition, page, cell ]
+    expected:
+      - { "document": "Title 33, Chapter 33.110 Single-Dwelling Zones", "edition": "11/1/26", "page": 11, "cell": "5 ft." }
+    expect_empty: false
+    notes: "Title 33, Chapter 33.110 Single-Dwelling Zones, edition 11/1/26, p.11, '5 ft.' (row_sequence evidence)."

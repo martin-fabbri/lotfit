@@ -1,0 +1,715 @@
+{
+ "schema": "lotfit.case/1",
+ "as_of": {
+  "date": "2026-11-15",
+  "meaning": "planned_submittal"
+ },
+ "jurisdiction": {
+  "state_layer": "OR",
+  "city_layer": "EUG"
+ },
+ "mode": "check_spot",
+ "capture": null,
+ "site": {
+  "zone": {
+   "value": "R-1",
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+     "where": "base zone and overlays",
+     "when": "2026-11-02",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "City of Eugene",
+     "status": "current"
+    }
+   ]
+  },
+  "overlays": {
+   "value": [
+    "/CAS"
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+     "where": "base zone and overlays",
+     "when": "2026-11-02",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "City of Eugene",
+     "status": "current"
+    }
+   ]
+  },
+  "lot_outline": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     64.19,
+     0
+    ],
+    [
+     64.19,
+     100.1
+    ],
+    [
+     0,
+     100.1
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "tax lot polygon, projected to the lot frame"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "front_lot_line": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     64.19,
+     0
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "east edge (street)"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "rear_lot_line": {
+   "value": [
+    [
+     0,
+     100.1
+    ],
+    [
+     64.19,
+     100.1
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "west edge"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "side_lot_lines": {
+   "value": [
+    [
+     [
+      0,
+      0
+     ],
+     [
+      0,
+      100.1
+     ]
+    ],
+    [
+     [
+      64.19,
+      0
+     ],
+     [
+      64.19,
+      100.1
+     ]
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "south and north edges"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "house_outline": {
+   "value": [
+    [
+     60.8,
+     16.11
+    ],
+    [
+     29.33,
+     16.32
+    ],
+    [
+     29.37,
+     22.31
+    ],
+    [
+     4.68,
+     22.47
+    ],
+    [
+     5.03,
+     75.2
+    ],
+    [
+     61.23,
+     74.83
+    ],
+    [
+     60.88,
+     22.1
+    ],
+    [
+     60.84,
+     22.1
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Oregon DOGAMI",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+     },
+     "where": "footprint polygon, projected to the lot frame"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "structures": {
+   "value": [],
+   "prov": [
+    {
+     "kind": "owner_statement",
+     "document": "LotFit session with the owner",
+     "where": "no accessory structures on the lot (to confirm on the walk)",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "owner's word"
+    }
+   ]
+  },
+  "primary_living_area_sqft": {
+   "value": 3151,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Oregon DOGAMI",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+     },
+     "where": "SQ_FT (assessor living area)",
+     "status": "current"
+    }
+   ]
+  },
+  "corner_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "one street frontage",
+     "status": "current"
+    }
+   ]
+  },
+  "flag_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "rectangular lot with full street frontage",
+     "status": "current"
+    }
+   ]
+  },
+  "through_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "one street frontage",
+     "status": "current"
+    }
+   ]
+  },
+  "alley": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Lane County",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: the issuer states no positional accuracy"
+     },
+     "where": "no alley on the parcel map",
+     "status": "current"
+    }
+   ]
+  },
+  "historic_resource": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+     "where": "no historic overlay",
+     "when": "2026-11-02",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "City of Eugene",
+     "status": "current"
+    }
+   ]
+  },
+  "primary_is_duplex": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Oregon DOGAMI",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+     },
+     "where": "one detached single-unit dwelling",
+     "status": "current"
+    }
+   ]
+  },
+  "primary_is_attached_house": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Oregon DOGAMI",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+     },
+     "where": "detached",
+     "status": "current"
+    }
+   ]
+  },
+  "primary_is_manufactured": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+     "when": "2026-11-01",
+     "by": "CC (Claude Code), fetched for the owner",
+     "issuer": "Oregon DOGAMI",
+     "tolerance": {
+      "value": 3.0,
+      "unit": "ft",
+      "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+     },
+     "where": "site-built 2007",
+     "status": "current"
+    }
+   ]
+  }
+ },
+ "unknowns": [
+  {
+   "fact": "site.trees",
+   "reason": "trees in the backyard are not surveyed yet (walk pending)"
+  },
+  {
+   "fact": "site.slope_pct",
+   "reason": "no capture yet; the yard falls about 7 % away from the house (walk 6 estimate, not a record)"
+  }
+ ],
+ "case_id": "019a4000-0000-7000-8000-00000000e163",
+ "plan": {
+  "kind": {
+   "value": "adu",
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session with the owner",
+     "where": "what",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "client's wish"
+    }
+   ]
+  },
+  "detached": {
+   "value": true,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "footprint": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     36,
+     0
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     0,
+     16
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1, exterior walls",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "placement": {
+   "value": {
+    "x": 14,
+    "y": 79,
+    "rotation": 0
+   },
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session with the owner",
+     "where": "client's spot: the middle of the backyard",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "client's wish"
+    }
+   ]
+  },
+  "height_ft": {
+   "value": 15,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3, to the highest point of the roof (EC 9.0500)",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "wall_height_ft": {
+   "value": 10,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "living_area_sqft": {
+   "value": 576,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "total_building_sqft": {
+   "value": 576,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1, measured at the exterior perimeter walls (EC 9.2751(17)(a)1.)",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "eave_ft": {
+   "value": 1,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "parking": {
+   "value": 0,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "is_garage": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "is_cistern": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "gable_walls": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "dormers": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "rooftop_deck": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "openings_facing_lot_line": {
+   "value": true,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A2",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "basement_conversion": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A1",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "vacation_occupancy": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session with the owner",
+     "where": "use",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "client's wish"
+    }
+   ]
+  },
+  "owner_occupancy_required": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session with the owner",
+     "where": "covenant check",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "owner's word"
+    }
+   ]
+  },
+  "sloped_ceiling": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "a 16 x 36 ft studio (576 sq ft), long side along the back wall (illustration)",
+     "where": "sheet A3",
+     "when": "2026-11-02",
+     "by": "CC for the owner",
+     "status": "illustration: not the owner's chosen plan"
+    }
+   ]
+  },
+  "accessory_dwellings_on_lot": {
+   "value": 1,
+   "prov": [
+    {
+     "kind": "owner_statement",
+     "document": "LotFit session with the owner",
+     "where": "no accessory dwelling on the lot today; this plan adds one (to confirm on the walk)",
+     "when": "2026-11-02",
+     "by": "the owner",
+     "status": "owner's word"
+    }
+   ]
+  }
+ }
+}

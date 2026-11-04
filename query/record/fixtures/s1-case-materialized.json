@@ -1,0 +1,880 @@
+{
+ "schema": "lotfit.case/1",
+ "case_id": "019a4000-0000-7000-8000-000000000001",
+ "as_of": {
+  "date": "2026-11-15",
+  "meaning": "planned_submittal"
+ },
+ "jurisdiction": {
+  "state_layer": "OR",
+  "city_layer": "PDX"
+ },
+ "mode": "check_spot",
+ "capture": {
+  "capture_id": "walk-3 (illustration)",
+  "manifest_sha256": "3e6c867900000000000000000000000000000000000000000000000000000003",
+  "grade": "A",
+  "provisional": false,
+  "tolerances_95pct": {
+   "formula": "0.08 + 0.015 * r_m",
+   "coefficients": {
+    "a": 0.08,
+    "b": 0.015
+   },
+   "reference_range_m": 10
+  }
+ },
+ "site": {
+  "zone": {
+   "value": "R5",
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "zoning",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "overlays": {
+   "value": [],
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "overlay zones",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "lot_outline": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     50,
+     0
+    ],
+    [
+     50,
+     100
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "lot dimensions in lot frame",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.5,
+      "unit": "ft",
+      "at_range_m": 15
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "front_lot_line": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     50,
+     0
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "front lot line",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft",
+      "at_range_m": 5
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "rear_lot_line": {
+   "value": [
+    [
+     0,
+     100
+    ],
+    [
+     50,
+     100
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "rear lot line",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.5,
+      "unit": "ft",
+      "at_range_m": 20
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "side_lot_lines": {
+   "value": [
+    [
+     [
+      0,
+      0
+     ],
+     [
+      0,
+      100
+     ]
+    ],
+    [
+     [
+      50,
+      0
+     ],
+     [
+      50,
+      100
+     ]
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "side lot lines",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.5,
+      "unit": "ft",
+      "at_range_m": 15
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "house_outline": {
+   "value": [
+    [
+     12,
+     20
+    ],
+    [
+     38,
+     20
+    ],
+    [
+     38,
+     55
+    ],
+    [
+     12,
+     55
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "house walls",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft",
+      "at_range_m": 8
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "structures": {
+   "value": [
+    {
+     "id": "shed",
+     "outline": [
+      [
+       40,
+       85
+      ],
+      [
+       48,
+       85
+      ],
+      [
+       48,
+       95
+      ],
+      [
+       40,
+       95
+      ]
+     ]
+    }
+   ],
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "capture walk-3 (illustration)",
+     "where": "shed walls",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft",
+      "at_range_m": 6
+     },
+     "rests_on": "capture walk-3 (illustration)"
+    }
+   ],
+   "status": "known"
+  },
+  "primary_living_area_sqft": {
+   "value": 1400,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "building: living area",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "corner_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "street frontage",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "flag_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "parcel shape",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "through_lot": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "street frontage",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "alley": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "right-of-way",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "trees": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "capture walk-3 (illustration)",
+     "where": "tree survey",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft"
+     }
+    }
+   ],
+   "status": "known"
+  },
+  "slope_pct": {
+   "value": 2,
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "capture walk-3 (illustration)",
+     "where": "ground mesh grade",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.5,
+      "unit": "deg"
+     }
+    }
+   ],
+   "status": "known"
+  },
+  "historic_resource": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "historic resource inventory",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "primary_is_duplex": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "building use",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "primary_is_attached_house": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "building use",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "primary_is_manufactured": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "official_record",
+     "document": "PortlandMaps property report (illustration)",
+     "where": "building use",
+     "when": "2026-10-20",
+     "by": "sample",
+     "issuer": "City of Portland",
+     "status": "current"
+    }
+   ],
+   "status": "known"
+  },
+  "screening": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "capture walk-3 (illustration)",
+     "where": "perimeter fence scan",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft"
+     }
+    }
+   ],
+   "status": "known"
+  },
+  "other_structures_in_setback": {
+   "value": 0,
+   "prov": [
+    {
+     "kind": "capture",
+     "document": "capture walk-3 (illustration)",
+     "where": "west and rear setback scan",
+     "when": "2026-11-01",
+     "by": "sample",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft"
+     }
+    }
+   ],
+   "status": "known"
+  },
+  "zone_family": {
+   "value": "single_dwelling",
+   "prov": [
+    {
+     "kind": "computed",
+     "document": "derived from site.zone",
+     "where": "PDX.33.110.020 (R5 -> single_dwelling)",
+     "when": "2026-11-15",
+     "by": "lotfit.case-gate",
+     "tolerance": {
+      "value": 0,
+      "unit": "ft"
+     },
+     "status": "known"
+    }
+   ],
+   "status": "known"
+  },
+  "lot_area_sqft": {
+   "value": 5000,
+   "prov": [
+    {
+     "kind": "computed",
+     "document": "derived from site.lot_outline",
+     "where": "shoelace area of site.lot_outline (33.930.025)",
+     "when": "2026-11-15",
+     "by": "lotfit.case-gate",
+     "tolerance": {
+      "value": 150,
+      "unit": "sqft"
+     },
+     "status": "known"
+    }
+   ],
+   "status": "known"
+  },
+  "house_rear_wall": {
+   "value": [
+    [
+     12,
+     55
+    ],
+    [
+     38,
+     55
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "computed",
+     "document": "derived from site.house_outline + site.front_lot_line",
+     "where": "wall farthest from front_lot_line (assumed main entrance faces street; site.house_main_entrance not supplied)",
+     "when": "2026-11-15",
+     "by": "lotfit.case-gate",
+     "tolerance": {
+      "value": 0.25,
+      "unit": "ft"
+     },
+     "status": "unconfirmed"
+    }
+   ],
+   "status": "unconfirmed"
+  }
+ },
+ "plan": {
+  "kind": {
+   "value": "adu",
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session (illustration)",
+     "where": "what",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "client's wish"
+    }
+   ],
+   "status": "known"
+  },
+  "detached": {
+   "value": true,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "footprint": {
+   "value": [
+    [
+     0,
+     0
+    ],
+    [
+     24,
+     0
+    ],
+    [
+     24,
+     24
+    ],
+    [
+     0,
+     24
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "placement": {
+   "value": {
+    "x": 2,
+    "y": 74,
+    "rotation": 0
+   },
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session (illustration)",
+     "where": "client's spot",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "client's wish"
+    }
+   ],
+   "status": "known"
+  },
+  "height_ft": {
+   "value": 15,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A3, measured per 33.930.050",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "wall_height_ft": {
+   "value": 12,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2 exterior wall",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "living_area_sqft": {
+   "value": 576,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1 area table",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "eave_ft": {
+   "value": 1,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2 eave detail",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "parking": {
+   "value": 0,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "is_garage": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "is_cistern": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "gable_walls": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "dormers": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "rooftop_deck": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "openings_facing_lot_line": {
+   "value": true,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A2 west elevation",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "basement_conversion": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A1",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "vacation_occupancy": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "owner_statement",
+     "document": "LotFit session (illustration)",
+     "where": "use declaration",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "unconfirmed"
+    }
+   ],
+   "status": "unconfirmed"
+  },
+  "owner_occupancy_required": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "entered",
+     "document": "LotFit session (illustration)",
+     "where": "covenant check",
+     "when": "2026-11-01",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "sloped_ceiling": {
+   "value": false,
+   "prov": [
+    {
+     "kind": "plan_document",
+     "document": "City of Portland free 24 x 24 studio plan set (illustration)",
+     "where": "sheet A3 section",
+     "when": "2026-10-30",
+     "by": "sample",
+     "status": "as drawn"
+    }
+   ],
+   "status": "known"
+  },
+  "outline": {
+   "value": [
+    [
+     2,
+     74
+    ],
+    [
+     26,
+     74
+    ],
+    [
+     26,
+     98
+    ],
+    [
+     2,
+     98
+    ]
+   ],
+   "prov": [
+    {
+     "kind": "computed",
+     "document": "derived from plan.footprint + plan.placement",
+     "where": "placed_outline at (2, 74) rot=0 deg",
+     "when": "2026-11-15",
+     "by": "lotfit.case-gate",
+     "tolerance": {
+      "value": 0,
+      "unit": "ft"
+     },
+     "status": "known"
+    }
+   ],
+   "status": "known"
+  },
+  "setbacks_used": {
+   "value": [
+    "side",
+    "rear"
+   ],
+   "prov": [
+    {
+     "kind": "computed",
+     "document": "derived from plan.outline + site.*_lot_line + PDX.T110-4",
+     "where": "setbacks in R5 where distance < base building setback ({'front': 10.0, 'side': 5.0, 'rear': 5.0, 'side_street': 5.0})",
+     "when": "2026-11-15",
+     "by": "lotfit.case-gate",
+     "tolerance": {
+      "value": 0.5,
+      "unit": "ft"
+     },
+     "status": "known"
+    }
+   ],
+   "status": "known"
+  }
+ },
+ "unknowns": []
+}

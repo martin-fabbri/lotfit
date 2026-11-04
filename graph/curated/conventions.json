@@ -1,0 +1,54 @@
+{
+ "about": "Conventions every solver follows (GR-31). CC, 2026-11-01. Tools: tools/geometry.py placed_outline; checked against shapely in graph/tests/test_model_tools.py.",
+ "units": "feet and square feet; angles in degrees",
+ "lot_frame": {
+  "origin": "the left end of the front lot line, as seen from the street looking at the lot",
+  "x": "along the front lot line, left to right",
+  "y": "from the front lot line toward the rear (the lot lies at y >= 0 near the front lot line)",
+  "front_lot_line": "lies on y = 0 for a lot whose front lot line is straight; otherwise site.front_lot_line states the segment"
+ },
+ "plan_frame": {
+  "origin": "the front-left corner of the plan's full outline at grade",
+  "x": "along the plan's front face, left to right",
+  "y": "from the front face toward the rear",
+  "outline": "plan.footprint is the full outline at grade: walls, porches, stoops and steps included; eaves are not in it and are stated in plan.eave_ft",
+  "faces": {
+   "front": "the face on the plan frame's y-minimum side",
+   "rear": "the face on the y-maximum side",
+   "left": "the face on the x-minimum side",
+   "right": "the face on the x-maximum side"
+  }
+ },
+ "placement": {
+  "names": "(x, y) is where the plan frame's origin sits in the lot frame",
+  "rotation": "degrees counterclockwise about the plan origin, one of 0, 90, 180, 270",
+  "outline": "outline_lot = rotate(rotation) * footprint + (x, y)",
+  "faces_after_rotation": {
+   "0": {
+    "front": "-y",
+    "rear": "+y",
+    "left": "-x",
+    "right": "+x"
+   },
+   "90": {
+    "front": "+x",
+    "rear": "-x",
+    "left": "-y",
+    "right": "+y"
+   },
+   "180": {
+    "front": "+y",
+    "rear": "-y",
+    "left": "+x",
+    "right": "-x"
+   },
+   "270": {
+    "front": "-x",
+    "rear": "+x",
+    "left": "+y",
+    "right": "-y"
+   }
+  }
+ },
+ "why": "Every part of the outline, porch included, is placed by the same transform and checked against the lot outline, so a porch can never be read as off the lot or left out of a setback."
+}
