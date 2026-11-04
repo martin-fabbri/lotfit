@@ -288,3 +288,258 @@ def check_front_or_behind(outline, front_lot_line, min_front_ft, house_rear_wall
         "tolerance_ft": tolerance_ft,
         "too_close_to_call": tcc,
     }
+
+
+def _and(vals: list) -> bool | None:
+    if any(v is False for v in vals):
+        return False
+    if any(v is None for v in vals):
+        return None
+    return True
+
+
+def G_closest(px, py, ax, ay, bx, by) -> tuple[float, float]:
+    dx = bx - ax
+    dy = by - ay
+    L2 = dx * dx + dy * dy or 1e-12
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / L2))
+    return (ax + t * dx, ay + t * dy)
+
+
+def _face_toward(seg, outline, rotation: int) -> str:
+    if rotation % 90 != 0:
+        raise ValueError("rotation must be a multiple of 90 degrees")
+    n = len(outline)
+    cx = sum(p[0] for p in outline) / n
+    cy = sum(p[1] for p in outline) / n
+    qx, qy = G_closest(cx, cy, *seg[0], *seg[1])
+    dx, dy = qx - cx, qy - cy
+    if abs(dx) >= abs(dy):
+        d = "+x" if dx > 0 else "-x"
+    else:
+        d = "+y" if dy > 0 else "-y"
+    table = {
+        0: {"-y": "front", "+y": "rear", "-x": "left", "+x": "right"},
+        90: {"+x": "front", "-x": "rear", "-y": "left", "+y": "right"},
+        180: {"+y": "front", "-y": "rear", "+x": "left", "-x": "right"},
+        270: {"-x": "front", "+x": "rear", "+y": "left", "-y": "right"},
+    }
+    return table[rotation % 360][d]
+
+
+def _extent_along(outline, seg) -> float:
+    (ax, ay), (bx, by) = seg
+    vx, vy = bx - ax, by - ay
+    L = (vx**2 + vy**2) ** 0.5
+    ts = [((x - ax) * vx + (y - ay) * vy) / L for x, y in outline]
+    return max(ts) - min(ts)
+
+
+def _exc_245c2(f: dict, p: dict, version: int) -> list[dict]:
+    def cond(item, name, holds, measure=None, reason=None, param=None):
+        c = {
+            "clause_id": f"PDX.33.110.245.C.2#v{version}::item:{item}",
+            "name": name,
+            "holds": holds,
+            "measure": measure,
+        }
+        if reason is not None:
+            c["reason"] = reason
+        if param is not None:
+            c["param"] = param
+        return c
+
+    def is_inside(x, ln):
+        return G.distance_to_segment(x, ln["line"]) < ln["min_ft"] - EPS
+
+    o = f["outline"]
+    tol = f.get("tolerance_ft", 0.0)
+    conds = []
+    zones = p["zones_allowing_structures_in_side_rear_setbacks"]
+    zone = f.get("zone")
+    conds.append(cond("b.", "zone is one of " + ", ".join(zones), None if zone is None else zone in zones))
+    r1 = check_setback(o, f["front_lot_line"], p["min_distance_from_front_lot_line"], tol)
+    h1 = r1["pass"]
+    rs = None
+    if f.get("corner_lot") is None:
+        h1 = _and([h1, None]) if h1 is not False else False
+    elif f.get("corner_lot") and f.get("side_street_lot_line") is None:
+        h1 = _and([h1, None]) if h1 is not False else False
+    elif f.get("corner_lot"):
+        rs = check_setback(o, f["side_street_lot_line"], p["min_distance_from_side_street_lot_line_corner"], tol)
+        h1 = _and([h1, rs["pass"]])
+    if rs is not None and rs["pass"] is False and r1["pass"] is not False:
+        measure1, param1 = rs, "min_distance_from_side_street_lot_line_corner"
+    else:
+        measure1, param1 = r1, "min_distance_from_front_lot_line"
+    conds.append(
+        cond(
+            "b.(1)",
+            "at least 40 ft from a front lot line (20 ft from a side street on a corner lot)",
+            h1,
+            measure1,
+            param=param1,
+        )
+    )
+    r2 = footprint_dimensions(o, p["max_footprint_dimension"])
+    conds.append(
+        cond(
+            "b.(2)",
+            "footprint within 24 ft by 24 ft, excluding eaves",
+            r2["pass"],
+            r2,
+            param="max_footprint_dimension",
+        )
+    )
+    if f.get("setback_lines", []) is None or f.get("structures", []) is None:
+        conds.append(
+            cond(
+                "b.(3)",
+                "combined length of structures in the setback, per line, no more than 24 ft",
+                None,
+                None,
+                reason="structures or setback lines unknown",
+                param="max_combined_length_in_setback_per_line",
+            )
+        )
+    else:
+        lines = f.get("setback_lines", [])
+        structs = f.get("structures", [])
+        h3 = True
+        if any(is_inside(o, ln) for ln in lines):
+            why3 = "only this structure is in the setback"
+        else:
+            why3 = "this structure is in no setback"
+        for ln in lines:
+            inside = [o] if is_inside(o, ln) else []
+            others = [_outline(s) for s in structs if is_inside(_outline(s), ln)]
+            if inside and others:
+                total = sum(_extent_along(x, ln["line"]) for x in inside + others)
+                why3 = f"{ln.get('name', 'line')}: combined {round(total, 3)} ft"
+                if total > p["max_combined_length_in_setback_per_line"] + EPS:
+                    h3 = False
+                    break
+        conds.append(
+            cond(
+                "b.(3)",
+                "combined length of structures in the setback, per line, no more than 24 ft",
+                h3,
+                None,
+                reason=why3,
+                param="max_combined_length_in_setback_per_line",
+            )
+        )
+    hh = None if f.get("height_ft") is None else f["height_ft"] <= p["max_height_in_setback"] + EPS
+    hw = None if f.get("wall_height_ft") is None else f["wall_height_ft"] <= p["max_wall_height_in_setback"] + EPS
+    if hh is False:
+        m4, p4 = check_max(f["height_ft"], p["max_height_in_setback"], "ft"), "max_height_in_setback"
+    elif f.get("wall_height_ft") is not None:
+        m4, p4 = check_max(f["wall_height_ft"], p["max_wall_height_in_setback"], "ft"), "max_wall_height_in_setback"
+    elif f.get("height_ft") is not None:
+        m4, p4 = check_max(f["height_ft"], p["max_height_in_setback"], "ft"), "max_height_in_setback"
+    else:
+        m4, p4 = None, None
+    conds.append(
+        cond(
+            "b.(4)",
+            "no more than 15 ft high, walls no more than 10 ft (gable portion excluded)",
+            _and([hh, hw]),
+            m4,
+            param=p4,
+        )
+    )
+    if f.get("enclosed", f.get("plan_kind") == "adu"):
+        h5, r5 = True, 'enclosed structure: "Screening is not required for enclosed structures."'
+    else:
+        h5, r5 = f.get("screening"), None
+    conds.append(cond("b.(5)", "screened from adjoining lots, or enclosed", h5, None, reason=r5))
+    lines6 = f.get("setback_lines", [])
+    in_setback = [ln for ln in (lines6 or []) if is_inside(o, ln)]
+    if f.get("openings_by_face") is not None and f.get("rotation") is not None and lines6 is None:
+        h6, r6 = None, "setback lines unknown"
+    elif f.get("openings_by_face") is not None and f.get("rotation") is not None:
+        obf = f.get("openings_by_face")
+        if isinstance(obf, list):
+            obf = {face: True for face in obf}
+        bad = [
+            ln.get("name", "line") for ln in in_setback if obf.get(_face_toward(ln["line"], o, f["rotation"]))
+        ]
+        h6 = not bad
+        r6 = "openings toward " + ", ".join(bad) if bad else None
+    elif f.get("openings_facing_lot_line") is not None:
+        h6, r6 = not f.get("openings_facing_lot_line"), None
+    else:
+        h6, r6 = None, "openings per face not stated"
+    conds.append(
+        cond("b.(6)", "no doors or windows in walls within the setback facing the lot line", h6, None, reason=r6)
+    )
+    rd = f.get("rooftop_deck")
+    conds.append(cond("b.(7)", "no rooftop deck", None if rd is None else not rd))
+    if f.get("dormers") is False:
+        conds.append(cond("b.(8)", "dormers at least 5 ft from side and rear lot lines", True, None, reason="no dormers"))
+    elif f.get("dormer_setback_ft") is not None:
+        sb = f["dormer_setback_ft"]
+        mn8 = p["dormer_min_setback_from_side_rear"]
+        ok8, tcc8 = judge(sb - mn8, 0.0)
+        r8 = {
+            "value": sb,
+            "limit": mn8,
+            "unit": "ft",
+            "margin": round(sb - mn8, 6),
+            "pass": ok8,
+            "tolerance": 0.0,
+            "too_close_to_call": tcc8,
+        }
+        conds.append(
+            cond(
+                "b.(8)",
+                "dormers at least 5 ft from side and rear lot lines",
+                r8["pass"],
+                r8,
+                param="dormer_min_setback_from_side_rear",
+            )
+        )
+    else:
+        conds.append(
+            cond(
+                "b.(8)",
+                "dormers at least 5 ft from side and rear lot lines",
+                None,
+                None,
+                reason="dormer positions not stated",
+            )
+        )
+    return conds
+
+
+EXCEPTIONS = {"PDX.33.110.245.C.2": _exc_245c2}
+
+
+@tool(
+    reads=[
+        "plan.outline",
+        "site.front_lot_line",
+        "site.side_street_lot_line",
+        "site.corner_lot",
+        "site.zone",
+        "plan.height_ft",
+        "plan.wall_height_ft",
+        "plan.rooftop_deck",
+        "plan.openings_facing_lot_line",
+        "plan.dormers",
+        "site.screening",
+        "site.structures",
+    ]
+)
+def check_exception_conditions(
+    exception_id: str, base_provision_id: str, facts: dict, params: dict, version: int = 1
+) -> dict:
+    if exception_id not in EXCEPTIONS:
+        raise ValueError(f"no evaluator for exception {exception_id}")
+    conds = EXCEPTIONS[exception_id](facts, params, version)
+    return {
+        "exception_id": exception_id,
+        "base_provision_id": base_provision_id,
+        "pass": _and([c["holds"] for c in conds]),
+        "conditions": conds,
+    }
