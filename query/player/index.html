@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <title>LotFit · Decision-Trace Walkthrough</title>
 <style>
-@font-face { font-family: Inter; font-weight: 400; src: url(node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2); }
-@font-face { font-family: Inter; font-weight: 500; src: url(node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2); }
-@font-face { font-family: Inter; font-weight: 600; src: url(node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
-@font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); }
-@font-face { font-family: Mono; font-weight: 400; src: url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2); }
-@font-face { font-family: Mono; font-weight: 500; src: url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 500; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-500-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-700-normal.woff2); }
+@font-face { font-family: Mono; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.3.0/files/jetbrains-mono-latin-400-normal.woff2); }
+@font-face { font-family: Mono; font-weight: 500; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.3.0/files/jetbrains-mono-latin-500-normal.woff2); }
 
 :root {
   --bg: #0d1117; --ink: #e8edf3; --muted: #8b97a6; --line: rgba(232,237,243,.14);
@@ -38,6 +38,9 @@ canvas { position: absolute; inset: 0; display: block; }
 #card .chip { font: 600 11px Mono; padding: 3px 7px; border-radius: 4px; letter-spacing: .06em; }
 #card .chip.no { background: rgba(255,93,93,.16); color: var(--red); }
 #card .chip.ok { background: rgba(94,224,138,.16); color: var(--green); }
+#card .chip.warn { background: rgba(245,179,66,.16); color: var(--amber); }
+#card .chk i.bad { color: var(--red); }
+#card .chk i.warn { color: var(--amber); }
 #card .chip.rule { background: rgba(232,237,243,.08); color: var(--ink); }
 #card .metric { display: flex; justify-content: space-between; font: 500 13px Inter; padding: 6px 0; border-top: 1px solid var(--line); gap: 8px; }
 #card .metric:first-of-type { margin-top: 10px; }
@@ -63,7 +66,7 @@ canvas { position: absolute; inset: 0; display: block; }
 #disc { position: absolute; right: 36px; bottom: 14px; font: 400 10.5px Mono; color: rgba(139,151,166,.7); }
 </style>
 </head>
-<body data-trace="../out/s1-trace.json">
+<body data-trace="demo/eug-demo-24x24.trace.json">
 <div id="stage">
   <div id="labels"></div>
   <div id="hud">
@@ -76,7 +79,7 @@ canvas { position: absolute; inset: 0; display: block; }
     <div id="disc">Pre-feasibility only · not a permit decision</div>
   </div>
 </div>
-<script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js" } }</script>
 <script type="module" src="scene.js"></script>
 </body>
 </html>
