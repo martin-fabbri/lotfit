@@ -11,6 +11,7 @@ import { MetaReviewerClient } from "./reviewer-client.mts";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 // --baseten routes to Baseten (BASETEN_META_API_KEY); default Fireworks (FIREWORKS_API_KEY). Keys never printed.
 if (process.argv.includes("--baseten")) process.env.LOTFIT_PROVIDER = "baseten";
+else process.env.LOTFIT_PROVIDER = "fireworks";
 const KEY = process.env.LOTFIT_PROVIDER === "baseten" ? "BASETEN_META_API_KEY" : "FIREWORKS_API_KEY";
 if (!process.env[KEY]) {
   const f = join(ROOT, ".env.local");

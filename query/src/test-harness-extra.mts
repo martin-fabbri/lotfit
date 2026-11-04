@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { checkCase } from "./case-gate.mts";
 import { compileTrace } from "./compile-trace.mts";
 import { makeUuid7 } from "./events.mts";
@@ -180,9 +180,30 @@ if (localHasKeys) {
     `status=${baseten.status} ${baseten.out.slice(0, 160)}`);
 }
 const FAKE = "fake-test-marker-KEY123";
-const withKey = spawn({ ...scrubbed, FIREWORKS_API_KEY: FAKE }, ["no-such-case-xyz"]);
+// End to end, no network: the child imports the real run-live (a bad case name stops it at the case
+// read, past the key block), then builds the default model client run-live would build.
+const childScript = [
+  `process.argv.splice(1, 0, "run-live.mts");`,
+  `try { await import(${JSON.stringify(pathToFileURL(RUN_LIVE).href)}); console.error("UNEXPECTED_SUCCESS"); process.exit(2); }`,
+  `catch (e) { const m = String((e && e.message) || e);`,
+  `  if (!/no-such-case-xyz/.test(m)) { console.error("UNEXPECTED " + m.slice(0, 200)); process.exit(2); } }`,
+  `const { BasetenModelClient } = await import(${JSON.stringify(pathToFileURL(path.join(ROOT, "query", "src", "model-client.mts")).href)});`,
+  `const c = new BasetenModelClient();`,
+  `console.log("MODELID=" + c.modelId);`,
+  `console.log("ROUTE=" + c.providerRoute);`,
+].join("\n");
+let withKey: { status: number | null; out: string };
+try {
+  const out = execFileSync(process.execPath, ["--input-type=module", "-e", childScript, "no-such-case-xyz"],
+    { env: { ...scrubbed, FIREWORKS_API_KEY: FAKE } as Record<string, string>, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  withKey = { status: 0, out: String(out) };
+} catch (e: any) {
+  withKey = { status: e.status ?? 1, out: String(e.stderr ?? "") + String(e.stdout ?? "") + String(e.message ?? "") };
+}
 ok("run-live: with FIREWORKS_API_KEY set it chooses Fireworks",
-  /no-such-case-xyz/.test(withKey.out) && !/FIREWORKS_API_KEY not found/.test(withKey.out), withKey.out.slice(0, 200));
+  withKey.status === 0 && !/FIREWORKS_API_KEY not found/.test(withKey.out) &&
+  withKey.out.includes("MODELID=accounts/fireworks/models/muse-spark-open") &&
+  withKey.out.includes("ROUTE=https://api.fireworks.ai/inference/v1"), withKey.out.slice(0, 300));
 ok("run-live: the key is never printed", !withKey.out.includes(FAKE));
 
 // The four demo cases pass the Case check; a scripted run on the scanline case reports and traces.
