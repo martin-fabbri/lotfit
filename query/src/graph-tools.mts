@@ -162,7 +162,7 @@ export async function readRuleFamily(g: Graph, args: { provision_ids: string[]; 
     CALL (v) { OPTIONAL MATCH (v)-[:HAS_TABLE_CELL]->(tc:TableCell)
                RETURN collect(DISTINCT {id: tc.id, table: tc.table, row: tc.row, column: tc.column, cell: tc.cell}) AS cells }
     CALL (v) { OPTIONAL MATCH (v)-[:HAS_CLAUSE]->(c:Clause) WITH c ORDER BY c.span_start
-               RETURN collect({id: c.id, kind: c.kind, quote: c.quote, status: c.status, guards: c.guards_json}) AS clauses }
+               RETURN collect({id: c.id, kind: c.kind, quote: c.quote, status: c.status, guards: c.guards_json, needs: c.needs}) AS clauses }
     CALL (v) { OPTIONAL MATCH (v)-[:HAS_READING]->(rd:Reading) OPTIONAL MATCH (ge:GrayAreaEffect)-[:EFFECT_OF]->(rd)
                RETURN collect(DISTINCT {ge: ge.id, phrase: rd.phrase, readings: rd.readings, settled_by: ge.settled_by, effects: ge.effects_json}) AS readings }
     CALL (p) { OPTIONAL MATCH (o:Operator)-[:MODELS]->(p) OPTIONAL MATCH (o)-[:RUNS_TOOL]->(t:Tool)
