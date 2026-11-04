@@ -1,0 +1,400 @@
+{
+  "beats": [
+    {
+      "id": "b1",
+      "kind": "establish",
+      "refs": [
+        "house"
+      ]
+    },
+    {
+      "id": "b2",
+      "kind": "constrain",
+      "refs": [
+        "EUG.T9.2740",
+        "EUG.9.2741.3",
+        "EUG.9.2751.17.a.1",
+        "EUG.9.2751.17.b.4.a.setback",
+        "EUG.T9.2750"
+      ]
+    },
+    {
+      "id": "b3",
+      "kind": "height",
+      "refs": [
+        "EUG.9.2751.17.b.4.a.slope"
+      ]
+    },
+    {
+      "id": "b4",
+      "kind": "envelope",
+      "refs": [
+        "EUG.T9.2740",
+        "EUG.9.2741.3",
+        "EUG.9.2751.17.a.1",
+        "EUG.9.2751.17.b.4.a.slope",
+        "EUG.9.2751.17.b.4.a.setback",
+        "EUG.T9.2750"
+      ]
+    },
+    {
+      "id": "b5",
+      "kind": "place",
+      "refs": [
+        "client_spot"
+      ]
+    },
+    {
+      "id": "b6",
+      "kind": "summary",
+      "refs": [
+        "EUG.T9.2740",
+        "EUG.9.2741.3",
+        "EUG.9.2751.17.a.1",
+        "EUG.9.2751.17.b.4.a.slope",
+        "EUG.9.2751.17.b.4.a.setback",
+        "EUG.T9.2750",
+        "client_spot"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "kind": "gate",
+      "measures": [],
+      "outcome": "unknown",
+      "provision_id": "EUG.T9.2740",
+      "unit": null,
+      "value": null,
+      "zone": null
+    },
+    {
+      "kind": "gate",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_accessory_dwellings_per_dwelling",
+            "provision_id": "EUG.9.2741.3",
+            "unit": "count",
+            "value": 1
+          },
+          "margin": 0,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "count",
+          "value": 1
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "EUG.9.2741.3",
+      "unit": "count",
+      "value": 1,
+      "zone": null
+    },
+    {
+      "kind": "plan_constraint",
+      "measures": [
+        {
+          "details": {
+            "binding": "share",
+            "cap_sqft": 800,
+            "share_sqft": 682.72484
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_sqft = min(max_share_of_lot_area × primary, max_building_sqft)",
+            "provision_id": "EUG.9.2751.17.a.1",
+            "unit": "sqft",
+            "value": 682.72484
+          },
+          "margin": 106.72484,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "sqft",
+          "value": 576
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "EUG.9.2751.17.a.1",
+      "unit": "sqft",
+      "value": 576,
+      "zone": null
+    },
+    {
+      "kind": "plan_constraint",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "max_height",
+            "provision_id": "EUG.9.2751.17.b.4.a.slope",
+            "unit": "ft",
+            "value": 25
+          },
+          "margin": 10,
+          "pass": true,
+          "tolerance": 0,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 15
+        }
+      ],
+      "outcome": "unknown",
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "unit": "ft",
+      "value": 15,
+      "zone": null
+    },
+    {
+      "kind": "placement_constraint",
+      "measures": [
+        {
+          "dimension_to_tape": "distance to the nearest lot line",
+          "limit": {
+            "param": "min_interior_setback",
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 1.36,
+          "pass": null,
+          "tolerance": 3,
+          "too_close_to_call": true,
+          "unit": "ft",
+          "value": 6.36
+        },
+        {
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 20,
+                "margin_ft": 15
+              },
+              {
+                "distance_ft": 20.19,
+                "margin_ft": 15.19
+              }
+            ]
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "min_interior_setback",
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 15,
+          "pass": true,
+          "tolerance": 3,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 20
+        }
+      ],
+      "outcome": "too_close_to_call",
+      "provision_id": "EUG.9.2751.17.b.4.a.setback",
+      "unit": "ft",
+      "value": 6.36,
+      "zone": null
+    },
+    {
+      "kind": "placement_constraint",
+      "measures": [
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "front_yard_setback_excluding_garages_and.R-1",
+            "provision_id": "EUG.T9.2750",
+            "unit": "ft",
+            "value": 10
+          },
+          "margin": 66,
+          "pass": true,
+          "tolerance": 3,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 76
+        }
+      ],
+      "outcome": "pass",
+      "provision_id": "EUG.T9.2750",
+      "unit": "ft",
+      "value": 76,
+      "zone": null
+    }
+  ],
+  "frame": {
+    "origin": "front-left",
+    "three": {
+      "X": "x",
+      "Y": "z",
+      "Z": "-y"
+    },
+    "units": "ft",
+    "x": "along the front lot line",
+    "y": "to the rear",
+    "z": "up"
+  },
+  "options": [
+    {
+      "id": "client_spot",
+      "margins": [
+        {
+          "dimension_to_tape": "distance to the nearest lot line",
+          "limit": {
+            "param": "min_interior_setback",
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 1.36,
+          "pass": null,
+          "tolerance": 3,
+          "too_close_to_call": true,
+          "unit": "ft",
+          "value": 6.36
+        },
+        {
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 20,
+                "margin_ft": 15
+              },
+              {
+                "distance_ft": 20.19,
+                "margin_ft": 15.19
+              }
+            ]
+          },
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "min_interior_setback",
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "unit": "ft",
+            "value": 5
+          },
+          "margin": 15,
+          "pass": true,
+          "tolerance": 3,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 20
+        },
+        {
+          "dimension_to_tape": null,
+          "limit": {
+            "param": "front_yard_setback_excluding_garages_and.R-1",
+            "provision_id": "EUG.T9.2750",
+            "unit": "ft",
+            "value": 10
+          },
+          "margin": 66,
+          "pass": true,
+          "tolerance": 3,
+          "too_close_to_call": false,
+          "unit": "ft",
+          "value": 76
+        }
+      ],
+      "outline": [
+        [
+          20,
+          76
+        ],
+        [
+          44,
+          76
+        ],
+        [
+          44,
+          100
+        ],
+        [
+          20,
+          100
+        ]
+      ],
+      "placement": {
+        "rotation": 0,
+        "x": 20,
+        "y": 76
+      },
+      "status": "conditional",
+      "why": [
+        "EUG.9.2751.17.b.4.a.setback [too_close_to_call]: 6.36 ft vs limit 5 ft (min_interior_setback), margin +1.36 ft; 20 ft vs limit 5 ft (min_interior_setback), margin +15 ft",
+        "EUG.T9.2750 [pass]: 76 ft vs limit 10 ft (front_yard_setback_excluding_garages_and.R-1), margin +66 ft"
+      ]
+    }
+  ],
+  "report_sha256": "c4e0c018a9886ff24fd1ffe31e6ccc6656a1019d420e0b162b568d5d296e917e",
+  "schema": "buildnexus.decision-trace/1",
+  "site": {
+    "existing": [
+      {
+        "height_ft": null,
+        "id": "house",
+        "kind": "house",
+        "outline": [
+          [
+            60.8,
+            16.11
+          ],
+          [
+            29.33,
+            16.32
+          ],
+          [
+            29.37,
+            22.31
+          ],
+          [
+            4.68,
+            22.47
+          ],
+          [
+            5.03,
+            75.2
+          ],
+          [
+            61.23,
+            74.83
+          ],
+          [
+            60.88,
+            22.1
+          ],
+          [
+            60.84,
+            22.1
+          ]
+        ]
+      }
+    ],
+    "lot": [
+      [
+        0,
+        0
+      ],
+      [
+        64.19,
+        0
+      ],
+      [
+        64.19,
+        106.36
+      ],
+      [
+        0,
+        106.36
+      ]
+    ],
+    "north_deg": null,
+    "north_uncertainty_deg": null
+  }
+}

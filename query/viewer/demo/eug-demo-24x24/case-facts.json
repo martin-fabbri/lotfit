@@ -1,0 +1,96 @@
+{
+  "facts": {
+    "site.zone": "R-1",
+    "site.lot_outline": {
+      "handle": {
+        "fact": "site.lot_outline"
+      }
+    },
+    "site.front_lot_line": {
+      "handle": {
+        "fact": "site.front_lot_line"
+      }
+    },
+    "site.rear_lot_line": {
+      "handle": {
+        "fact": "site.rear_lot_line"
+      }
+    },
+    "site.side_lot_lines": {
+      "handle": {
+        "fact": "site.side_lot_lines"
+      }
+    },
+    "site.house_outline": {
+      "handle": {
+        "fact": "site.house_outline"
+      }
+    },
+    "site.structures": {
+      "handle": {
+        "fact": "site.structures"
+      }
+    },
+    "site.lot_area_sqft": 6827.2484,
+    "site.house_rear_wall": [
+      [
+        5.03,
+        75.2
+      ],
+      [
+        61.23,
+        74.83
+      ]
+    ],
+    "plan.footprint": [
+      [
+        0,
+        0
+      ],
+      [
+        24,
+        0
+      ],
+      [
+        24,
+        24
+      ],
+      [
+        0,
+        24
+      ]
+    ],
+    "plan.placement": {
+      "x": 20,
+      "y": 76,
+      "rotation": 0
+    },
+    "plan.height_ft": 15,
+    "plan.total_building_sqft": 576,
+    "plan.outline": [
+      [
+        20,
+        76
+      ],
+      [
+        44,
+        76
+      ],
+      [
+        44,
+        100
+      ],
+      [
+        20,
+        100
+      ]
+    ],
+    "site.trees": null
+  },
+  "unknowns": [
+    {
+      "fact": "site.trees",
+      "reason": "trees in the backyard are not surveyed yet (walk pending)"
+    }
+  ]
+}
