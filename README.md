@@ -188,8 +188,8 @@ LotFit's planner step is distilled into Muse Glimmer 30B (open weights) with LoR
 Fireworks serverless, trained only on runs the deterministic Judge accepted — 1,032 rows
 from 24 verified runs — and scored by code on 2 held-out cases. Today's planner (Muse
 Spark Open) reproduces the verified applies sets at F1 0.952 (decision accuracy 0.725)
-on the hold-outs; the tuned Glimmer is training now. See
-[docs/post-training.md](docs/post-training.md).
+on the hold-outs; the tuned Glimmer answers unseen decisions at 0.900 (base 0.000).
+See [docs/post-training.md](docs/post-training.md).
 
 ## Repository
 
