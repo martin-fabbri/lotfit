@@ -6,7 +6,7 @@ deterministic Judge accepted. Base and tuned are scored by code on the same held
 
 ## What and where
 
-- Base model: `accounts/fireworks/models/muse-glimmer-30b`, LoRA (rank 16, alpha 32), 3 epochs.
+- Base model: `accounts/fireworks/models/muse-glimmer-30b`, LoRA (rank 8, alpha 32), 1 epoch, batch 16.
 - Platform: Fireworks serverless training (`muse_glimmer_starter`, `--max-seq-len 8192`).
 - Tuned model: `accounts/martin-fabbri-a-c4b16b/models/lotfit-planner-glimmer-v1`
   (served on an on-demand deployment for evaluation, deleted after).
