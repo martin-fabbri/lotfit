@@ -181,6 +181,139 @@ export function resetFactRegistry(path: string = DEFAULT_FACTS_PATH): void {
   factsCache = null;
 }
 
+export interface ItemInputs {
+  events: Iterable<LotFitEvent>;                 // the run's events (C6)
+  index: Map<string, IndexEntry>;                // provision_id → index entry (C2)
+  ruleFamilies: Map<string, RuleFamily>;         // provision_id → rule family (C2)
+  kase: Record<string, any>;                     // the case (C1), read through factStatus (RVS-05)
+  run: { thread_id: string; graph_load_id: string; config_hash: string; as_of: string };
+  rubric: Rubric;                                // RVS-03
+}
+
+export function buildReviewItems(inp: ItemInputs): ReviewItem[] {
+  const byProv = new Map<string, Extract<LotFitEvent, { type: "lotfit.exclusion_recorded" }>>();
+  for (const ev of inp.events) {
+    if (ev.type !== "lotfit.exclusion_recorded") continue;
+    byProv.set(ev.data.provision_id, ev);
+  }
+  const kind = projectKindOf(inp.kase);
+  const items: ReviewItem[] = [];
+  for (const ev of byProv.values()) {
+    if (ev.data.basis !== "planner_reading") continue;
+    const e = inp.index.get(ev.data.provision_id);
+    if (!e) continue;
+    if (!inp.rubric.reviewed_stages.has(e.evaluation_stage)) continue;
+    const rf = inp.ruleFamilies.get(e.provision_id);
+    if (!rf) {
+      throw new Error(`no rule family for ${e.provision_id}: the review cannot read the rule (D5)`);
+    }
+    const allText = rf.clauses.filter((c) => c.quote.trim() !== "");
+    const text = allText.slice(0, 30).map((c) => ({ clause_id: c.clause_id, quote: c.quote }));
+    const scopeClause = rf.clauses.find((c) => c.clause_id === ev.data.scope_clause_id);
+    const d = scopeClause?.disposition;
+    const relied =
+      d !== null && d !== undefined && d.kind === "inert_for" && (d.scope === undefined || d.scope === kind)
+        ? [{ clause_id: scopeClause!.clause_id, disposition: d }]
+        : [];
+    const guardFacts = new Set<string>();
+    for (const c of rf.clauses) {
+      for (const g of c.guards) {
+        guardFacts.add(g.fact);
+      }
+    }
+    const registry = registeredFacts();
+    const ruleFacts = new Set<string>(guardFacts);
+    for (const c of rf.clauses) {
+      for (const name of c.needs ?? []) {
+        if (registry.has(name)) ruleFacts.add(name);
+      }
+    }
+    const byHandle = (name: string): { fact: string; status: FactStatus; value?: unknown } => {
+      const st = factStatus(inp.kase, name);
+      if (st.value === undefined || isScalarish(st.value)) {
+        return { fact: name, ...st };
+      }
+      return { fact: name, status: st.status };
+    };
+    const map = new Map<string, { fact: string; status: FactStatus; value?: unknown }>();
+    for (const name of ruleFacts) {
+      if (!map.has(name)) map.set(name, byHandle(name));
+    }
+    for (const scope of ["site", "plan"] as const) {
+      const bag: Record<string, unknown> = inp.kase[scope] ?? {};
+      for (const k of Object.keys(bag)) {
+        const name = `${scope}.${k}`;
+        if (!map.has(name)) map.set(name, byHandle(name));
+      }
+    }
+    for (const u of inp.kase.unknowns ?? []) {
+      if (!map.has(u.fact)) map.set(u.fact, { fact: u.fact, status: "unknown" });
+    }
+    const body: Record<string, unknown> = {
+      schema: "lotfit.review-item/1",
+      run: inp.run,
+      provision: {
+        provision_id: e.provision_id,
+        title: e.title,
+        section: e.section,
+        type: e.type,
+        evaluation_stage: e.evaluation_stage,
+        zones: e.scope.applies_to_zones,
+        project_kinds: e.scope.project_kinds,
+      },
+      scope: { clause_id: ev.data.scope_clause_id, quote: e.scope.scope_quote },
+      text,
+      exclusion: { basis: ev.data.basis, planner_quote: ev.data.scope_quote },
+      text_truncated: allText.length > 30,
+      rule_facts: [...ruleFacts].sort(),
+      ...(relied.length > 0 ? { dispositions_relied_on: relied } : {}),
+      case_facts: [...map.values()].sort((a, b) => a.fact.localeCompare(b.fact)),
+      rubric: { id: inp.rubric.id, version: inp.rubric.version, sha256: inp.rubric.sha256 },
+    };
+    const item_sha256 = sha256Hex(canonicalJson(body));
+    items.push(C.ReviewItem.parse({ ...body, item_sha256 }));
+  }
+  return items;
+}
+
+export function renderItem(item: ReviewItem): string {
+  const p = item.provision;
+  const lines: string[] = [];
+  lines.push(`item_sha256: ${item.item_sha256}`);
+  lines.push(`Rule: ${p.provision_id} — ${p.title} (section ${p.section ?? "n/a"}; stage ${p.evaluation_stage}; zones ${p.zones.join(", ") || "not stated"})`);
+  lines.push(`Scope sentence (${item.scope.clause_id}): "${item.scope.quote}"`);
+  lines.push(`The analyst excluded it, quoting: "${item.exclusion.planner_quote}"`);
+  lines.push(`Rule text:`);
+  for (const t of item.text) {
+    lines.push(`  [${t.clause_id}] ${t.quote}`);
+  }
+  const relied = item.dispositions_relied_on ?? [];
+  if (relied.length > 0) {
+    const list = relied
+      .map((r) =>
+        r.disposition.scope !== undefined ? `${r.disposition.kind} (${r.disposition.scope})` : r.disposition.kind,
+      )
+      .join("; ");
+    lines.push(`Signed by a person for the scope clause: ${list}`);
+  }
+  if (item.text_truncated === true) {
+    lines.push(`(The rule text above is cut at 30 clauses.)`);
+  }
+  lines.push(`Lot facts:`);
+  lines.push(
+    item.case_facts
+      .map((f) => {
+        const suffix =
+          f.value !== undefined && f.status !== "true" && f.status !== "false"
+            ? ` (${JSON.stringify(f.value)})`
+            : "";
+        return `- ${f.fact}: ${f.status}${suffix}`;
+      })
+      .join("\n"),
+  );
+  return lines.join("\n");
+}
+
 export function projectKindOf(kase: Kase | undefined): string | null {
   const read = (entry: unknown): unknown =>
     entry !== null && typeof entry === "object" && "value" in entry
