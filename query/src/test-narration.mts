@@ -1,12 +1,12 @@
 // Narration lines and timing (no network): scripted model answers checked, retried, templated;
-// timeline.mjs estimates; voice.mjs refuses without a key.
+// spoken values built in code; timeline.mjs estimates; voice.mjs refuses without a key.
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createScriptedModelClient } from "./model-client.mts";
-import { writeNarration, templateLine, templateData, checkBeat, sectionNumbers } from "./narration.mts";
+import { writeNarration, templateLine, templateSummary, checkBeat, buildSpoken, spokenRef, speakMeasure } from "./narration.mts";
 
 let n = 0, t = 0;
 const ok = (name: string, cond: boolean, detail = "") => { t++; if (cond) n++; console.log(`${cond ? "PASS" : "FAIL"}  ${name}${cond || !detail ? "" : " — " + detail}`); };
@@ -26,14 +26,40 @@ const report = {
       citations: [{ quote: "The unit may be at most 800 square feet." }] },
   ],
 };
+const spoken = buildSpoken(trace, report);
+const refsOf = (id: string): string[] => trace.beats.find((b: any) => b.id === id).refs ?? [];
+const kindOf = (id: string): string => trace.beats.find((b: any) => b.id === id).kind;
+const sentences = (text: string): string[] => text.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
+
+ok("spoken_ref for EUG, PDX, ORS and table ids",
+  spokenRef("EUG.9.2751.17.a.1") === "Eugene code 9.2751, 17 a 1" &&
+  spokenRef("EUG.T9.2750") === "Eugene table 9.2750" &&
+  spokenRef("PDX.33.110.220.a") === "Portland code 33.110, 220 a" &&
+  spokenRef("ORS.197.312.5") === "Oregon code 197.312, 5",
+  [spokenRef("EUG.9.2751.17.a.1"), spokenRef("EUG.T9.2750"), spokenRef("PDX.33.110.220.a"), spokenRef("ORS.197.312.5")].join(" | "));
+ok("rounded measures say about, exact ones do not",
+  speakMeasure(682.72484, "sqft") === "about 683 square feet" &&
+  speakMeasure(6.36, "ft") === "about 6.4 feet" &&
+  speakMeasure(576, "sqft") === "576 square feet" &&
+  speakMeasure(1, "count") === "1 unit",
+  [speakMeasure(682.72484, "sqft"), speakMeasure(6.36, "ft")].join(" | "));
+ok("a line with 682.72484 is refused",
+  !checkBeat("Eugene code 9.2751, 17 a 1 measures 682.72484 square feet and passes.", refsOf("b2"), kindOf("b2"), spoken).ok);
+
 const J = (beats: Array<{ id: string; chapter: string; text: string }>) => JSON.stringify({ beats });
 const clean: Array<{ id: string; chapter: string; text: string }> = [
-  { id: "b1", chapter: "The lot", text: "The lot measures 64.19 by 106.36 feet, with the house on it." },
-  { id: "b2", chapter: "Setback rules", text: "Eugene code 9.2751, section 17: the setback measures 6.36 feet against a limit of 5 feet, too close to call." },
-  { id: "b3", chapter: "Height cap", text: "Eugene code 9.2751, section 17 is not measured yet." },
-  { id: "b4", chapter: "The envelope", text: "Eugene code 9.2741 passes with 1 dwelling." },
+  { id: "b1", chapter: "The lot", text: "The lot measures about 64.2 feet by about 106.4 feet, with the house on it." },
+  { id: "b2", chapter: "The rules", text: [
+    "Eugene table 9.2740 isn't measured yet.",
+    "Eugene code 9.2741, 3 (1 unit) passes.",
+    "Eugene code 9.2751, 17 a 1 (576 square feet vs 800 square feet) passes.",
+    "Eugene code 9.2751, 17 b 4 a setback (6.4 feet vs 5 feet) is too close to call with the scan, so it gets taped.",
+    "Eugene table 9.2750 (76 feet) passes.",
+  ].join(" ") },
+  { id: "b3", chapter: "Height cap", text: "Eugene code 9.2751, 17 b 4 a slope (15 feet) isn't measured yet." },
+  { id: "b4", chapter: "The space", text: "Inside setbacks of 5 feet, space is left to build in." },
   { id: "b5", chapter: "The spot", text: "The unit goes at the client spot, 20 feet from the left and 76 feet back." },
-  { id: "b6", chapter: "The answer", text: "It needs a check." },
+  { id: "b6", chapter: "The answer", text: "It needs a check. Still open: Eugene code 9.2751, 17 b 4 a setback." },
 ];
 const scripted = (answers: string[]) => createScriptedModelClient((_req, i) => ({ content: answers[Math.min(i, answers.length - 1)]! }));
 
@@ -44,7 +70,7 @@ ok("clean answer passes, one entry per beat, same ids and order",
   r0.beats.every((b, i) => b.id === trace.beats[i].id && b.source === "model"),
   r0.beats.map((b) => `${b.id}:${b.source}`).join(","));
 
-const badNum = clean.map((b) => (b.id === "b2" ? { ...b, text: b.text.replace("6.36 feet", "7.5 feet") } : b));
+const badNum = clean.map((b) => (b.id === "b2" ? { ...b, text: b.text.replace("6.4 feet", "7.5 feet") } : b));
 const c1 = scripted([J(badNum), J(badNum)]);
 const r1 = await writeNarration(trace, report, c1);
 const t1 = r1.beats.find((b) => b.id === "b2")!;
@@ -65,26 +91,46 @@ const c3 = scripted([J(badSum), J(clean)]);
 const r3 = await writeNarration(trace, report, c3);
 const t3 = r3.beats.find((b) => b.id === "b6")!;
 ok("fits for NEEDS_CHECK is refused, retry accepted",
-  c3.recordedRequests.length === 2 && t3.source === "model" && t3.text === "It needs a check.", `${t3.source}: ${t3.text}`);
+  c3.recordedRequests.length === 2 && t3.source === "model" && t3.text.startsWith("It needs a check."), `${t3.source}: ${t3.text}`);
 
-const data = templateData(trace, report);
-const pool = new Set<number>();
-{
-  const walk = (x: unknown): void => {
-    if (typeof x === "number" && isFinite(x)) pool.add(Math.round(x * 100) / 100);
-    else if (Array.isArray(x)) x.forEach(walk);
-    else if (x && typeof x === "object") Object.values(x).forEach(walk);
-  };
-  walk(trace); walk(report);
-}
+const b2 = trace.beats.find((b: any) => b.id === "b2");
+const b2tpl = templateLine({ id: "b2", kind: b2.kind, refs: b2.refs ?? [] }, spoken);
+const b2sent = sentences(b2tpl.text);
+ok("constrain beat with 5 refs gives 5 sentences in order, each under 25 words",
+  b2sent.length === 5 &&
+  b2sent.every((s, i) => s.includes(spoken.provisions.get(b2.refs[i])!.ref)) &&
+  b2sent.every((s) => s.split(/\s+/).length <= 25),
+  b2tpl.text);
+ok("template has no bare pass after a number",
+  ![...trace.beats.map((b: any) => templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken).text)]
+    .some((text) => /[\d)]\s+pass\b/i.test(text)));
+
 const tplFails: string[] = [];
 for (const b of trace.beats) {
-  const refs = (b.refs ?? []).filter((r: string) => /^[A-Z]{2,}\./.test(r));
-  const tpl = templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, data);
-  const chk = checkBeat(tpl.text, refs, b.kind, pool, sectionNumbers(refs), report.verdict);
+  const tpl = b.kind === "summary"
+    ? { chapter: "The answer", text: templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken) }
+    : templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken);
+  const chk = checkBeat(tpl.text, b.refs ?? [], b.kind, spoken);
   if (!chk.ok) tplFails.push(`${b.id}: ${chk.reasons.join("; ")}`);
 }
 ok("template lines alone pass the number check for every beat", tplFails.length === 0, tplFails.join(" | "));
+
+const allSent: Array<{ beat: string; s: string }> = [];
+for (const b of trace.beats) {
+  const tpl = b.kind === "summary"
+    ? templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken)
+    : templateLine({ id: b.id, kind: b.kind, refs: b.refs ?? [] }, spoken).text;
+  for (const s of sentences(tpl)) allSent.push({ beat: b.id, s: s.toLowerCase() });
+}
+const dup = allSent.find((a, i) => allSent.findIndex((b) => b.s === a.s) !== i && allSent.find((b) => b.s === a.s)!.beat !== a.beat);
+ok("no beat repeats another beat's sentence", dup === undefined, dup ? `${dup.beat}: ${dup.s}` : "");
+
+const env = templateLine({ id: "b4", kind: "envelope", refs: refsOf("b4") }, spoken);
+ok("envelope is one sentence with no rule list",
+  sentences(env.text).length === 1 && !/Eugene|Portland|Oregon|code|table/i.test(env.text), env.text);
+const sum = templateSummary(["EUG.9.2751.17.b.4.a.setback", "EUG.9.2751.17.b.4.a.slope"], spoken);
+ok("summary matches the verdict in at most 35 words",
+  /^It needs a check\./.test(sum) && sum.split(/\s+/).length <= 35, sum);
 
 const tmp = mkdtempSync(path.join(tmpdir(), "lotfit-narration-"));
 writeFileSync(path.join(tmp, "trace.json"), JSON.stringify(trace));
