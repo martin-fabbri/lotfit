@@ -1,3 +1,7 @@
+<h2 align="center">🏆 Our entry to the Meta Global AI Developer Hackathon</h2>
+<p align="center"><b>Hosted by Meta · run by Cerebral Valley · inference partners Fireworks, Baseten and Modal</b><br>
+Indie Developer track · build period October 27 – November 4, 2026</p>
+
 <p align="center">
   <img src="docs/assets/lotfit-banner.svg" alt="LotFit: does it fit? Every number traced to its code clause." width="100%">
 </p>
@@ -14,8 +18,13 @@
 
 ---
 
-Everything in this repository was built during the hackathon. Yardstick, our open-source capture tool, was also built
-this week, as a separate repo.
+> [!IMPORTANT]
+> **This repository is a hackathon entry.** LotFit is our submission to the **Meta Global AI Developer Hackathon**,
+> hosted by **Meta** and run by **Cerebral Valley**, with inference partners **Fireworks**, **Baseten** and
+> **Modal**. Indie Developer track · build period October 27 – November 4, 2026.
+>
+> Everything in this repository was built during the hackathon. Yardstick, our open-source capture tool, was also
+> built this week, as a separate repo.
 
 ## The problem
 
@@ -186,6 +195,17 @@ query/viewer/     run viewer (with a real run)
 query/player/     3D walkthrough and narration pipeline
 docs/             the deep dives
 ```
+
+## Hackathon entry
+
+| | |
+|---|---|
+| Event | **Meta Global AI Developer Hackathon**, hosted by Meta, run by Cerebral Valley |
+| Track | Indie Developer |
+| Build period | October 27 – November 4, 2026 |
+| Meta models used | Muse Spark Open (planner, narration) · Muse Spark 1.3 (reviewer) · Muse Code (every line of code here) |
+| Inference partner used | Fireworks (Muse Spark Open); Baseten supported with `--baseten` |
+| Built this week | everything in this repository; Yardstick (capture) as a separate repo |
 
 ## Team
 
