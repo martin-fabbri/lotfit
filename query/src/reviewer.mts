@@ -444,3 +444,112 @@ export function judgeAnswer(raw: string, item: ReviewItem, kase: Record<string, 
     warnings,
   };
 }
+
+export interface ReviewOptions {
+  items: ReviewItem[];
+  client: ReviewerClient | null;
+  plannerModel: string;                 // the Planner's modelId, for the different-model rule
+  verdict: z.infer<typeof C.Verdict>;   // the final report's verdict
+  kase: Record<string, any>;
+  rubric: Rubric;
+  timeoutMs?: number;                   // per call; default 20_000
+  deadlineMs?: number;                  // the whole review; default 60_000
+}
+
+export interface ReviewResult {
+  outcome: ReviewOutcome;               // C.ReviewOutcome, parsed
+  calls: Array<{ item: ReviewItem; content: string; usage: UsageRecord }>;  // replies that arrived, in arrival order
+}
+
+export async function review(o: ReviewOptions): Promise<ReviewResult> {
+  const rub = { id: o.rubric.id, version: o.rubric.version, sha256: o.rubric.sha256 };
+  const notRun = (
+    category: string,
+    message: string,
+    usage: UsageRecord[] = [],
+    rejected: Rejected[] = [],
+    warnings: ReviewOutcome["warnings"] = [],
+    calls: ReviewResult["calls"] = [],
+  ): ReviewResult => ({
+    outcome: C.ReviewOutcome.parse({
+      status: "not_run", answered: 0, warnings, model: o.client?.modelId ?? "none",
+      rubric: rub, items: o.items.length, flags: [], sound: [], unclear: [], rejected, hold: false,
+      error: { category, message }, usage,
+    }),
+    calls,
+  });
+  if (o.client === null) {
+    return notRun("harness", "no Reviewer configured for this run");
+  }
+  const client = o.client;
+  if (canonicalModel(client.modelId) === canonicalModel(o.plannerModel)) {
+    return notRun("harness", `the Reviewer must be a different model from the Planner (B4): both are ${canonicalModel(o.plannerModel)}`);
+  }
+  const timeoutMs = o.timeoutMs ?? 20_000;
+  const deadline = Date.now() + (o.deadlineMs ?? 60_000);
+  const calls: ReviewResult["calls"] = [];
+  const withDeadline = <T,>(p: Promise<T>): Promise<T> => {
+    const left = deadline - Date.now();
+    if (left <= 0) return Promise.reject(new Error("review deadline reached"));
+    p.catch(() => {});
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error("review deadline reached")), Math.min(left, timeoutMs + 1000));
+    });
+    return Promise.race([p, timeout]).finally(() => {
+      if (timer !== undefined) clearTimeout(timer);
+    });
+  };
+  const results: Judged[] = await Promise.all(o.items.map(async (item): Promise<Judged> => {
+    const pid = item.provision.provision_id;
+    const user = renderItem(item);
+    const earlier: Rejected[] = [];
+    const warnings: string[] = [];
+    let last: Judged = { rejected: [] };
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const msg = attempt === 1 || last.rejected.length === 0
+        ? user
+        : `${user}\n\nYour previous reply was not valid: ${last.rejected.map((r) => r.detail ?? r.reason).join("; ")}. Reply with the JSON object only.`;
+      let reply: ReviewerReply;
+      try {
+        reply = await withDeadline(client.answer({ item, system: o.rubric.system, user: msg, timeoutMs }));
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        const r: Rejected = { provision_id: pid, raw: null, reason: "no_answer", detail: message.slice(0, 300) };
+        if (attempt === 1 && !/deadline/.test(r.detail ?? "")) {
+          earlier.push(r);
+          last = { rejected: [] };
+          continue;
+        }
+        return { rejected: [...earlier, r], warnings };
+      }
+      calls.push({ item, content: reply.content, usage: reply.usage });
+      last = judgeAnswer(reply.content, item, o.kase, o.rubric);
+      warnings.push(...(last.warnings ?? []));
+      const answeredThis = last.flag !== undefined || last.sound !== undefined || last.unclear !== undefined;
+      const retryable = !answeredThis && last.rejected.some((x) => x.reason === "bad_schema");
+      if (!retryable) {
+        return { ...last, rejected: [...earlier, ...last.rejected], warnings };
+      }
+      earlier.push(...last.rejected);
+    }
+    return { ...last, rejected: [...earlier.filter((r) => !last.rejected.includes(r)), ...last.rejected], warnings };
+  }));
+  const usage = calls.map((c) => c.usage);
+  const rejected = results.flatMap((r) => r.rejected);
+  const warnings = results.flatMap((r, i) => (r.warnings ?? []).map((detail) => ({ provision_id: o.items[i]!.provision.provision_id, detail })));
+  const answered = results.filter((r) => r.flag !== undefined || r.sound !== undefined || r.unclear !== undefined).length;
+  if (o.items.length > 0 && answered === 0) {
+    const why = results.every((r) => r.rejected.some((x) => x.reason === "no_answer")) ? "no answer" : "no accepted answer";
+    return notRun("model", `${why} for any of ${o.items.length} item(s): ${rejected[rejected.length - 1]?.detail ?? rejected[0]?.reason ?? "provider error"}`, usage, rejected, warnings, calls);
+  }
+  const flags = results.flatMap((r) => (r.flag ? [r.flag] : []));
+  const hold = (o.verdict === "FITS" || o.verdict === "FITS_IF") && flags.some((f) => f.severity === "high" && f.confirmed && f.route === "hold_if_fits");
+  const status = answered < o.items.length ? "partial" : flags.length > 0 ? "flagged" : "clean";
+  const sound = results.flatMap((r) => (r.sound ? [r.sound] : []));
+  const unclear = results.flatMap((r) => (r.unclear ? [r.unclear] : []));
+  const error = status === "partial"
+    ? { category: "model", message: `${o.items.length - answered} of ${o.items.length} item(s) have no accepted answer` }
+    : null;
+  return { calls, outcome: C.ReviewOutcome.parse({ status, answered, warnings, model: client.modelId, rubric: rub, items: o.items.length, flags, sound, unclear, rejected, hold, error, usage }) };
+}
