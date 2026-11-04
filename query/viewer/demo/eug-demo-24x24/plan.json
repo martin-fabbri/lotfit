@@ -1,0 +1,289 @@
+{
+  "index_hash": "61f2b808f7702a8cab9bda1ed9101b9c54fcd1573e99121b0130aa660efff84f",
+  "applies": [
+    {
+      "provision_id": "ORS.197A.425",
+      "scope_quote": "zoned for detached single-unit dwellings",
+      "facts_needed": [
+        "site.zone",
+        "site.zone_family"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "scope_quote": "The vertical distance above a reference datum measured to the highest point of the coping of a flat roof, to the deck line of a mansard roof, or to the average height of the gables of a pitched or hipped roof.",
+      "facts_needed": [
+        "plan.height_ft",
+        "plan.wall_height_ft"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.dwelling-accessory",
+      "scope_quote": "An interior, attached or detached residential structure that is used in connection with or that is accessory to a single-unit dwelling.",
+      "facts_needed": [
+        "plan.kind",
+        "site.zone"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.flag-lot",
+      "scope_quote": "A lot located behind another lot except for a narrow portion extending to the public street which is suitable for vehicular, bicycle and pedestrian access.",
+      "facts_needed": [
+        "site.flag_lot"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.front-lot-line",
+      "scope_quote": "A lot line abutting a public street or in cases of private streets, the front lot line shall be considered to be the boundary of the private street or the access easement for the private street.",
+      "facts_needed": [
+        "site.front_lot_line",
+        "site.lot_outline"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.grade",
+      "scope_quote": "For purposes of determining building height, the grade shall be the lowest point of elevation of the finished surface of the ground, paving, or sidewalk within a five foot horizontal distance of the exterior wall of the building.",
+      "facts_needed": [
+        "site.slope_pct",
+        "plan.height_ft"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.interior-lot-line",
+      "scope_quote": "Any lot or parcel line that is not a front lot line.",
+      "facts_needed": [
+        "site.side_lot_lines",
+        "site.rear_lot_line"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "scope_quote": "That portion of a lot which, when viewed directly from above, would be covered by a building or structure, or any part thereof, except that the following structures or parts of structures shall themselves not be included in calculating lot coverage:",
+      "facts_needed": [
+        "site.lot_area_sqft",
+        "plan.footprint",
+        "site.structures"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "scope_quote": "The lot line that creates the smallest angle with a line drawn east-west and intersecting the northmost point of the lot.",
+      "facts_needed": [
+        "site.lot_outline",
+        "site.rear_lot_line"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "scope_quote": "The part of a building that casts the longest shadow onto the adjacent northern lot(s) when the sun is at an altitude of 22.6 degrees and an azimuth ranging from 30 degrees east and west of true south; except a shadow caused by a narrow object such as a mast or whip antenna, a dish antenna with a diameter of 3 feet or less, a chimney, utility pole or wire.",
+      "facts_needed": [
+        "plan.height_ft",
+        "site.lot_outline"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.3",
+      "scope_quote": "The accessory dwelling and the primary dwelling must share a common wall or ceiling for a minimum length of 8 feet to be considered attached.",
+      "facts_needed": [
+        "plan.detached",
+        "site.house_outline"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.4110",
+      "scope_quote": "This /CAS overlay zone is applied to those lands within the city's jurisdiction that are encompassed by the sectors described in this overlay zone and as indicated in the Eugene overlay zone map.",
+      "facts_needed": [
+        "site.overlays"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2741.3",
+      "scope_quote": "for each detached single-unit dwelling on the same lot",
+      "facts_needed": [
+        "site.zone",
+        "site.zone_family",
+        "plan.accessory_dwellings_on_lot",
+        "plan.kind"
+      ]
+    },
+    {
+      "provision_id": "EUG.T9.2740",
+      "scope_quote": "Table 9.2740 Residential Zone Land Uses and Permit Requirements",
+      "facts_needed": [
+        "site.zone",
+        "plan.kind",
+        "plan.detached"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.1",
+      "scope_quote": "The total building square footage of an accessory dwelling",
+      "facts_needed": [
+        "plan.total_building_sqft",
+        "plan.living_area_sqft",
+        "site.primary_living_area_sqft"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "scope_quote": "In addition, except where the setback is from a property line abutting a public right-of-way or private street, at a point that is 15 feet above finished grade, the setback shall slope at the rate of 10 inches vertically for every 12 inches horizontally away from the property line until a point not to exceed a maximum building height of 25 feet.",
+      "facts_needed": [
+        "site.lot_outline",
+        "site.side_lot_lines",
+        "site.rear_lot_line",
+        "plan.height_ft",
+        "plan.wall_height_ft",
+        "plan.footprint",
+        "plan.placement"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.2",
+      "scope_quote": "A pedestrian walkway shall be provided from the street or alley to the primary entrance of the accessory dwelling.",
+      "facts_needed": [
+        "plan.placement",
+        "site.lot_outline",
+        "plan.footprint"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.3",
+      "scope_quote": "The primary entry to an accessory dwelling shall be defined by a covered or roofed entrance with a minimum roof depth and width of no less than 3 feet.",
+      "facts_needed": [
+        "plan.placement",
+        "plan.footprint"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.setback",
+      "scope_quote": "Except for accessory dwellings on flag lots (see EC 9.2775), the following standards apply:",
+      "facts_needed": [
+        "site.lot_outline",
+        "site.front_lot_line",
+        "site.rear_lot_line",
+        "site.side_lot_lines",
+        "plan.footprint",
+        "plan.placement",
+        "site.flag_lot"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.c",
+      "scope_quote": "The allowances for setback intrusions provided at EC 9.6745(3) do not apply within the setback described in a. or b. above, except that eaves and chimneys are allowed to project into this setback no more than 2 feet.",
+      "facts_needed": [
+        "plan.eave_ft",
+        "site.lot_outline",
+        "plan.footprint"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2795.1",
+      "scope_quote": "all structures on R-1 and R-2 zoned lots, 4000 square feet or greater,\nwith a minimum north-south dimension of 75 feet",
+      "facts_needed": [
+        "site.zone",
+        "site.lot_area_sqft",
+        "site.lot_outline"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "scope_quote": "Buildings shall be setback from the northern property line according to the standards in this section.",
+      "facts_needed": [
+        "site.lot_outline",
+        "plan.footprint",
+        "plan.placement",
+        "plan.height_ft"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "scope_quote": "A building is exempt from the solar setback standards when any of the following conditions exist:",
+      "facts_needed": [
+        "site.lot_outline",
+        "site.trees",
+        "site.slope_pct"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "scope_quote": "no structure shall be erected, altered, or maintained,\nand no vegetation shall be allowed to penetrate the surface heights of the various sectors",
+      "facts_needed": [
+        "site.overlays",
+        "plan.height_ft",
+        "site.lot_outline"
+      ]
+    },
+    {
+      "provision_id": "EUG.T9.2750",
+      "scope_quote": "Table 9.2750 Residential Zone Development Standards",
+      "facts_needed": [
+        "site.zone",
+        "site.lot_area_sqft",
+        "plan.footprint",
+        "plan.height_ft",
+        "site.lot_outline"
+      ]
+    }
+  ],
+  "excluded_at_index": [
+    {
+      "provision_id": "EUG.9.2751.17.a.2",
+      "scope_quote": "For any portion of an attached accessory dwelling"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.4",
+      "scope_quote": "Accessory dwellings on flag lots"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.1",
+      "scope_quote": "For an accessory dwelling located above a garage, up to 800 square feet of unheated garage or other unheated storage space attached to the accessory dwelling is allowed and is not counted in the total building square footage for the accessory dwelling."
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.b",
+      "scope_quote": "located where there is a grade change of 5\nfeet or more"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.c",
+      "scope_quote": "within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association"
+    },
+    {
+      "provision_id": "EUG.9.2751.3.d",
+      "scope_quote": "An additional 7 feet of building height is allowed for roof slopes of 6:12 or steeper in the R-1, R-2, R-3 and R-4 zones, except that this additional building height allowance is not permitted in the R-1 zone for accessory dwellings, accessory buildings or development on alley access lots."
+    },
+    {
+      "provision_id": "EUG.9.2775.5.e.1.a",
+      "scope_quote": "Additional Standards for Accessory Dwellings on Flag Lots"
+    },
+    {
+      "provision_id": "EUG.9.6745.3.a",
+      "scope_quote": "Except as provided in subsection (c) of this section, the following building features may project into the required front yard setback no more than 5 feet and into the required interior yard setback no more than 2 feet; provided, that such projections are at least 8 feet from any building on an adjacent lot:"
+    }
+  ],
+  "order": [
+    "ORS.197A.425",
+    "EUG.9.0500.building-height",
+    "EUG.9.0500.dwelling-accessory",
+    "EUG.9.0500.flag-lot",
+    "EUG.9.0500.front-lot-line",
+    "EUG.9.0500.grade",
+    "EUG.9.0500.interior-lot-line",
+    "EUG.9.0500.lot-coverage",
+    "EUG.9.0500.northern-lot-line",
+    "EUG.9.0500.shade-point",
+    "EUG.9.2751.17.a.3",
+    "EUG.9.4110",
+    "EUG.9.2741.3",
+    "EUG.T9.2740",
+    "EUG.9.2751.17.a.1",
+    "EUG.9.2751.17.b.4.a.slope",
+    "EUG.9.2751.17.b.2",
+    "EUG.9.2751.17.b.3",
+    "EUG.9.2751.17.b.4.a.setback",
+    "EUG.9.2751.17.b.4.c",
+    "EUG.9.2795.1",
+    "EUG.9.2795.2.a",
+    "EUG.9.2795.3",
+    "EUG.9.4130.3",
+    "EUG.T9.2750"
+  ]
+}

@@ -1,0 +1,942 @@
+{
+  "schema": "lotfit.case/1",
+  "case_id": "019a4000-0000-7000-8000-00000000e241",
+  "as_of": {
+    "date": "2026-11-15",
+    "meaning": "planned_submittal"
+  },
+  "jurisdiction": {
+    "state_layer": "OR",
+    "city_layer": "EUG"
+  },
+  "mode": "check_spot",
+  "capture": {
+    "capture_id": "20261103_lot_merged_eug_demo",
+    "manifest_sha256": "34cb43b2243f0beecd794ed6c291692c0e2d785c05c00e76b5f962b0d67c5563",
+    "grade": "fail",
+    "provisional": true,
+    "tolerances_95pct": {
+      "formula": "max(primary_tape_floor(r), 1.96 * sqrt(sigma_lidar_m^2 + (scale_error_eff * r)^2 + (loop_gap_per_m * r)^2 + sigma_tracking_m^2))",
+      "coefficients": {
+        "max_tape_residual_m": 0,
+        "primary_tape_floor_10m_m": 0,
+        "sigma_lidar_m": 0.015,
+        "scale_error_ratio": -0.032899,
+        "scale_error_se": 0.008635,
+        "scale_error_eff": 0.015629,
+        "loop_closure_gap_m": 1.027448,
+        "walk_length_m": 70.6464,
+        "loop_gap_per_m": 0.01454352,
+        "sigma_tracking_m": 0.005109,
+        "limited_tracking_share": 0.00217,
+        "pair_graph_edge_rmse_m": 0.002094,
+        "max_marker_position_uncertainty_m": 0.856998
+      },
+      "reference_range_m": 10
+    },
+    "registration": {
+      "method": "similarity_fit",
+      "translation_ft": [
+        53.9698,
+        75.3445
+      ],
+      "rotation_deg": 180,
+      "scale": 1,
+      "rms_residual_ft": 0.0417
+    }
+  },
+  "site": {
+    "zone": {
+      "value": "R-1",
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+          "where": "base zone and overlays",
+          "when": "2026-11-02",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "City of Eugene",
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "overlays": {
+      "value": [
+        "/CAS"
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+          "where": "base zone and overlays",
+          "when": "2026-11-02",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "City of Eugene",
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "lot_outline": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          64.19,
+          0
+        ],
+        [
+          64.19,
+          106.36
+        ],
+        [
+          0,
+          106.36
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick merged lot cloud 20261103_lot_merged_eug_demo (5 walks, 2026-11-02/03)",
+          "where": "county outline with the rear edge moved to the scanned back fence",
+          "when": "2026-11-03",
+          "by": "CC (Claude Code), from the owner's walks",
+          "tolerance": {
+            "value": 1.38,
+            "unit": "ft",
+            "at_range_m": 10,
+            "method": "grade.json formula of the reference walk"
+          },
+          "status": "used: the owner's decision 2026-11-03 for the demo",
+          "role": "used"
+        },
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "tax lot polygon, projected to the lot frame",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "role": "conflicting record"
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "front_lot_line": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          64.19,
+          0
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "east edge (street)",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          }
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "rear_lot_line": {
+      "value": [
+        [
+          0,
+          106.36
+        ],
+        [
+          64.19,
+          106.36
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick merged lot cloud 20261103_lot_merged_eug_demo (5 walks, 2026-11-02/03)",
+          "where": "scanned back fence, 1.91 m beyond the county rear line (reconciliation 01a1a440-680b-7152-b94e-17c68d9c94c6, find-rear-depth-1p9m)",
+          "when": "2026-11-03",
+          "by": "CC (Claude Code), from the owner's walks",
+          "tolerance": {
+            "value": 1.38,
+            "unit": "ft",
+            "at_range_m": 10,
+            "method": "grade.json formula of the reference walk"
+          },
+          "status": "used: the owner's decision 2026-11-03 for the demo",
+          "role": "used"
+        },
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "west edge: rear line at y = 100.1 ft (county); not used",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "status": "superseded for the demo by the scan",
+          "role": "conflicting record"
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "side_lot_lines": {
+      "value": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            106.36
+          ]
+        ],
+        [
+          [
+            64.19,
+            0
+          ],
+          [
+            64.19,
+            106.36
+          ]
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick merged lot cloud 20261103_lot_merged_eug_demo (5 walks, 2026-11-02/03)",
+          "where": "county side lines extended to the scanned back fence",
+          "when": "2026-11-03",
+          "by": "CC (Claude Code), from the owner's walks",
+          "tolerance": {
+            "value": 1.38,
+            "unit": "ft",
+            "at_range_m": 10,
+            "method": "grade.json formula of the reference walk"
+          },
+          "status": "used: the owner's decision 2026-11-03 for the demo",
+          "role": "used"
+        },
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "south and north edges",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "role": "conflicting record"
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "house_outline": {
+      "value": [
+        [
+          60.8,
+          16.11
+        ],
+        [
+          29.33,
+          16.32
+        ],
+        [
+          29.37,
+          22.31
+        ],
+        [
+          4.68,
+          22.47
+        ],
+        [
+          5.03,
+          75.2
+        ],
+        [
+          61.23,
+          74.83
+        ],
+        [
+          60.88,
+          22.1
+        ],
+        [
+          60.84,
+          22.1
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+          "where": "footprint polygon, projected to the lot frame",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Oregon DOGAMI",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+          }
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "structures": {
+      "value": [],
+      "prov": [
+        {
+          "kind": "owner_statement",
+          "document": "LotFit session with the owner",
+          "where": "no accessory structures on the lot (to confirm on the walk)",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "owner's word"
+        }
+      ],
+      "status": "known"
+    },
+    "primary_living_area_sqft": {
+      "value": 3151,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+          "where": "SQ_FT (assessor living area)",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Oregon DOGAMI",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "corner_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "one street frontage",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "flag_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "rectangular lot with full street frontage",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "through_lot": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "one street frontage",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "alley": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Lane County tax lot map (Lane County public tax-lot service), tax lot identifier withheld",
+          "where": "no alley on the parcel map",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Lane County",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "historic_resource": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "City of Eugene zoning (mapping.eugene-or.gov), queried by map tax lot",
+          "where": "no historic overlay",
+          "when": "2026-11-02",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "City of Eugene",
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "primary_is_duplex": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+          "where": "one detached single-unit dwelling",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Oregon DOGAMI",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "primary_is_attached_house": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+          "where": "detached",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Oregon DOGAMI",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "primary_is_manufactured": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "official_record",
+          "document": "Oregon statewide building footprints, footprint identifier withheld (reviewed on 2018 imagery)",
+          "where": "site-built 2007",
+          "when": "2026-11-01",
+          "by": "CC (Claude Code), fetched for the owner",
+          "issuer": "Oregon DOGAMI",
+          "tolerance": {
+            "value": 3,
+            "unit": "ft",
+            "method": "assumed by CC: digitised from imagery; the issuer states no positional accuracy"
+          },
+          "status": "current"
+        }
+      ],
+      "status": "known"
+    },
+    "slope_pct": {
+      "value": 4.3,
+      "prov": [
+        {
+          "kind": "capture",
+          "document": "Yardstick merged lot cloud 20261103_lot_merged_eug_demo (5 walks, 2026-11-02/03)",
+          "where": "ground plane fit over 598 half-metre cells of the back yard (residual p90 0.24 m); falls away from the house",
+          "when": "2026-11-03",
+          "by": "CC (Claude Code), from the owner's walks",
+          "tolerance": {
+            "value": 0.4196,
+            "unit": "m",
+            "at_range_m": 10,
+            "method": "grade.json formula of the reference walk"
+          },
+          "status": "grade fail, provisional"
+        }
+      ],
+      "status": "unconfirmed"
+    },
+    "zone_family": {
+      "value": "single_dwelling",
+      "prov": [
+        {
+          "kind": "computed",
+          "document": "query/src/sensitivity.mts",
+          "where": "zone -> zone_family",
+          "when": "2026-11-15",
+          "by": "case-gate",
+          "status": "computed"
+        }
+      ]
+    },
+    "lot_area_sqft": {
+      "value": 6827.2484,
+      "prov": [
+        {
+          "kind": "computed",
+          "document": "query/src/sensitivity.mts",
+          "where": "shoelace(site.lot_outline)",
+          "when": "2026-11-15",
+          "by": "case-gate",
+          "status": "computed"
+        }
+      ]
+    },
+    "house_rear_wall": {
+      "value": [
+        [
+          5.03,
+          75.2
+        ],
+        [
+          61.23,
+          74.83
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "computed",
+          "document": "query/src/sensitivity.mts",
+          "where": "furthest_edge(site.house_outline, site.front_lot_line)",
+          "when": "2026-11-15",
+          "by": "case-gate",
+          "status": "computed"
+        }
+      ]
+    }
+  },
+  "plan": {
+    "kind": {
+      "value": "adu",
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session with the owner",
+          "where": "what",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "client's wish"
+        }
+      ],
+      "status": "known"
+    },
+    "detached": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "footprint": {
+      "value": [
+        [
+          0,
+          0
+        ],
+        [
+          24,
+          0
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          0,
+          24
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1, exterior walls",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "placement": {
+      "value": {
+        "x": 20,
+        "y": 76,
+        "rotation": 0
+      },
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session with the owner",
+          "where": "client's spot: the middle of the backyard",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "client's wish"
+        }
+      ],
+      "status": "known"
+    },
+    "height_ft": {
+      "value": 15,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3, to the highest point of the roof (EC 9.0500)",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "wall_height_ft": {
+      "value": 10,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "living_area_sqft": {
+      "value": 576,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "total_building_sqft": {
+      "value": 576,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1, measured at the exterior perimeter walls (EC 9.2751(17)(a)1.)",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "eave_ft": {
+      "value": 1,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "parking": {
+      "value": 0,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "is_garage": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "is_cistern": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "gable_walls": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "dormers": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "rooftop_deck": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "openings_facing_lot_line": {
+      "value": true,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A2",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "basement_conversion": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A1",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "vacation_occupancy": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session with the owner",
+          "where": "use",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "client's wish"
+        }
+      ],
+      "status": "known"
+    },
+    "owner_occupancy_required": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "entered",
+          "document": "LotFit session with the owner",
+          "where": "covenant check",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "owner's word"
+        }
+      ],
+      "status": "known"
+    },
+    "sloped_ceiling": {
+      "value": false,
+      "prov": [
+        {
+          "kind": "plan_document",
+          "document": "Portland's free 24 x 24 pre-approved studio plan (the plan the demo uses)",
+          "where": "sheet A3",
+          "when": "2026-11-02",
+          "by": "CC for the owner",
+          "status": "illustration: not the owner's chosen plan"
+        }
+      ],
+      "status": "known"
+    },
+    "accessory_dwellings_on_lot": {
+      "value": 1,
+      "prov": [
+        {
+          "kind": "owner_statement",
+          "document": "LotFit session with the owner",
+          "where": "no accessory dwelling on the lot today; this plan adds one (to confirm on the walk)",
+          "when": "2026-11-02",
+          "by": "the owner",
+          "status": "owner's word"
+        }
+      ],
+      "status": "known"
+    },
+    "outline": {
+      "value": [
+        [
+          20,
+          76
+        ],
+        [
+          44,
+          76
+        ],
+        [
+          44,
+          100
+        ],
+        [
+          20,
+          100
+        ]
+      ],
+      "prov": [
+        {
+          "kind": "computed",
+          "document": "query/src/sensitivity.mts",
+          "where": "placed_outline(plan.footprint, plan.placement)",
+          "when": "2026-11-15",
+          "by": "case-gate",
+          "status": "computed"
+        }
+      ]
+    },
+    "setbacks_used": {
+      "value": {
+        "front_ft": 76,
+        "rear_ft": 6.36,
+        "side_ft": 20
+      },
+      "prov": [
+        {
+          "kind": "computed",
+          "document": "query/src/sensitivity.mts",
+          "where": "distance_to_line(plan.outline, site.*_lot_line)",
+          "when": "2026-11-15",
+          "by": "case-gate",
+          "status": "computed"
+        }
+      ]
+    }
+  },
+  "unknowns": [
+    {
+      "fact": "site.trees",
+      "reason": "trees in the backyard are not surveyed yet (walk pending)"
+    }
+  ]
+}
