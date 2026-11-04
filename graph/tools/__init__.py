@@ -543,3 +543,78 @@ def check_exception_conditions(
         "pass": _and([c["holds"] for c in conds]),
         "conditions": conds,
     }
+
+
+def _bbox(poly) -> tuple[float, float, float, float]:
+    xs = [p[0] for p in poly]
+    ys = [p[1] for p in poly]
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+@tool(reads=["site.lot_outline", "site.house_outline", "site.structures", "plan.footprint"])
+def find_placements(
+    lot_outline,
+    house_outline,
+    structures,
+    footprint,
+    setbacks,
+    step=1.0,
+    rotations=(0, 90),
+    tolerance_ft=0.0,
+    front_or_behind=None,
+) -> dict:
+    out, clear_n = _grid_search(
+        lot_outline, house_outline, structures, footprint, setbacks, step, rotations, tolerance_ft, front_or_behind
+    )
+    used = "grid"
+    if not out:
+        out, clear_n = _grid_search(
+            lot_outline,
+            house_outline,
+            structures,
+            footprint,
+            setbacks,
+            step / 4,
+            rotations,
+            tolerance_ft,
+            front_or_behind,
+        )
+        used = "refined"
+    return {"candidates": out, "count": len(out), "clear_count": clear_n, "search_pass": used}
+
+
+def _grid_search(
+    lot_outline, house_outline, structures, footprint, setbacks, step, rotations, tolerance_ft, front_or_behind
+) -> tuple[list, int]:
+    lx0, ly0, lx1, ly1 = _bbox(lot_outline)
+    pad = max(max(abs(c) for c in p) for p in footprint)
+    clear = []
+    marginal = []
+    for r in rotations:
+        for i in range(int((lx1 - lx0 + 2 * pad) / step) + 1):
+            for j in range(int((ly1 - ly0 + 2 * pad) / step) + 1):
+                pl = {"x": round(lx0 - pad + i * step, 6), "y": round(ly0 - pad + j * step, 6), "rotation": r}
+                o = G.placed_outline(footprint, pl)
+                x0, y0, x1, y1 = _bbox(o)
+                if x0 < lx0 - EPS or y0 < ly0 - EPS or x1 > lx1 + EPS or y1 > ly1 + EPS:
+                    continue
+                ms = [G.distance_to_segment(o, s["line"]) - s["min_ft"] for s in setbacks]
+                if any(m < -tolerance_ft - EPS for m in ms):
+                    continue
+                if front_or_behind is not None:
+                    fob = front_or_behind
+                    fb = check_front_or_behind(
+                        o, fob["front_lot_line"], fob["min_front_ft"], fob["house_rear_wall"], tolerance_ft
+                    )
+                    if fb["margin_ft"] < -tolerance_ft - EPS:
+                        continue
+                    ms.append(fb["margin_ft"])
+                fit = physical_fit(lot_outline, house_outline, structures, o)["pass"]
+                if fit is False:
+                    continue
+                c = {"placement": pl, "outline": o, "min_margin_ft": round(min(ms), 6) if ms else None}
+                if fit is True and (not ms or min(ms) >= tolerance_ft - EPS):
+                    clear.append(c)
+                else:
+                    marginal.append(c)
+    return (clear + marginal, len(clear))
