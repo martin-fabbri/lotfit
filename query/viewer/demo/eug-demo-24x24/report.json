@@ -1,0 +1,983 @@
+{
+  "schema": "lotfit.evaluation-report/1",
+  "case_id": "019a4000-0000-7000-8000-00000000e241",
+  "case_hash": "d7275f4fdaa9dad689c8d7c5437befc78958f5c076032181b1ce61ef839dcf60",
+  "graph_load_id": "777403f1afed002112a9225d3459f48c654dc73bbe6cfdcfd626318f9b8d542f@2026-11-04T02:06:22.229859+00:00",
+  "config_hash": "44a779968b6f1c9a13626b5e6a9c786146fd798a80d975401eba4ee2cda5dec3",
+  "as_of": {
+    "date": "2026-11-15",
+    "meaning": "planned_submittal"
+  },
+  "verdict": "NEEDS_CHECK",
+  "model_verdict": null,
+  "verdict_note": "Evaluation completed with verdict NEEDS_CHECK.",
+  "banner": "Pre-feasibility only; not a permit decision.",
+  "plan_limit": null,
+  "placement": {
+    "client_spot": {
+      "placement": {
+        "x": 20,
+        "y": 76,
+        "rotation": 0
+      },
+      "passes": null,
+      "failing": [],
+      "rejected_exceptions": []
+    },
+    "recommended": null,
+    "search": null
+  },
+  "findings": [
+    {
+      "provision_id": "EUG.T9.2740",
+      "target": "case",
+      "outcome": "unknown",
+      "evaluation_stage": "gate",
+      "citations": [
+        {
+          "document": "EUG.T9.2740#v1",
+          "page": null,
+          "clause_id": "EUG.T9.2740#v1::sentence:1",
+          "quote": "Table 9.2740 Residential Zone Land Uses and Permit Requirements",
+          "sha256": "65c53412026eb94412b4a504e4e58ece6d2fbfba1ff7f009ae144a4937c77b6d"
+        }
+      ],
+      "params": [],
+      "measures": [],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a693-e2a2-7001-9d44-0237eca05550"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2741.3",
+      "target": "case",
+      "outcome": "pass",
+      "evaluation_stage": "gate",
+      "citations": [
+        {
+          "document": "EUG.9.2741.3#v1",
+          "page": null,
+          "clause_id": "EUG.9.2741.3#v1::sentence:2",
+          "quote": "One accessory dwelling is allowed for each detached single-unit dwelling on the same lot, subject to the standards at EC",
+          "sha256": "f874a86f25bf06d76fb526fe5294201a90a23898e94795cff5a15d8abcc74889"
+        }
+      ],
+      "params": [
+        {
+          "provision_id": "EUG.9.2741.3",
+          "param": "max_accessory_dwellings_per_dwelling",
+          "value": 1,
+          "unit": "count"
+        }
+      ],
+      "measures": [
+        {
+          "value": 1,
+          "unit": "count",
+          "limit": {
+            "provision_id": "EUG.9.2741.3",
+            "param": "max_accessory_dwellings_per_dwelling",
+            "value": 1,
+            "unit": "count"
+          },
+          "margin": 0,
+          "tolerance": 0,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        }
+      ],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a694-55e6-7000-a737-398f1d5d32f6"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.1",
+      "target": "case",
+      "outcome": "pass",
+      "evaluation_stage": "plan_constraint",
+      "citations": [
+        {
+          "document": "EUG.9.2751.17.a.1#v1",
+          "page": null,
+          "clause_id": "EUG.9.2751.17.a.1#v1::sentence:2",
+          "quote": "The total building square footage of an accessory dwelling shall not exceed 10 percent of the total lot area or 800 square feet, whichever is smaller.",
+          "sha256": "d04a2571ba046297ff3fb135a4ed5c722c7f39d5e411c45f61ee77981231ade0"
+        }
+      ],
+      "params": [
+        {
+          "provision_id": "EUG.9.2751.17.a.1",
+          "param": "max_sqft = min(max_share_of_lot_area × primary, max_building_sqft)",
+          "value": 682.72484,
+          "unit": "sqft"
+        }
+      ],
+      "measures": [
+        {
+          "value": 576,
+          "unit": "sqft",
+          "limit": {
+            "provision_id": "EUG.9.2751.17.a.1",
+            "param": "max_sqft = min(max_share_of_lot_area × primary, max_building_sqft)",
+            "value": 682.72484,
+            "unit": "sqft"
+          },
+          "margin": 106.72484,
+          "tolerance": 0,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null,
+          "details": {
+            "share_sqft": 682.72484,
+            "cap_sqft": 800,
+            "binding": "share"
+          }
+        }
+      ],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a694-de91-7002-bd4f-fd2ba74146db"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "target": "case",
+      "outcome": "unknown",
+      "evaluation_stage": "plan_constraint",
+      "citations": [
+        {
+          "document": "EUG.9.2751.17.b.4.a.slope#v1",
+          "page": null,
+          "clause_id": "EUG.9.2751.17.b.4.a.slope#v1::sentence:1",
+          "quote": "In addition, except where the setback is from a property line abutting a public right-of-way or private street, at a point that is 15 feet above finished grade, the setback shall slope at the rate of 10 inches vertically",
+          "sha256": "d04a2571ba046297ff3fb135a4ed5c722c7f39d5e411c45f61ee77981231ade0"
+        }
+      ],
+      "params": [
+        {
+          "provision_id": "EUG.9.2751.17.b.4.a.slope",
+          "param": "max_height",
+          "value": 25,
+          "unit": "ft"
+        }
+      ],
+      "measures": [
+        {
+          "value": 15,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "EUG.9.2751.17.b.4.a.slope",
+            "param": "max_height",
+            "value": 25,
+            "unit": "ft"
+          },
+          "margin": 10,
+          "tolerance": 0,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        }
+      ],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a694-dec0-7001-83bc-cb775eace2d2"
+      ]
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.setback",
+      "target": "client_spot",
+      "outcome": "too_close_to_call",
+      "evaluation_stage": "placement_constraint",
+      "citations": [
+        {
+          "document": "EUG.9.2751.17.b.4.a.setback#v1",
+          "page": null,
+          "clause_id": "EUG.9.2751.17.b.4.a.setback#v1::item:a.",
+          "quote": "a. Except as provided in subsection b. below, interior yard setbacks shall be at least 5 feet.",
+          "sha256": "d04a2571ba046297ff3fb135a4ed5c722c7f39d5e411c45f61ee77981231ade0"
+        }
+      ],
+      "params": [
+        {
+          "provision_id": "EUG.9.2751.17.b.4.a.setback",
+          "param": "min_interior_setback",
+          "value": 5,
+          "unit": "ft"
+        }
+      ],
+      "measures": [
+        {
+          "value": 6.36,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "param": "min_interior_setback",
+            "value": 5,
+            "unit": "ft"
+          },
+          "margin": 1.36,
+          "tolerance": 3,
+          "pass": null,
+          "too_close_to_call": true,
+          "dimension_to_tape": "distance to the nearest lot line"
+        },
+        {
+          "value": 20,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "EUG.9.2751.17.b.4.a.setback",
+            "param": "min_interior_setback",
+            "value": 5,
+            "unit": "ft"
+          },
+          "margin": 15,
+          "tolerance": 3,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null,
+          "details": {
+            "nearest_segment": 0,
+            "per_segment": [
+              {
+                "distance_ft": 20,
+                "margin_ft": 15
+              },
+              {
+                "distance_ft": 20.19,
+                "margin_ft": 15.19
+              }
+            ]
+          }
+        }
+      ],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a697-7bdd-7001-89af-1739d2207f19",
+        "01a1a697-7bad-7000-bace-69a8f9090685"
+      ]
+    },
+    {
+      "provision_id": "EUG.T9.2750",
+      "target": "client_spot",
+      "outcome": "pass",
+      "evaluation_stage": "placement_constraint",
+      "citations": [
+        {
+          "document": "EUG.T9.2750#v1",
+          "page": null,
+          "clause_id": "EUG.T9.2750#v1::sentence:1",
+          "quote": "Table 9.2750 Residential Zone Development Standards",
+          "sha256": "356c200d2ff7122773fcb42e66521dbfc839bccd5850c55dcc89dd9d3c8d847d"
+        }
+      ],
+      "params": [
+        {
+          "provision_id": "EUG.T9.2750",
+          "param": "front_yard_setback_excluding_garages_and.R-1",
+          "value": 10,
+          "unit": "ft"
+        }
+      ],
+      "measures": [
+        {
+          "value": 76,
+          "unit": "ft",
+          "limit": {
+            "provision_id": "EUG.T9.2750",
+            "param": "front_yard_setback_excluding_garages_and.R-1",
+            "value": 10,
+            "unit": "ft"
+          },
+          "margin": 66,
+          "tolerance": 3,
+          "pass": true,
+          "too_close_to_call": false,
+          "dimension_to_tape": null
+        }
+      ],
+      "confirmation": "confirmed",
+      "evidence_call_ids": [
+        "01a1a697-7c7b-7004-96f1-dd4f3e7a6a19"
+      ]
+    }
+  ],
+  "dispositions_relied_on": [],
+  "conflicts": [],
+  "assumptions": [],
+  "conditions": [],
+  "questions": [],
+  "not_found": [],
+  "unchecked": [
+    {
+      "provision_id": "ORS.197A.425",
+      "clause_id": "ORS.197A.425#v1::item:(1)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (1)"
+    },
+    {
+      "provision_id": "ORS.197A.425",
+      "clause_id": "ORS.197A.425#v1::item:(1)(b)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (b) As used in this subsection:"
+    },
+    {
+      "provision_id": "ORS.197A.425",
+      "clause_id": "ORS.197A.425#v1::item:(1)(b)(A)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (A) \"Accessory dwelling unit\" means an interior, attached or detached residential structure that is used in connection with or that is accessory to a single-unit dwelling."
+    },
+    {
+      "provision_id": "ORS.197A.425",
+      "clause_id": "ORS.197A.425#v1::item:(1)(b)(B)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (B) \"Reasonable local regulations relating to siting and design\" does not include owner-occupancy requirements of either the primary or accessory structure or requirements to construct additional off-street parking."
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The vertical distance above a reference datum measured to the highest point of the coping of a flat roof, to the deck line of a mansard roof, or to the average height of the gables of a pitched or hipped roof."
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): For the purposes of residential zones, building height shall be the vertical distance above a reference datum measured to the highest point of the roof."
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The maximum height of a stepped or terraced building is the maximum height of all segments of that building."
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::item:(A)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (A) The reference datum is the lowest grade when the highest ground surface within a five-foot horizontal distance of the exterior wall of the building is not more than 10 feet above the lowest grade."
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::condition:(A)/when#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): when the highest ground surface within a five-foot horizontal distance of the exterior wall of the building is not more than 10 feet above the lowest grade"
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::item:(B)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (B) The reference datum is 10 feet higher than the lowest grade when the highest ground surface described in item (A) above is 10 feet or more above the lowest grade. (See Figure 9.0500 Building Height Calculation.)"
+    },
+    {
+      "provision_id": "EUG.9.0500.building-height",
+      "clause_id": "EUG.9.0500.building-height#v1::condition:(B)/when#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): when the highest ground surface described in item (A) above is 10 feet or more above the lowest grade"
+    },
+    {
+      "provision_id": "EUG.9.0500.dwelling-accessory",
+      "clause_id": "EUG.9.0500.dwelling-accessory#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): An interior, attached or detached residential structure that is used in connection with or that is accessory to a single-unit dwelling."
+    },
+    {
+      "provision_id": "EUG.9.0500.flag-lot",
+      "clause_id": "EUG.9.0500.flag-lot#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): A lot located behind another lot except for a narrow portion extending to the public street which is suitable for vehicular, bicycle and pedestrian access."
+    },
+    {
+      "provision_id": "EUG.9.0500.flag-lot",
+      "clause_id": "EUG.9.0500.flag-lot#v1::condition:s2/except#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): except for a narrow portion extending to the public street which is suitable for vehicular, bicycle and pedestrian access"
+    },
+    {
+      "provision_id": "EUG.9.0500.flag-lot",
+      "clause_id": "EUG.9.0500.flag-lot#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The \"flag pole\" of a flag lot is the access corridor to the buildable \"flag portion\" of the lot."
+    },
+    {
+      "provision_id": "EUG.9.0500.flag-lot",
+      "clause_id": "EUG.9.0500.flag-lot#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.2775(2) Residential Flag Lot Description.)"
+    },
+    {
+      "provision_id": "EUG.9.0500.front-lot-line",
+      "clause_id": "EUG.9.0500.front-lot-line#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): A lot line abutting a public street or in cases of private streets, the front lot line shall be considered to be the boundary of the private street or the access easement for the private street."
+    },
+    {
+      "provision_id": "EUG.9.0500.front-lot-line",
+      "clause_id": "EUG.9.0500.front-lot-line#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.0500 Lot Lines, Lot Frontage, Lot Width, Lot Depth.)"
+    },
+    {
+      "provision_id": "EUG.9.0500.grade",
+      "clause_id": "EUG.9.0500.grade#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): For purposes of determining building height, the grade shall be the lowest point of elevation of the finished surface of the ground, paving, or sidewalk within a five foot horizontal distance of the exterior wall of the building."
+    },
+    {
+      "provision_id": "EUG.9.0500.interior-lot-line",
+      "clause_id": "EUG.9.0500.interior-lot-line#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Any lot or parcel line that is not a front lot line."
+    },
+    {
+      "provision_id": "EUG.9.0500.interior-lot-line",
+      "clause_id": "EUG.9.0500.interior-lot-line#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.0500 Lot Lines, Lot Frontage, Lot Width, Lot Depth.)"
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "clause_id": "EUG.9.0500.lot-coverage#v1::condition:s2/when#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): when viewed directly from above, would be covered by a building or structure, or any part thereof"
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "clause_id": "EUG.9.0500.lot-coverage#v1::condition:s2/except#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): except that the following structures or parts of structures shall themselves not be included in calculating lot coverage"
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "clause_id": "EUG.9.0500.lot-coverage#v1::item:(A)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (A) Any part of a structure without a roof."
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "clause_id": "EUG.9.0500.lot-coverage#v1::item:(B)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (B) Roof eaves."
+    },
+    {
+      "provision_id": "EUG.9.0500.lot-coverage",
+      "clause_id": "EUG.9.0500.lot-coverage#v1::item:(C)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (C) Carports, porches, and balconies that are open at least 50 percent of their respective perimeter. The percentage calculation for adjacent carports, porches, and balconies that are separated by a common wall shall be determined individually for each carport, porch, or balcony."
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The lot line that creates the smallest angle with a line drawn east-west and intersecting the northmost point of the lot."
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If the north line abuts an undevelopable area on another lot other than a required yard area, the northern lot line shall be at the north edge of such undevelopable area."
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::condition:s3/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If the north line abuts an undevelopable area on another lot"
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::condition:s3/other_than#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): other than a required yard area, the northern lot line shall be at the north edge of such undevelopable area"
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If 2 lot lines have an identical The Eugene Code is current through Ordinance 20742, passed July 13, 2026."
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::condition:s4/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If 2 lot lines have an identical The Eugene Code is current through Ordinance 20742"
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::sentence:5",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Definitions | Eugene Code Page 23 of 38 angle relative to a line drawn east-west, then the northern lot line shall be a line 10 feet in length within the lot parallel with and at a maximum distance from the front lot line."
+    },
+    {
+      "provision_id": "EUG.9.0500.northern-lot-line",
+      "clause_id": "EUG.9.0500.northern-lot-line#v1::sentence:6",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.2790(2)Solar Lot Requirements.)"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The part of a building that casts the longest shadow onto the adjacent northern lot(s) when the sun is at an altitude of 22.6 degrees and an azimuth ranging from 30 degrees east and west of true south; except a shadow caused by a narrow object such as a mast or whip antenna, a dish antenna with a diameter of 3 feet or less, a chimney, utility pole or wire."
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::condition:s2/when#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): when the sun is at an altitude of 22.6 degrees and an azimuth ranging from 30 degrees east and west of true south"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::condition:s2/except#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): except a shadow caused by a narrow object such as a mast or whip antenna"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The height of the shade point shall be measured from the shade point to lowest grade directly below the shade point."
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If the shade point is located at the north end of the ridgeline of a building oriented within 45 degrees of the true north-south line, the shade point may be reduced by 3 feet."
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::condition:s4/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If the shade point is located at the north end of the ridgeline of a building oriented within 45 degrees of the true north-south line"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:5",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If a structure has a roof oriented within 45 degrees of the true east-west line with a pitch that is flatter than 5 feet (vertical) in 12 feet (horizontal), the shade point will be the eave of the roof."
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::condition:s5/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If a structure has a roof oriented within 45 degrees of the true east-west line with a pitch that is flatter than 5 feet (vertical) in 12 feet (horizontal)"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:6",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If such a roof has a pitch that is 5 feet in 12 feet or steeper, the shade point will be the peak of the roof."
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::condition:s6/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If such a roof has a pitch that is 5 feet in 12 feet or steeper"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::sentence:7",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.2795(2) Shade Point Height (SPH) Measurement, Figure 9.2795(2)"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::item:(a)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (a) R-1 Solar Setback Calculation, and Figure 9.2795(2)"
+    },
+    {
+      "provision_id": "EUG.9.0500.shade-point",
+      "clause_id": "EUG.9.0500.shade-point#v1::item:(b)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (b) R-2 Solar Setback Calculation.)"
+    },
+    {
+      "provision_id": "EUG.9.4110",
+      "clause_id": "EUG.9.4110#v1::sentence:1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): This /CAS overlay zone is applied to those lands within the city's jurisdiction that are encompassed by the sectors described in this overlay zone and as indicated in the Eugene overlay zone map."
+    },
+    {
+      "provision_id": "EUG.9.4110",
+      "clause_id": "EUG.9.4110#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The provisions of the /CAS overlay zone supplement those of the applicable base zone or special area zone."
+    },
+    {
+      "provision_id": "EUG.9.4110",
+      "clause_id": "EUG.9.4110#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Where the overlay zone and base zone or special area zone provisions conflict, the more restrictive requirement applies."
+    },
+    {
+      "provision_id": "EUG.9.4110",
+      "clause_id": "EUG.9.4110#v1::condition:s3/where#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Where the overlay zone and base zone or special area zone provisions conflict"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.1",
+      "clause_id": "EUG.9.2751.17.a.1#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Total building square footage is measured at the exterior perimeter walls and is defined as all square footage inside of the dwelling, including, but not limited to hallways, entries, closets, utility rooms, stairways and bathrooms."
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "clause_id": "EUG.9.2751.17.b.4.a.slope#v1::condition:s1/except#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): except"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "clause_id": "EUG.9.2751.17.b.4.a.slope#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.2751(16)(b)3."
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.slope",
+      "clause_id": "EUG.9.2751.17.b.4.a.slope#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Building Height/Interior Setbacks)"
+    },
+    {
+      "provision_id": "EUG.9.2751.17.b.4.a.setback",
+      "clause_id": "EUG.9.2751.17.b.4.a.setback#v1::condition:a./except#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Except as provided in subsection b. below"
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Buildings shall be setback from the northern property line according to the standards in this section."
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): An applicant for a development permit for a building subject to this section shall submit verification on a form approved by the city manager that shows either the solar setback or how the structure qualifies for an exemption."
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If buildings on separate lots are attached or connected at a common lot line, the solar setback standards apply as if the buildings are a single building on a single lot composed of both lots."
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::condition:s4/if#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): If buildings on separate lots are attached or connected at a common lot line"
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::condition:s4/if#2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): if the buildings are a single building on a single lot composed of both lots"
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::sentence:5",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (See Figure 9.2795 Solar Setback Standards, Figure 9.2795(2) Shade Point Height (SPH) Measurement, Figure 9.2795(2)"
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::item:(a)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (a) R-1 Solar Setback Calculation, and Figure 9.2795(2)"
+    },
+    {
+      "provision_id": "EUG.9.2795.2.a",
+      "clause_id": "EUG.9.2795.2.a#v1::condition:(a)/where#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Where"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(c)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (c) Existing Shade. The building will shade an area that is already shaded by one or more of the following:"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(c)1.",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 1. An existing or approved building or structure."
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(c)2.",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 2. A topographic feature."
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(c)3.",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 3. Coniferous trees or broadleaf evergreens that will remain after development of the site. Insignificant Benefit. The building will shade one or more of the following:"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::condition:(c)1./excluding#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): excluding solar greenhouses and other similar solar structures"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(c)3.#2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 3. The wall of a non-residential structure."
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(d)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (d) Neighbor Approval. The owner of the abutting property to the north, for which a certificate of occupancy has been issued by the city, grants an exemption to the solar setback requirement on a form supplied by the city and subject to a fee set by the city manager."
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(e)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (e) PUD Exemption. The lot is identified as being exempt from solar setback provisions through an approved PUD application where one or more of the following exists:"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::condition:(e)/where#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): where one or more of the following exists"
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(e)1.",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 1. The lot has been identified as being exempt from solar setback standards."
+    },
+    {
+      "provision_id": "EUG.9.2795.3",
+      "clause_id": "EUG.9.2795.3#v1::item:(e)2.",
+      "reason": "not-modeled clause has no signed disposition (GR-47): 2. The proposed building locations and heights were approved."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:2",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The maximum height of structures and objects shall normally be the same as the zones to which the commercial airport safety overlay zone is added."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:3",
+      "reason": "not-modeled clause has no signed disposition (GR-47): However, no structure shall be erected, altered, or maintained, and no vegetation shall be allowed to penetrate the surface heights of the various sectors as described below and shown on the Airspace plan."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:4",
+      "reason": "not-modeled clause has no signed disposition (GR-47): These sectors include all land lying beneath the approach surfaces, transitional surfaces, horizontal surfaces, and conical surfaces as they apply to the Eugene Airport."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:5",
+      "reason": "not-modeled clause has no signed disposition (GR-47): An area located in more than one sector is considered to be only in the sector with the most restrictive height limit."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:6",
+      "reason": "not-modeled clause has no signed disposition (GR-47): For purposes of this overlay zone, to determine height limits, the datum is mean sea level elevation unless otherwise specified."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::condition:s6/unless#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): unless otherwise specified"
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:7",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Runways 16L-34R and 16R-34L Approach Sectors."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:8",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Runway 16R-34L is an existing, precision instrument runway."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:9",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Runway 16L-34R is a future precision instrument runway."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:10",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The inner edge of both of their approach sectors coincide with the width of the runway primary surfaces and are 1000 feet wide."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:11",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The approach sectors expand outward uniformly to a width of 16,000 feet at a horizontal distance of 50,000 feet from the primary surfaces."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:12",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Their centerlines are a continuation of the runway centerlines beginning at the centerpoint coordinates."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:13",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The surfaces of the Runway 16L-34R and Runway 16R-34L approach sectors slope 50 feet outward for each 1 foot upward beginning at the end of and at the same elevation as the primary surfaces and extend to a horizontal distance of 10,000 feet along the extended runway centerlines; thence slope upward 40 feet horizontally for each 1 foot vertically to an additional horizontal distance of 40,000 feet along the extended runway centerlines."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:14",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Horizontal Sector."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:15",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The horizontal sector encompasses the area obtained by swinging arcs of 10,000 feet radii from the center of each end of the primary surface of each runway and connecting the adjacent arcs by drawing lines tangent to those arcs."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:16",
+      "reason": "not-modeled clause has no signed disposition (GR-47): However, the horizontal sector does not include the approach and transition sectors."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:17",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The surface of the horizontal sector is a horizontal plane that is 515 feet above mean sea level."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:18",
+      "reason": "not-modeled clause has no signed disposition (GR-47): That is 150 feet above the airport elevation."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:19",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Conical Surface."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:20",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The surface of the conical sector extends at a slope of 20 feet outward for each foot upward from the periphery of a horizontal surface for a horizontal distance of 4,000 feet."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:21",
+      "reason": "not-modeled clause has no signed disposition (GR-47): It begins 150 feet above the airport's elevation and extends to a height of 350 feet above the airport's elevation."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:22",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The Eugene Code is current through Ordinance 20742, passed July 13, 2026."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:23",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Chapter 9 Land Use | Eugene Code Page 403 of 908 (Section 9.4130, see chart at front of Chapter 9 for legislative history from 2/26/01 through 6/1/02; and amended by Ordinance No. 20569, enacted November 14, 2016, effective December 17, 2016.) /CL Clear Lake Overlay Zone 9.4150 Purpose of /CL Clear Lake Overlay Zone."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:24",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The /CL Clear Lake Overlay Zone is intended to provide and protect the City's large-lot industrial portfolio in the Clear Lake expansion area."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:25",
+      "reason": "not-modeled clause has no signed disposition (GR-47): A minimum of eleven large lots of various sizes (10-20, 20-50, 50-75, and greater than 75 acres) will be provided as a means to ensure future development fulfills the community's desired outcomes for economic prosperity and increased employment opportunities, while addressing environmental justice concerns."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:26",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The /CL Overlay implements supporting comprehensive plan policies that call for fairness and equity in achieving a healthy environment, vibrant community, and improved quality of life for surrounding neighborhoods."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:27",
+      "reason": "not-modeled clause has no signed disposition (GR-47): To this end, the /CL Overlay regulations identify certain uses that are restricted or prohibited."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:28",
+      "reason": "not-modeled clause has no signed disposition (GR-47): These prohibitions and restrictions are intended to avoid incompatibilities between odorous emissions or particulate discharges and nearby residences, schools, or parks."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:29",
+      "reason": "not-modeled clause has no signed disposition (GR-47): In addition to the permitted uses in the base zone, future development in the Clear Lake area is encouraged to build upon Eugene's competitive advantages and recognize the community's values around climate change, sustainability, local food systems, and natural resources."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:30",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (Section 9.4150 added by Ordinance No. 20584, enacted July 17, 2017, effective August 24, 2017.) 9.4155 /CL Clear Lake Overlay Zone Applicability."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:31",
+      "reason": "not-modeled clause has no signed disposition (GR-47): EC 9.4150 through EC 9.4175 apply to all property to which the /CL Clear Lake Overlay Zone has been applied through the city's rezoning process."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:32",
+      "reason": "not-modeled clause has no signed disposition (GR-47): The provisions of the /CL Clear Lake Overlay Zone supplement those of the applicable base zone."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::condition:s33/where#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Where the overlay zone and base zone provisions conflict"
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:34",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (Section 9.4155 added by Ordinance No. 20584, enacted July 17, 2017, effective August 24, 2017.) 9.4160 /CL Clear Lake Overlay Zone Siting Requirements."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:35",
+      "reason": "not-modeled clause has no signed disposition (GR-47): When consistent with the approval criteria in EC 9.8865 Zone Change Approval Criteria, the /CL Clear Lake Overlay Zone shall be applied only to the area depicted on Figure 9.4160 Clear Lake Area Overlay Zone."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::condition:s35/when#1",
+      "reason": "not-modeled clause has no signed disposition (GR-47): When consistent with the approval criteria in EC 9.8865 Zone Change Approval Criteria"
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:36",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (Section 9.4160 added by Ordinance No. 20584, enacted July 17, 2017, effective August 24, 2017.) The Eugene Code is current through Ordinance 20742, passed July 13, 2026."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::sentence:37",
+      "reason": "not-modeled clause has no signed disposition (GR-47): Chapter 9 Land Use | Eugene Code 9.4165 Page 404 of 908 /CL Clear Lake Overlay Zone Special Application and Development Standards."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::item:(1)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (1) Application Requirements. In addition to standard required application materials, a development permit proposing a new building, change of use, additional use, or building expansion that exceeds 25 percent of the existing building square footage on the development site shall include demonstration of compliance with EC 9.7007 Neighborhood/Applicant Meetings. Developments that require multiple applications may convene a single neighborhood/applicant meeting to address all materials."
+    },
+    {
+      "provision_id": "EUG.9.4130.3",
+      "clause_id": "EUG.9.4130.3#v1::item:(2)",
+      "reason": "not-modeled clause has no signed disposition (GR-47): (2) Development Standards. In addition to the development standards of the applicable base and overlay zones, a development permit proposing a new building, change of use, additional use, or building expansion that exceeds 25 percent of the existing building square footage on the development site shall demonstrate compliance with the following standards at the time of application submittal."
+    },
+    {
+      "provision_id": "EUG.9.2751.17.a.2",
+      "clause_id": "EUG.9.2751.17.a.2#v1::item:a.",
+      "reason": "excluded on the Planner's reading of its scope sentence, not computed (SPEC 14): \"For any portion of an attached accessory dwelling\""
+    },
+    {
+      "provision_id": "EUG.9.2751.17.c",
+      "clause_id": "EUG.9.2751.17.c#v1::sentence:2",
+      "reason": "excluded on the Planner's reading of its scope sentence, not computed (SPEC 14): \"within the city-recognized boundaries of Amazon Neighbors, Fairmount Neighbors and South University Neighborhood Association\""
+    }
+  ],
+  "verifier": {
+    "passed": false,
+    "issues": [
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.2751.17.b.2",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.2751.17.b.2 (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.2751.17.b.3",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.2751.17.b.3 (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.2751.17.b.4.c",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.2751.17.b.4.c (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.2795.1",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.2795.1 (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.2795.2.a",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.2795.2.a (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V1_COVERAGE",
+        "provision_id": "EUG.9.4130.3",
+        "target": "client_spot",
+        "message": "Index provision EUG.9.4130.3 (placement_constraint) is not ruled out by a known_false guard and has no finding for target 'client_spot'."
+      },
+      {
+        "code": "V5_VERDICT",
+        "message": "Model verdict 'null' disagrees with entailed verdict 'NEEDS_CHECK'.",
+        "detail": {
+          "model_verdict": null,
+          "verdict": "NEEDS_CHECK"
+        }
+      }
+    ]
+  },
+  "critic": null,
+  "reviewer": {
+    "status": "not_run",
+    "answered": 0,
+    "warnings": [],
+    "model": "none",
+    "rubric": {
+      "id": "lotfit.reviewer-rubric",
+      "version": "none",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "items": 0,
+    "flags": [],
+    "sound": [],
+    "unclear": [],
+    "rejected": [],
+    "hold": false,
+    "error": {
+      "category": "harness",
+      "message": "no Reviewer configured for this run"
+    },
+    "usage": []
+  },
+  "telemetry": {
+    "tokens": 198526,
+    "calls": 33,
+    "turns": 15,
+    "wall_s_plan_execute": 722.385,
+    "wall_s_total": 725.334,
+    "cost_usd": 0.39599799999999996,
+    "models": {
+      "agent": "accounts/fireworks/models/muse-spark-open"
+    }
+  }
+}

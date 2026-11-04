@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LotFit · Run viewer</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<style>
+@font-face { font-family: Inter; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 500; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-500-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 700; src: url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-700-normal.woff2); }
+@font-face { font-family: Mono; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.3.0/files/jetbrains-mono-latin-400-normal.woff2); }
+@font-face { font-family: Mono; font-weight: 500; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.3.0/files/jetbrains-mono-latin-500-normal.woff2); }
+:root {
+  --bg: #0a1626; --panel: #0f1f33; --panel2: #13263d; --ink: #e8eef6; --muted: #8aa0b8; --dim: #56708c;
+  --line: rgba(120,170,220,.16); --grid: rgba(80,150,220,.07);
+  --cyan: #3fd0e0; --green: #4fdc8a; --amber: #f5b342; --red: #ff6464;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #050b14; height: 100%; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; font-family: Inter, system-ui, sans-serif; color: var(--ink); }
+#stage { position: relative; width: 1280px; height: 720px; overflow: hidden; transform-origin: center center;
+  background: var(--bg);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px; }
+.mono { font-family: Mono, ui-monospace, monospace; }
+#top { position: absolute; left: 32px; right: 32px; top: 22px; display: flex; justify-content: space-between; align-items: baseline; }
+#brand { font: 500 12px Mono; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+#brand b { color: var(--cyan); font-weight: 500; }
+#step { font: 500 12px Mono; color: var(--muted); letter-spacing: .08em; }
+#title { position: absolute; left: 32px; top: 46px; font: 700 28px/1.1 Inter; letter-spacing: -.01em; }
+#sub { position: absolute; left: 32px; top: 82px; font: 400 14px Inter; color: var(--muted); }
+#body { position: absolute; left: 32px; right: 32px; top: 116px; bottom: 44px; }
+#foot { position: absolute; left: 32px; right: 32px; bottom: 14px; display: flex; justify-content: space-between;
+  font: 400 11px Mono; color: var(--dim); }
+.panel { position: absolute; background: rgba(15,31,51,.92); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.ph { font: 600 12px Mono; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+.ph .n { color: var(--ink); font-size: 13px; }
+.chip { font: 600 11px Mono; padding: 3px 8px; border-radius: 4px; letter-spacing: .06em; white-space: nowrap; }
+.c-ok { background: rgba(79,220,138,.15); color: var(--green); }
+.c-no { background: rgba(255,100,100,.15); color: var(--red); }
+.c-am { background: rgba(245,179,66,.15); color: var(--amber); }
+.c-cy { background: rgba(63,208,224,.13); color: var(--cyan); }
+.c-dim { background: rgba(138,160,184,.12); color: var(--muted); }
+/* facts */
+.fact { display: flex; justify-content: space-between; gap: 16px; padding: 9px 16px; border-bottom: 1px solid var(--line); font: 500 14px Inter; }
+.fact .k { color: var(--muted); font-weight: 400; }
+.fact .v { text-align: right; }
+.fact .src { display: block; font: 400 11px Mono; color: var(--dim); margin-top: 2px; }
+/* rules */
+.rule { padding: 8px 16px; border-bottom: 1px solid var(--line); }
+.rule .id { font: 500 12px Mono; color: var(--ink); display: flex; justify-content: space-between; gap: 8px; }
+.rule .q { font: 400 12.5px/1.4 Inter; color: var(--muted); margin-top: 3px; }
+.rule .q mark { background: linear-gradient(90deg, rgba(63,208,224,.28) var(--hl,0%), transparent var(--hl,0%)); color: var(--ink); padding: 0 2px; border-radius: 2px; }
+.rule.ex .q mark { background: linear-gradient(90deg, rgba(138,160,184,.22) var(--hl,0%), transparent var(--hl,0%)); }
+.list { position: absolute; left: 0; right: 0; top: 41px; bottom: 0; overflow: hidden; }
+.list .inner { position: absolute; left: 0; right: 0; top: 0; }
+/* terminal */
+#term { font: 400 12px/1.55 Mono; padding: 10px 14px; position: absolute; left: 0; right: 0; top: 41px; bottom: 0; overflow: hidden; }
+#term .inner { position: absolute; left: 14px; right: 14px; bottom: 10px; }
+.ln { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+.ln.turn { color: var(--dim); }
+.ln.model { color: var(--dim); }
+.ln.call { color: var(--cyan); }
+.ln.ok { color: var(--muted); }
+.ln.err { color: var(--amber); }
+.ln.find { color: var(--ink); }
+.ln.ex { color: var(--muted); }
+.ln.sys { color: var(--ink); font-weight: 500; }
+.ln .g { color: var(--green); } .ln .a { color: var(--amber); } .ln .r { color: var(--red); } .ln .d { color: var(--dim); }
+.stat { display: flex; justify-content: space-between; padding: 9px 16px; border-bottom: 1px solid var(--line); font: 500 13px Inter; }
+.stat .k { color: var(--muted); font-weight: 400; } .stat .v { font-family: Mono; }
+/* findings */
+.fr { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.fr .pid { font: 600 13px Mono; }
+.fr .tg { font: 400 11px Mono; color: var(--dim); margin-left: 6px; }
+.fr .nums { grid-column: 1 / 3; font: 500 13px Mono; color: var(--ink); }
+.fr .nums .d { color: var(--dim); }
+.fr .q { grid-column: 1 / 3; font: 400 12px/1.4 Inter; color: var(--muted); }
+.fr .q::before { content: "“"; } .fr .q::after { content: "”"; }
+#verdict { position: absolute; display: flex; flex-direction: column; gap: 8px; }
+#verdict .big { font: 700 34px/1 Inter; letter-spacing: -.01em; }
+#verdict .why { font: 400 13px/1.45 Inter; color: var(--muted); }
+#verdict .why li { margin-left: 16px; }
+svg text { font-family: Mono, monospace; }
+#ctl { position: fixed; left: 0; right: 0; bottom: 0; height: 26px; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+  background: rgba(5,11,20,.85); font: 500 11px Mono; color: var(--muted); }
+#ctl input { flex: 1; accent-color: #3fd0e0; }
+#ctl button { background: none; border: 1px solid var(--line); color: var(--ink); font: 500 11px Mono; padding: 2px 8px; border-radius: 4px; cursor: pointer; }
+body.render #ctl { display: none; }
+.fade { transition: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="top"><div id="brand"><b>LotFit</b> · run viewer</div><div id="step" class="mono"></div></div>
+  <div id="title"></div>
+  <div id="sub"></div>
+  <div id="body"></div>
+  <div id="foot"><span id="footl"></span><span>Pre-feasibility only · not a permit decision</span></div>
+</div>
+<div id="ctl"><button id="pp">pause</button><input id="scrub" type="range" min="0" max="1000" value="0"><span id="tc">0.0 s</span></div>
+<script type="module" src="viewer.js"></script>
+</body>
+</html>
