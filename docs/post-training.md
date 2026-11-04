@@ -46,12 +46,14 @@ Cost: $0.00 training (promotion). Deployment: TBD GPU-hours, deleted after eval.
 | Plan applies F1 (10 plans) | 0.952 | n/a (no serverless endpoint) | training |
 | Plan placement-slice F1 | 1.000 | — | training |
 | Plan validity (exact partition) | 1.000 | — | training |
-| Decision accuracy (40 sampled) | TBD | — | training |
+| Decision accuracy (40 sampled) | 0.725 | — | training |
 
 How measured: `eval_plan.mts` sends each eval row to the model (temperature 0,
 reasoning effort low), extracts the plan JSON, and compares the applies set, the
 placement-constraint slice, and partition validity against the verified plan. Same rows,
-same scorer, both models.
+same scorer, both models. The 0.725 includes 2 rows where Fireworks stayed overloaded
+through retries (counted as misses) and 2 rows where the model returned JSON without a
+decision; without the overloads it is 29/38 = 0.763.
 
 ## What is not yet known
 
