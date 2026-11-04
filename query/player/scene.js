@@ -3,9 +3,12 @@
 // World mapping per `trace.frame.three`: `(X = x, Y = z, Z = -y)`, so a viewer in the street (`y < 0 => Z > 0`)
 // looking toward the rear (`y > 0 => Z < 0`) sees `x = 0` at the front-left corner, unmirrored (A6, A8).
 import * as THREE from "three";
+import { fmt, summaryCard } from "./summary.js";
 
 const W = 1280, H = 720;
-const TRACE_URL = document.body?.dataset?.trace || "../out/s1-trace.json";
+const pageParams = new URLSearchParams(location.search);
+const TRACE_URL =
+  pageParams.get("trace") || document.body?.dataset?.trace || "demo/eug-demo-24x24.trace.json";
 
 async function fetchJsonOptional(primaryUrl, fallbackUrl) {
   for (const url of [primaryUrl, fallbackUrl]) {
@@ -24,7 +27,7 @@ const trace = await fetchJsonOptional(TRACE_URL, "trace.json");
 if (!trace) {
   throw new Error(`Failed to load decision trace from ${TRACE_URL}`);
 }
-const rawTimeline = await fetchJsonOptional("../out/s1-timeline.json", null);
+const rawTimeline = await fetchJsonOptional(pageParams.get("timeline") || "timeline.json", null);
 
 // ---------- math & geometry helpers ----------
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -745,7 +748,7 @@ const hud = {
 const selectedOptVis = optionVisuals.find((o) => o.isSelected) || optionVisuals[optionVisuals.length - 1];
 const titleHeading = trace.project?.title
   ? trace.project.title.split(" — ")[0]
-  : `Lot ${lotBox.w} × ${lotBox.d} ${units} · ADU Feasibility`;
+  : `Lot ${fmt(lotBox.w)} × ${fmt(lotBox.d)} ${units} · ADU Feasibility`;
 const titleSub = trace.project?.purpose
   ? `${trace.project.purpose} · ${trace.project.jurisdiction || ""}`
   : `Schema ${trace.schema} · Frame ${trace.frame?.origin || "front-left"} (${frameThree.X}, ${frameThree.Y}, ${frameThree.Z})`;
@@ -773,11 +776,11 @@ function renderCardForBeat(b) {
     const structRows = existingStructures
       .map(
         (s) =>
-          `<div class="metric"><span>${s.id} (${s.kind})</span><b>${s.bbox.w} × ${s.bbox.d} ${units} (${s.areaSqft} sq ft)</b></div>`,
+          `<div class="metric"><span>${s.id} (${s.kind})</span><b>${fmt(s.bbox.w)} × ${fmt(s.bbox.d)} ${units} (${fmt(s.areaSqft)} sq ft)</b></div>`,
       )
       .join("");
     return `<div class="src"><span>Site geometry</span>${chip("ok", "LOT FRAME")}</div>
-      <div class="ttl">${lotBox.w} × ${lotBox.d} ${units} (${lotAreaSqft.toLocaleString()} sq ft)</div>
+      <div class="ttl">${fmt(lotBox.w)} × ${fmt(lotBox.d)} ${units} (${fmt(lotAreaSqft)} sq ft)</div>
       <div class="val">Origin: ${trace.frame?.origin || "front-left"} · Three: (${frameThree.X}, ${frameThree.Y}, ${frameThree.Z})</div>
       ${structRows}`;
   }
@@ -790,25 +793,25 @@ function renderCardForBeat(b) {
         const m0 = c.measures?.[0];
         const valTxt =
           m0 && m0.limit
-            ? `${m0.value} / ${m0.limit.value} ${m0.unit}`
+            ? `${fmt(m0.value)} / ${fmt(m0.limit.value)} ${m0.unit}`
             : c.value !== null && c.value !== undefined
-              ? `${c.value} ${c.unit || ""}`.trim()
+              ? `${fmt(c.value)} ${c.unit || ""}`.trim()
               : c.outcome || c.kind;
         return `<div class="metric"><span>${c.provision_id}</span><b>${valTxt}</b></div>`;
       })
       .join("");
     const badge = kind === "height" ? "HEIGHT" : "CONSTRAINTS";
     return `<div class="src"><span>Code provisions</span>${chip("rule", badge)}</div>
-      <div class="ttl">${kind === "height" ? `Max height ${maxAllowedHeightFt} ${units}` : "Active code rules"}</div>
+      <div class="ttl">${kind === "height" ? `Max height ${fmt(maxAllowedHeightFt)} ${units}` : "Active code rules"}</div>
       ${rows}`;
   }
 
   if (kind === "envelope") {
     return `<div class="src"><span>Derived from setbacks</span>${chip("ok", "ENVELOPE")}</div>
       <div class="ttl">Buildable rear envelope</div>
-      <div class="metric"><span>Ground area</span><b>${envAreaSqft.toLocaleString()} sq ft</b></div>
-      <div class="metric"><span>Max height</span><b>${maxAllowedHeightFt} ${units}</b></div>
-      <div class="metric"><span>Width × depth</span><b>${envBox.w} × ${envBox.d} ${units}</b></div>`;
+      <div class="metric"><span>Ground area</span><b>${fmt(envAreaSqft)} sq ft</b></div>
+      <div class="metric"><span>Max height</span><b>${fmt(maxAllowedHeightFt)} ${units}</b></div>
+      <div class="metric"><span>Width × depth</span><b>${fmt(envBox.w)} × ${fmt(envBox.d)} ${units}</b></div>`;
   }
 
   if (kind === "reject") {
@@ -821,8 +824,8 @@ function renderCardForBeat(b) {
       .slice(0, 4)
       .map((w) => `<div class="rsn">• ${w}</div>`)
       .join("");
-    return `<div class="src"><span>${opt.id} at (${opt.placement.x}, ${opt.placement.y})</span>${chip("no", "REJECTED")}</div>
-      <div class="ttl">${optVis.bbox.w} × ${optVis.bbox.d} ${units} (${optVis.areaSqft} sq ft)</div>
+    return `<div class="src"><span>${opt.id} at (${fmt(opt.placement.x)}, ${fmt(opt.placement.y)})</span>${chip("no", "REJECTED")}</div>
+      <div class="ttl">${fmt(optVis.bbox.w)} × ${fmt(optVis.bbox.d)} ${units} (${fmt(optVis.areaSqft)} sq ft)</div>
       ${whyHtml}`;
   }
 
@@ -835,37 +838,17 @@ function renderCardForBeat(b) {
       .slice(0, 5)
       .map((m) => {
         const label = m.limit?.param || m.limit?.provision_id || m.unit;
-        const sign = m.margin >= 0 ? `+${m.margin}` : `${m.margin}`;
-        return `<div class="metric"><span>${label}</span><b>${m.value} ${m.unit} (${sign} ${m.unit})</b></div>`;
+        const sign = m.margin >= 0 ? `+${fmt(m.margin)}` : `${fmt(m.margin)}`;
+        return `<div class="metric"><span>${label}</span><b>${fmt(m.value)} ${m.unit} (${sign} ${m.unit})</b></div>`;
       })
       .join("");
-    return `<div class="src"><span>${opt.id} at (${opt.placement.x}, ${opt.placement.y})</span>${chip("ok", opt.status.toUpperCase())}</div>
-      <div class="ttl">${optVis.bbox.w} × ${optVis.bbox.d} ${units} · ${optVis.areaSqft} sq ft</div>
+    return `<div class="src"><span>${opt.id} at (${fmt(opt.placement.x)}, ${fmt(opt.placement.y)})</span>${chip("ok", opt.status.toUpperCase())}</div>
+      <div class="ttl">${fmt(optVis.bbox.w)} × ${fmt(optVis.bbox.d)} ${units} · ${fmt(optVis.areaSqft)} sq ft</div>
       ${marginRows}`;
   }
 
   if (kind === "summary" || kind === "caveats") {
-    const uniqueProvisions = [];
-    const seen = new Set();
-    for (const c of constraintList) {
-      if (c.provision_id && !seen.has(c.provision_id)) {
-        seen.add(c.provision_id);
-        uniqueProvisions.push(c);
-      }
-    }
-    const checksHtml = uniqueProvisions
-      .slice(0, 7)
-      .map(
-        (c) =>
-          `<div class="chk"><i>${c.outcome === "fail" ? "×" : "✓"}</i>${c.provision_id}<span class="s">${c.outcome || c.kind}</span></div>`,
-      )
-      .join("");
-    const selLabel = selectedOptVis
-      ? `${selectedOptVis.id} at (${selectedOptVis.option.placement.x}, ${selectedOptVis.option.placement.y}) · ${selectedOptVis.areaSqft} sq ft`
-      : "Evaluation complete";
-    return `<div class="src"><span>All findings & margins verified</span>${chip("ok", "COMPLETE")}</div>
-      <div class="ttl">${selLabel}</div>
-      ${checksHtml}`;
+    return summaryCard(selectedOptVis?.option ?? null, selectedOptVis?.areaSqft ?? 0, constraintList);
   }
 
   return "";
@@ -909,7 +892,7 @@ function seek(t) {
   hemi.intensity = lerp(1.15, 0.65, shadowMix);
   hud.sun.style.opacity = String(hasSolar ? shadowMix : 0);
   if (hasSolar && hud.sunTxt) {
-    hud.sunTxt.textContent = `SOLAR · ${solarConstraint.sun.altitude_deg ?? 22.5}°`;
+    hud.sunTxt.textContent = `SOLAR · ${fmt(solarConstraint.sun.altitude_deg ?? 22.5)}°`;
   }
 
   // Title overlay fades out after intro
@@ -924,7 +907,7 @@ function seek(t) {
   placeLabel(
     "lot",
     toWorld(lotBox.cx, lotBox.y0 - 6, 1.2),
-    `<span class="k">LOT</span>${lotBox.w} × ${lotBox.d} ${units} · ${lotAreaSqft.toLocaleString()} sq ft`,
+    `<span class="k">LOT</span>${fmt(lotBox.w)} × ${fmt(lotBox.d)} ${units} · ${fmt(lotAreaSqft)} sq ft`,
     siteLabelOp,
   );
 
@@ -932,7 +915,7 @@ function seek(t) {
     placeLabel(
       st.labelId,
       toWorld(st.bbox.cx, st.bbox.cy, st.totalH + 3.5),
-      `<span class="k">${st.kind.toUpperCase()}</span>${st.id} (${st.bbox.w} × ${st.bbox.d} ${units})`,
+      `<span class="k">${st.kind.toUpperCase()}</span>${st.id} (${fmt(st.bbox.w)} × ${fmt(st.bbox.d)} ${units})`,
       siteLabelOp,
     );
   }
@@ -962,7 +945,7 @@ function seek(t) {
       placeLabel(
         zv.labelId,
         zv.labelAnchor,
-        `<span class="k">${zv.constraint.provision_id}</span>${cVal} ${cUnit} ${sideKindTag}`,
+        `<span class="k">${zv.constraint.provision_id}</span>${fmt(cVal)} ${cUnit} ${sideKindTag}`,
         constrainLblOp,
         "#ff9e9e",
       );
@@ -976,7 +959,7 @@ function seek(t) {
     placeLabel(
       lv.labelId,
       toWorld(lotBox.x0 + lotBox.w * 0.22, lv.lineY, 2.2),
-      `<span class="k">${lv.constraint.provision_id}</span>${cVal} ${cUnit} front line / rear wall`,
+      `<span class="k">${lv.constraint.provision_id}</span>${fmt(cVal)} ${cUnit} front line / rear wall`,
       constrainLblOp,
       "#f5c66b",
     );
@@ -998,7 +981,7 @@ function seek(t) {
   placeLabel(
     "height_limit",
     toWorld(envBox.x1 + 2, envBox.y1, maxAllowedHeightFt + 2.5),
-    `<span class="k">${heightConstraint?.provision_id || "MAX HEIGHT"}</span>${maxAllowedHeightFt} ${units}`,
+    `<span class="k">${heightConstraint?.provision_id || "MAX HEIGHT"}</span>${fmt(maxAllowedHeightFt)} ${units}`,
     hOp,
     "#9fe2ff",
   );
@@ -1019,7 +1002,7 @@ function seek(t) {
   placeLabel(
     "envelope",
     toWorld(envBox.cx, envBox.cy, eh + 3),
-    `<span class="k">ENVELOPE</span>${envBox.w} × ${envBox.d} ${units} · ${envAreaSqft.toLocaleString()} sq ft`,
+    `<span class="k">ENVELOPE</span>${fmt(envBox.w)} × ${fmt(envBox.d)} ${units} · ${fmt(envAreaSqft)} sq ft`,
     envLblOp,
     "#7ee8de",
   );
@@ -1047,8 +1030,8 @@ function seek(t) {
 
       const failMargin = ov.option.margins?.find((m) => m.pass === false) || ov.option.margins?.[0];
       const failText = failMargin
-        ? `${ov.id} (${ov.option.placement.x}, ${ov.option.placement.y}) · margin ${failMargin.margin} ${failMargin.unit}`
-        : `${ov.id} (${ov.option.placement.x}, ${ov.option.placement.y}) · rejected`;
+        ? `${ov.id} (${fmt(ov.option.placement.x)}, ${fmt(ov.option.placement.y)}) · margin ${fmt(failMargin.margin)} ${failMargin.unit}`
+        : `${ov.id} (${fmt(ov.option.placement.x)}, ${fmt(ov.option.placement.y)}) · rejected`;
       placeLabel(
         ov.labelId,
         toWorld(ov.bbox.cx, ov.bbox.cy, ov.heightFt + 3.2),
@@ -1070,7 +1053,7 @@ function seek(t) {
       placeLabel(
         ov.labelId,
         toWorld(ov.bbox.cx, ov.bbox.cy, ov.heightFt + 3.8),
-        `<span class="k">${ov.option.status.toUpperCase()}</span>${ov.id} (${ov.option.placement.x}, ${ov.option.placement.y}) · ${ov.areaSqft} sq ft · ${ov.heightFt} ${units}`,
+        `<span class="k">${ov.option.status.toUpperCase()}</span>${ov.id} (${fmt(ov.option.placement.x)}, ${fmt(ov.option.placement.y)}) · ${fmt(ov.areaSqft)} sq ft · ${fmt(ov.heightFt)} ${units}`,
         kIn,
         "#7ee8de",
       );
@@ -1097,21 +1080,21 @@ function seek(t) {
       placeLabel(
         "margin_west",
         toWorld((lotBox.x0 + ov.bbox.x0) / 2, ov.bbox.cy, 2.0),
-        `${westDist} ${units}`,
+        `${fmt(westDist)} ${units}`,
         kIn * 0.9,
         "#8ff0b0",
       );
       placeLabel(
         "margin_east",
         toWorld((ov.bbox.x1 + lotBox.x1) / 2, ov.bbox.cy, 2.0),
-        `${eastDist} ${units}`,
+        `${fmt(eastDist)} ${units}`,
         kIn * 0.9,
         "#8ff0b0",
       );
       placeLabel(
         "margin_rear",
         toWorld(ov.bbox.cx, (ov.bbox.y1 + lotBox.y1) / 2, 2.0),
-        `${rearDist} ${units} rear`,
+        `${fmt(rearDist)} ${units} rear`,
         kIn * 0.9,
         "#8ff0b0",
       );

@@ -102,6 +102,16 @@ Live run: `node src/run-live.mts <case>` from `query/`, with a case from `query/
 or the repo-root `.env.local`. Aura credentials go in the repo-root `.env.aura`. Both
 files are gitignored and never printed.
 
+## Walkthrough player
+
+`query/player/` plays a decision trace as a 3D walkthrough: the lot and house, the
+setback zones, the buildable envelope, the placements tried, and a summary card with the
+outcome of each rule. Open it by serving that folder over HTTP, for example
+`python3 -m http.server` inside it, then opening `index.html`; `?trace=<url>` plays a
+different trace, and the default is `demo/eug-demo-24x24.trace.json`. Stills and video
+render with `python3 render.py stills <t…>` and `python3 render.py video <name>`
+(playwright, Chromium, and ffmpeg).
+
 ## Repository layout
 
 ```
@@ -120,4 +130,5 @@ query/
   ontology/     the graph ontology and its schema
   contracts/    contract fixtures
   py/           the Python case validator
+  player/       3D walkthrough of a decision trace
 ```
