@@ -4,11 +4,11 @@ regular expression or arithmetic over the verbatim text, so ingest and build alw
 import datetime, hashlib, json, os, re, unicodedata
 
 SCHEMA = "lotfit.codegraph/v6"
-DEFAULT_TEXTS = os.environ.get("LOTFIT_CODE_TEXT", os.path.expanduser("~/Workspace/scrap/code-text-cc"))
+DEFAULT_TEXTS = os.environ.get("LOTFIT_CODE_TEXT", "")
 UNITS = {None, "ft", "in", "sqft", "%", "count", "stories", "days", "years", "hours", "degrees", "ratio"}
 
 
-# ---------- normalisation: identical to ~/Workspace/scrap/code-text/check_extraction.py ----------
+# ---------- normalisation ----------
 def norm(s):
     """Unicode NFKC, typographic quotes and dashes to ASCII, no soft hyphens or non-breaking spaces, every run of
     whitespace to one space."""
