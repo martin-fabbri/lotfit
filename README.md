@@ -1,4 +1,4 @@
-<h2 align="center">🏆 Our entry to the Meta Global AI Developer Hackathon</h2>
+<h2 align="center">Our entry to the Meta Global AI Developer Hackathon</h2>
 <p align="center"><b>Hosted by Meta · run by Cerebral Valley · inference partners Fireworks, Baseten and Modal</b><br>
 Indie Developer track · build period October 27 – November 4, 2026</p>
 
