@@ -23,7 +23,7 @@ Indie Developer track · build period October 27 – November 4, 2026</p>
 > hosted by **Meta** and run by **Cerebral Valley**, with inference partners **Fireworks**, **Baseten** and
 > **Modal**. Indie Developer track · build period October 27 – November 4, 2026.
 >
-> Everything in this repository was built during the hackathon. Yardstick, our open-source capture tool, was also
+> Everything in this repository was built during the hackathon. [Yardstick](https://github.com/martin-fabbri/yardstick), our open-source capture tool, was also
 > built this week, as a separate repo.
 
 ## The problem
@@ -81,6 +81,7 @@ sets the origin and closes the loop; close sightings check scale against the pri
 fence agreeing within **3 mm** across walks. Every capture carries its own **95 % error** (0.42 m at 10 m), and every
 site fact carries its tolerance into the case. That is what lets LotFit say *too close to call*. The scan is read
 against the county record: here it found the rear line **6.26 ft deeper** than the record says.
+Captured with [Yardstick](https://github.com/martin-fabbri/yardstick), our open-source capture tool (separate repo, not part of this entry).
 → [capture.md](docs/capture.md)
 
 ## The Rulebook: code as data
@@ -216,7 +217,7 @@ docs/             the deep dives
 | Meta models used | Muse Spark Open (planner, narration) · Muse Spark 1.3 (reviewer) · Muse Code (every line of code here) |
 | Meta open weights | Muse Glimmer 30B, LoRA-trained on Fireworks serverless for the planner step ([doc](docs/post-training.md)) |
 | Inference partner used | Fireworks (Muse Spark Open, Glimmer training); Baseten supported with `--baseten` |
-| Built this week | everything in this repository; Yardstick (capture) as a separate repo |
+| Built this week | everything in this repository; [Yardstick](https://github.com/martin-fabbri/yardstick) (capture) as a separate repo |
 
 ## Team
 
